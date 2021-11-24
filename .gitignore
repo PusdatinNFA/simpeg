@@ -1,0 +1,8 @@
+.DS_Store
+.env
+index.php
+assets/*
+themes/*
+bonfire/*
+application/config/*
+applicatin/third_party/*
