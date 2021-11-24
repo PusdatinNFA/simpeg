@@ -336,7 +336,7 @@ class Bkn extends Admin_Controller
 		$data_utama_pegawai = $this->cache->get('data_utama_'.$nip_baru);
         if($data_utama_pegawai==null){
         	// get data utama
-	        $jsonsatkers   = $api_bkn->data_utama($nip_baru);
+	        $jsonsatkers   = $api_bkn->getData("data-utama",$nip_baru);
 	        $decodejson    = json_decode($jsonsatkers);
 	        $decodejson    = json_decode($decodejson);
 	        $data_utama_pegawai 	= json_decode($decodejson->data);
@@ -350,7 +350,8 @@ class Bkn extends Admin_Controller
 		$data_golongan = $this->cache->get('golongan_'.$nip_baru);
         if($data_golongan==null){
         	// data riwayat golongan
-			$jsonrwt_golongan = $api_bkn->data_rwt_golongan_bkn($nip_baru);
+            $jsonrwt_golongan   = $api_bkn->getData("rw-golongan",$nip_baru);
+			// $jsonrwt_golongan = $api_bkn->data_rwt_golongan_bkn($nip_baru);
 	        $jsonrwt_golongan = json_decode($jsonrwt_golongan);
 	        $jsonrwt_golongan = json_decode($jsonrwt_golongan);
 	        $data_golongan = $jsonrwt_golongan->data;
