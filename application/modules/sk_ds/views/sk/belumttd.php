@@ -76,12 +76,11 @@
                 
 				<tr>
 					<td colspan=4>
-						<a class="btn btn-social btn-google pull-right" id="btn_sign">
+						<a class="btn btn-social btn-google pull-left" id="btn_sign">
 			                <i class="fa fa-edit"></i> <span id="texttandatangan">Tanda Tangan SK</span>
 			            </a>
 			            &nbsp; &nbsp;
 			            <button type="submit" class="btn btn-success pull-right "><i class="fa fa-search"></i> Cari</button>
-						
 					</td>
 				</tr>
 			</table>

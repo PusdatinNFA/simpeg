@@ -447,7 +447,7 @@ class Tte extends Admin_Controller
         }else{
             // jika masukan ke tabel DS dari pdf draft
             if($status_ds == 1){
-                $file_pdf_draft = trim($this->settings_lib->item('site.pathsk'))."template/".$id_file.".pdf";
+                $file_pdf_draft = trim($this->settings_lib->item('site.pathsk'))."draft/".$id_file.".pdf";
                 if(file_exists($file_pdf_draft)){
                     $content_file = file_get_contents($file_pdf_draft);
                     $base64data = base64_encode($content_file);
@@ -640,7 +640,6 @@ class Tte extends Admin_Controller
         if (file_exists($direktori.$file_name)) {
            unlink($direktori.$file_name);
         }
-        
         $bin = base64_decode($b64, true);
         file_put_contents($direktori.$file_name, $bin);
     }
@@ -727,9 +726,6 @@ class Tte extends Admin_Controller
         if (isset($aisi_variable) && is_array($aisi_variable) && count($aisi_variable)):
             foreach($aisi_variable as $isi_variable):
                 $isivar[$isi_variable->nama_variable] = $isi_variable->isi;
-
-                //array_push($isivar, [$isi_variable->id_variable => $isi_variable->isi]);
-
             endforeach;
         endif;
         $this->load->library('LibOpenTbs');
@@ -760,35 +756,19 @@ class Tte extends Admin_Controller
         $TBS->MergeField('p',$array_variable);
 
         $output_file_name = $id_file.'.docx';
-        $direktori = trim($this->settings_lib->item('site.pathsk'))."template/";
+        $direktori = trim($this->settings_lib->item('site.pathsk'))."draft/";
         $docx_location = $direktori.$output_file_name;
         
         //$TBS->Show(OPENTBS_FILE, $docx_location); // Also merges all [onshow] automatic fields.
         $TBS->Show(OPENTBS_DOWNLOAD, $output_file_name); // Also merges all [onshow] automatic fields. dan download file
         
-        /*
-        try {
-            $unoconv = Unoconv\Unoconv::create([
-                 'unoconv.binaries' => '/usr/bin/unoconv',
-                ] 
-            );
-            $unoconv->transcode($docx_location, 'pdf', "temps/".$output_file_name.'.pdf');
-            header("Content-type: application/pdf");
-            header("Content-Disposition: inline; filename=filename.pdf");
-            @readfile("temps/".$output_file_name.'.pdf');
-            
-        }catch(Exception $e){
-            die($e." ada error");
-            echo $e->getMessage();
-        }   
-        */
     }
     private function generate_pdf_from_word($file_word = ""){
-        $command = "";
+        $output = shell_exec('unoconv -f pdf '.$file_word.' 2>&1');
         // linux
         // $return = shell_exec('export HOME=/tmp && /usr/bin/soffice --convert-to pdf --outdir /var/www/brin-simpeg/assets/surat/template/ '.$file_word);
         // on mac
-        $return = exec('soffice --headless --convert-to pdf 1e94e44b1932fa033d43f442df87e223.docx /Applications/XAMPP/htdocs/brin-simpeg/assets/sk/template/test.pdf >& /dev/null');
+        // $return = exec('soffice --headless --convert-to pdf 1e94e44b1932fa033d43f442df87e223.docx /Applications/XAMPP/htdocs/brin-simpeg/assets/sk/template/test.pdf >& /dev/null');
         // var_dump(exec('whoami'));
         //$return = shell_exec('export HOME=/tmp && lowriter --convert-to pdf --outdir /var/www/html/templatesurat/assets/uploaded/template/result /var/www/html/templatesurat/assets/uploaded/template/Surat$
         // if ($return) {
@@ -850,7 +830,7 @@ class Tte extends Admin_Controller
             $TBS->MergeField('p',$array_variable);
 
             $output_file_name = $id_file.'.docx';
-            $direktori = trim($this->settings_lib->item('site.pathsk'))."template/";
+            $direktori = trim($this->settings_lib->item('site.pathsk'))."draft/";
             $docx_location = $direktori.$output_file_name;
             
             $TBS->Show(OPENTBS_FILE, $docx_location); // Also merges all [onshow] automatic fields.
@@ -919,10 +899,10 @@ class Tte extends Admin_Controller
     }
     public function viewdoc($file = "")
     {
-        if (empty($id)) {
+        if (empty($file)) {
             Template::set_message("file tidak ditemukan", 'error');
         }
-        $direktori = trim($this->settings_lib->item('site.pathsk'))."template/";
+        $direktori = trim($this->settings_lib->item('site.pathsk'))."draft/";
         $file_name = $file.".pdf";
         $base64signed = "";
         

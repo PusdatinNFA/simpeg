@@ -894,27 +894,11 @@ echo $file;
                 $row []  = $record->nomor_sk."<br>".$record->tgl_sk;
                 $row []  = $record->NAMA_UNOR_FULL != "" ? $record->NAMA_UNOR_FULL : $record->unit_kerja_pemilik_sk;
                 //$row []  = $record->KATEGORI_JABATAN;
-                
                 $btn_actions = array();
+                $btn_actions  [] = "<a href='".base_url()."admin/sk/sk_ds/readsk/".$record->id_file."' url='".base_url()."admin/sk/sk_ds/readsk/".$record->id_file."' data-toggle='tooltip' title='Tanda Tangan SK' class='btn btn-sm btn-success'><i class='glyphicon glyphicon-edit'></i> </a>";
                 
-                $btn_actions  [] = "
-                    <a class='show-modal-custom' href='".base_url()."admin/sk/sk_ds/readsk/".$record->id_file."'  data-toggle='tooltip' title='Tanda Tangan SK'><span class='fa-stack'>
-                       <i class='fa fa-square fa-stack-2x'></i>
-                        <i class='fa fa-book fa-stack-1x fa-inverse'></i>
-                        </span>
-                        </a>
-                ";
-                /*end*/
-                $btn_actions  [] = "
-                    <a class='show-modal-custom' href='".base_url()."admin/sk/sk_ds/downloadsk/".$record->id_file."'  data-toggle='tooltip' title='Download draft SK'><span class='fa-stack'>
-                       <i class='fa fa-square fa-stack-2x'></i>
-                        <i class='fa fa-download fa-stack-1x fa-inverse'></i>
-                        </span>
-                        </a>
-                ";
-                
-                $row[] = implode(" ",$btn_actions);
-                
+                $btn_actions  [] = "<a href='".base_url()."admin/sk/sk_ds/downloadsk/".$record->id_file."' data-toggle='tooltip' title='Download SK' class='btn btn-sm btn-warning'><i class='glyphicon glyphicon-download'></i> </a>";
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";                
 
                 $output['data'][] = $row;
                 $nomor_urut++;
@@ -1614,9 +1598,9 @@ echo $file;
             if($filters['kategori_jb']){
                 $this->sk_ds_model->where('"KATEGORI_JABATAN"',$filters['kategori_jabatan']); 
             }
-            if($filters['chkqr']){
-                $this->sk_ds_model->where('tbl_file_ds.lokasi_file',$filters['textqrcode']); 
-            }
+            // if($filters['chkqr']){
+            //     $this->sk_ds_model->where('tbl_file_ds.lokasi_file',$filters['textqrcode']); 
+            // }
             if($filters['kategori_cb']){
                 $this->sk_ds_model->where('tbl_file_ds.kategori',$filters['kategori_sk']); 
             }
@@ -1664,28 +1648,11 @@ echo $file;
                 //$row []  = $record->NAMA_UNOR_FULL;
                 $row []  = $record->NAMA_UNOR_FULL != "" ? $record->NAMA_UNOR_FULL : $record->unit_kerja_pemilik_sk;
                 //$row []  = $record->KATEGORI_JABATAN;
-                
                 $btn_actions = array();
-                 
-                $btn_actions  [] = "
-                    <a class='show-modal-custom' href='".base_url()."admin/sk/sk_ds/validasisk/".$record->id_file."'  data-toggle='tooltip' title='Koreksi draf SK'><span class='fa-stack'>
-                       <i class='fa fa-square fa-stack-2x'></i>
-                        <i class='fa fa-book fa-stack-1x fa-inverse'></i>
-                        </span>
-                        </a>
-                ";
-                /*end*/
-                $btn_actions  [] = "
-                    <a class='show-modal-custom' href='".base_url()."admin/sk/sk_ds/downloadsk/".$record->id_file."'  data-toggle='tooltip' title='Download SK'><span class='fa-stack'>
-                       <i class='fa fa-square fa-stack-2x'></i>
-                        <i class='fa fa-download fa-stack-1x fa-inverse'></i>
-                        </span>
-                        </a>
-                ";
+                $btn_actions  [] = "<a href='".base_url()."admin/sk/sk_ds/validasisk/".$record->id_file."' data-toggle='tooltip' title='Validasi SK' class='btn btn-sm btn-success'><i class='glyphicon glyphicon-edit'></i> </a>";
                 
-                $row[] = implode(" ",$btn_actions);
-                
-
+                $btn_actions  [] = "<a href='".base_url()."admin/sk/sk_ds/downloadsk/".$record->id_file."' data-toggle='tooltip' title='Download SK' class='btn btn-sm btn-warning'><i class='glyphicon glyphicon-download'></i> </a>";
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";   
                 $output['data'][] = $row;
                 $nomor_urut++;
             }
@@ -1810,29 +1777,11 @@ echo $file;
                 $row []  = $record->nomor_sk."<br>".$record->tgl_sk;
                 //$row []  = $record->NAMA_UNOR_FULL;
                 $row []  = $record->NAMA_UNOR_FULL != "" ? $record->NAMA_UNOR_FULL : $record->unit_kerja_pemilik_sk;
-                //$row []  = $record->KATEGORI_JABATAN;
-                
                 $btn_actions = array();
-                 
-                $btn_actions  [] = "
-                    <a class='show-modal-custom' href='".base_url()."admin/sk/sk_ds/validasisk/".$record->id_file."'  data-toggle='tooltip' title='Lihat SK'><span class='fa-stack'>
-                       <i class='fa fa-square fa-stack-2x'></i>
-                        <i class='fa fa-book fa-stack-1x fa-inverse'></i>
-                        </span>
-                        </a>
-                ";
-                /*end*/
-                $btn_actions  [] = "
-                    <a class='show-modal-custom' href='".base_url()."admin/sk/sk_ds/downloadsk/".$record->id_file."'  data-toggle='tooltip' title='Download SK'><span class='fa-stack'>
-                       <i class='fa fa-square fa-stack-2x'></i>
-                        <i class='fa fa-download fa-stack-1x fa-inverse'></i>
-                        </span>
-                        </a>
-                ";
+                $btn_actions  [] = "<a href='".base_url()."admin/sk/sk_ds/validasisk/".$record->id_file."' data-toggle='tooltip' title='Lihat SK' class='btn btn-sm btn-success'><i class='glyphicon glyphicon-edit'></i> </a>";
                 
-                $row[] = implode(" ",$btn_actions);
-                
-
+                $btn_actions  [] = "<a href='".base_url()."admin/sk/sk_ds/downloadsk/".$record->id_file."' data-toggle='tooltip' title='Download SK' class='btn btn-sm btn-warning'><i class='glyphicon glyphicon-download'></i> </a>";
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";   
                 $output['data'][] = $row;
                 $nomor_urut++;
             }

@@ -2,7 +2,7 @@
 <?php
 $checkSegment = $this->uri->segment(4);
 ?>
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
 	
 	<div class="box-body">
 		<table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-hover table-antriankoreksi">
@@ -34,14 +34,9 @@ $tableantriankoreksi = $(".table-antriankoreksi").DataTable({
 	  url: "<?php echo base_url() ?>admin/sk/sk_ds/getdata_antrian_validasi",
 	  type:'POST',
 	  "data": function ( d ) {
-			d.search['advanced_search_filters']=  $("#form_search_pegawai_sudah").serializeArray();
+			// d.search['advanced_search_filters']=  $("#form_search_pegawai_sudah").serializeArray();
 		}
 	}
 });
-$("#form_search_pegawai_sudah").submit(function(){
-	$tableantriankoreksi.ajax.reload(null,true);
-	return false;
-});
- 
 </script>
 </div>

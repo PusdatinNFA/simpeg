@@ -1,9 +1,7 @@
 <div class="tab-pane" id="<?php echo $TAB_ID;?>">
 <?php
 $checkSegment = $this->uri->segment(4);
-?>
-<div class="admin-box box box-warning">
-	
+?>	
 	<div class="box-body">
 		<table class="table table-bordered table-striped table-responsive dt-responsive table-hover table-antriankoreksi">
 			<thead>
@@ -38,7 +36,4 @@ $tableantriankoreksi = $(".table-antriankoreksi").DataTable({
 		}
 	}
 });
- 
- 
 </script>
-</div>

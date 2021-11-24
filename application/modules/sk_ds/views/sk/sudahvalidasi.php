@@ -13,7 +13,7 @@ if ($can_delete) {
 ?>
 
 
-<div class="admin-box box box-primary expanded-box">
+<div class="admin-box box box-danger expanded-box">
 	<div class="box-header">
               <h3 class="box-title">Pencarian Lanjut</h3>
 			   <div class="box-tools pull-right">
@@ -99,7 +99,7 @@ if ($can_delete) {
                             </select>
                         </td>
                     </tr>
-				<tr>
+				<!-- <tr>
                         <td width="20px"><input type="checkbox" class="chkqr" name="chkqr"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">Qr</label></td>
                         <td colspan=2>
@@ -108,7 +108,7 @@ if ($can_delete) {
                             
                         </select>
                         </td>
-                    </tr>
+                    </tr> -->
 				<tr>
 					<td colspan=4>
 						<button type="submit" class="btn btn-success pull-right "><i class="fa fa-search"></i> Cari</button>
@@ -120,7 +120,7 @@ if ($can_delete) {
 		?>
 	</div>
 </div>
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
 	
 	<div class="box-body">
 		<table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-hover table-datasudah">
@@ -130,8 +130,8 @@ if ($can_delete) {
 				<th>Pemilik SK</th>
 				<th>Kategori SK</th>
 				<th>No SK / Tgl SK</th>
-				<th>Unit Kerja</th>
-				<th width="70px" align="center">#</th></tr>
+				<th width="50%">Unit Kerja</th>
+				<th width="10%" align="center">#</th></tr>
 			</thead>
 		</table>
 	</div>

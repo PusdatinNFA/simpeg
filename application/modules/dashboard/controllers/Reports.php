@@ -161,7 +161,7 @@ class reports extends Admin_Controller
 				$o = json_decode(Template::get('data_jumlah_pegawai_per_golongan'));
 				$this->load->library('Excel');
 				$objPHPExcel = new PHPExcel();
-				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/templates/template_data_dashboard_golongan.xlsx');
+				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/assets/templates/template_data_dashboard_golongan.xlsx');
 
 				$objPHPExcel->setActiveSheetIndex(0);
 				$start_row = 5;
@@ -170,7 +170,7 @@ class reports extends Admin_Controller
 					$objPHPExcel->getActiveSheet()->setCellValue('C'.$start_row, $row->total);
 					$start_row++;			
 				}
-				$filename = 'DASHBOARD_GOLONGAN.xls';
+				$filename = 'dashboard_golongan.xls';
 				header('Content-Type: application/vnd.ms-excel');
 				header('Content-Disposition: attachment;filename="'.$filename.'"');
 				header('Cache-Control: max-age=0');
@@ -185,7 +185,7 @@ class reports extends Admin_Controller
 				$o = json_decode(Template::get('jsonpensiuntahun'));
 				$this->load->library('Excel');
 				$objPHPExcel = new PHPExcel();
-				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/templates/template_data_dashboard_proyeksi_pensiun.xlsx');
+				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/assets/templates/template_data_dashboard_proyeksi_pensiun.xlsx');
 
 				$objPHPExcel->setActiveSheetIndex(0);
 				$start_row = 5;
@@ -208,7 +208,7 @@ class reports extends Admin_Controller
 				$o = json_decode(Template::get('jsonpendidikan'));
 				$this->load->library('Excel');
 				$objPHPExcel = new PHPExcel();
-				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/templates/template_data_dashboard_pendidikan.xlsx');
+				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/assets/templates/template_data_dashboard_pendidikan.xlsx');
 
 				$objPHPExcel->setActiveSheetIndex(0);
 				$start_row = 5;
@@ -231,7 +231,7 @@ class reports extends Admin_Controller
 				$o = Template::get('agamas');
 				$this->load->library('Excel');
 				$objPHPExcel = new PHPExcel();
-				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/templates/template_data_dashboard_agama.xlsx');
+				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/assets/templates/template_data_dashboard_agama.xlsx');
 
 				$objPHPExcel->setActiveSheetIndex(0);
 				$start_row = 5;
@@ -255,7 +255,7 @@ class reports extends Admin_Controller
 				$o = json_decode(Template::get('jsonumur'));
 				$this->load->library('Excel');
 				$objPHPExcel = new PHPExcel();
-				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/templates/template_data_dashboard_umur.xlsx');
+				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/assets/templates/template_data_dashboard_umur.xlsx');
 
 				$objPHPExcel->setActiveSheetIndex(0);
 				$start_row = 5;
@@ -278,7 +278,7 @@ class reports extends Admin_Controller
 				$o = json_decode(Template::get('jsonjk'));
 				$this->load->library('Excel');
 				$objPHPExcel = new PHPExcel();
-				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/templates/template_data_dashboard_jenis_kelamin.xlsx');
+				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/assets/templates/template_data_dashboard_jenis_kelamin.xlsx');
 
 				$objPHPExcel->setActiveSheetIndex(0);
 				$start_row = 5;
@@ -293,7 +293,6 @@ class reports extends Admin_Controller
 				header('Cache-Control: max-age=0');
 
 				$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  //downloadable file is in Excel 2003 format (.xls)
-				//$objWriter = PHPExcel_IOFactory::createWriter($objTpl, 'Excel2007'); 
 				$objWriter->save('php://output');  //send it to user, of course you can save it to disk also!
 				exit; //done.. exiting!
 			}
@@ -301,7 +300,7 @@ class reports extends Admin_Controller
 				$o = json_decode(Template::get('json_generasi'));
 				$this->load->library('Excel');
 				$objPHPExcel = new PHPExcel();
-				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/templates/template_data_dashboard_jenis_kelamin.xlsx');
+				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/assets/templates/template_data_dashboard_jenis_kelamin.xlsx');
 
 				$objPHPExcel->getActiveSheet()->setCellValue('B2', "Matriks Generasi dan Jumlah Pegawai");
 				$objPHPExcel->getActiveSheet()->setCellValue('B4', "Generasi");
@@ -326,7 +325,7 @@ class reports extends Admin_Controller
 				$o = json_decode(Template::get('json_kategori_jabatan'));
 				$this->load->library('Excel');
 				$objPHPExcel = new PHPExcel();
-				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/templates/template_data_dashboard_jenis_kelamin.xlsx');
+				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/assets/templates/template_data_dashboard_jenis_kelamin.xlsx');
 
 				$objPHPExcel->setActiveSheetIndex(0);
 				$objPHPExcel->getActiveSheet()->setCellValue('B2', "Rekap Berdasarkan Kategori Jabatan");
@@ -350,7 +349,7 @@ class reports extends Admin_Controller
 				$o = json_decode(Template::get('json_kategori_jabatan'));
 				$this->load->library('Excel');
 				$objPHPExcel = new PHPExcel();
-				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/templates/template_ketegori_jabatan_eselon1.xlsx');
+				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/assets/templates/template_ketegori_jabatan_eselon1.xlsx');
 				$unitkerja = ROOT_UNOR_ID;
 				$datadetil = $this->unitkerja_model->find_view_unit_list($unitkerja);
 				$aunors = Modules::run('pegawai/manage_unitkerja/getcache_unor',$unitkerja);
