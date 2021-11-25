@@ -63,4 +63,18 @@ class Golongan_model extends BF_Model
 	public function find_first_row(){
 		return $this->db->get($this->db->schema.".".$this->table_name)->first_row();
 	}
+	public function getGolongan($id="")
+	{
+		$data = $this->cache->get('golongan');
+		$adata = array();
+		if ($data == null) {
+			$rows =  $this->db->query('select * from golongan')->result();
+			foreach ($rows as $row) {
+				$adata[$row->ID] = $row;
+			}
+			$data = $adata;
+			$this->cache->write($data, 'golongan');
+		}
+		return isset($data[$id]) ? $data[$id] : null;
+	}
 }

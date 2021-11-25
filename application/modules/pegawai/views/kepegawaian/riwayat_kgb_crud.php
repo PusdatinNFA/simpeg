@@ -140,9 +140,9 @@
                     </div>
                 </div>
             <div class="control-group<?php echo form_error('unit_kerja_induk_id') ? ' error' : ''; ?> col-sm-12">
-                <?php echo form_label("Unit Kerja Induk", 'Unit Kerja Induk', array('class' => 'control-label')); ?>
+                <?php echo form_label("Unit Kerja", 'Unit Kerja Induk', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                    <select name="unit_kerja_induk_id" class="select2 form-control lazy-select2" data-minimum=0 data-placeholder='Cari Unit Kerja' data-url='<?php echo base_url('pegawai/riwayat_kgb/list_satker');?>'>
+                    <select id="unit_kerja_induk_id" name="unit_kerja_induk_id" class="select2 form-control">
                         <?php 
                             if($selectedUnitKerjaInduk){
                                 echo "<option value='{$selectedUnitKerjaInduk->ID}'>{$selectedUnitKerjaInduk->NAMA_UNOR}</option>";
@@ -248,4 +248,21 @@
 			}});
 		return false; 
 	}
+$("#unit_kerja_induk_id").select2({
+    placeholder: 'Cari Unit Kerja...',
+    width: '100%',
+    minimumInputLength: 5,
+    allowClear: true,
+    ajax: {
+        url: '<?php echo site_url("pegawai/kepegawaian/ajax_unit_list");?>',
+        dataType: 'json',
+        data: function(params) {
+            return {
+                term: params.term || '',
+                page: params.page || 1
+            }
+        },
+        cache: true
+    }
+});
 </script>

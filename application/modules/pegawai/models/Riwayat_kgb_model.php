@@ -78,4 +78,31 @@ class Riwayat_kgb_model extends BF_Model
 		}
 		return parent::find_all();
 	}
+	public function find_ref($ref ="")
+	{
+		
+		if(empty($this->selects))
+		{
+			$this->select($this->table_name .'.*,g.NAMA2 AS golongan2_name');
+		}
+		$this->db->join("golongan g", "g.ID=rwt_kgb.n_golongan_id", "LEFT");
+		return parent::find_by("ref",$ref);
+	}
+	public function getTemplate($id_module = 1){
+		$data = $this->db->query("select * from mst_templates where id = ?",array($id_module))->first_row();
+		return $data;
+	}
+	public function getWage($golongan,$working_periode){
+		$data = $this->cache->get('wage');
+		$adata = array();
+		if ($data == null) {
+			$rows = $this->db->query("select * from wage")->result();
+			foreach ($rows as $row) {
+				$adata[$row->GOLONGAN."_".$row->WORKING_PERIOD] = $row;
+			}
+			$data = $adata;
+			$this->cache->write($data, 'wage');
+		}
+		return isset($data[$golongan."_".$working_periode]) ? $data[$golongan."_".$working_periode] : null;
+	}	
 }

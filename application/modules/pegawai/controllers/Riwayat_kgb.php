@@ -96,7 +96,8 @@ class Riwayat_kgb extends Admin_Controller
                 }
                 if($this->auth->has_permission($this->permissionPrint))
                 {    
-                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/printsk/".$record->ref."/pdf' data-toggle='tooltip' title='Print SK' tooltip='Print SK' class='btn btn-sm btn-warning'><i class='fa fa-print'></i> </a>";
+                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/printsk/".$record->ref."/pdf' data-toggle='tooltip' title='Print SK' tooltip='Print SK' class='btn btn-sm btn-warning show-modal'><i class='fa fa-print'></i> </a>";
+                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/printsk/".$record->ref."' data-toggle='tooltip' title='Download Dokumen word' tooltip='Download word' class='btn btn-sm btn-info'><i class='fa fa-download'></i> </a>";
                 }
                 if($this->auth->has_permission($this->permissionEdit))
                 {    
@@ -158,13 +159,9 @@ class Riwayat_kgb extends Admin_Controller
         $this->show($PNS_ID);
     }
     public function edit($ref_id=''){
-        $this->riwayat_kgb_model->where("ref",$ref_id);
-        $kgb_data = $this->riwayat_kgb_model->first_row();  
-        $this->pegawai_model->where("ID",$kgb_data->pegawai_id);
-        $pegawai_data = $this->pegawai_model->find_first_row();  
-
+        $kgb_data = $this->riwayat_kgb_model->find_by("ref",$ref_id);
+        $pegawai_data = $this->pegawai_model->find_by("NIP_BARU",$kgb_data->pegawai_nip);
         $list_golongan = $this->golongan_model->find_all();
-       
         $selectedUnitKerjaInduk = $this->unitkerja_model->find_by_id($kgb_data->unit_kerja_induk_id);
         
         Template::set_view("kepegawaian/riwayat_kgb_crud");
@@ -176,15 +173,15 @@ class Riwayat_kgb extends Admin_Controller
         Template::render();
     }
     public function printsk($ref_id='',$type = ""){
-        $this->riwayat_kgb_model->where("ref",$ref_id);
-        $kgb_data = $this->riwayat_kgb_model->first_row();  
+        $this->auth->restrict($this->permissionCreate);
+        $this->load->helper('aplikasi');
+        $kgb_data = $this->riwayat_kgb_model->find_ref($ref_id);
+        // print_r($kgb_data);
         $this->pegawai_model->where("NIP_BARU",trim($kgb_data->pegawai_nip));
         $pegawai_data = $this->pegawai_model->find_first_row();  
-        $list_golongan = $this->golongan_model->find($kgb_data->n_golongan_id);
+        $list_golongan = $this->golongan_model->getGolongan($kgb_data->n_golongan_id);
         $selectedUnitKerjaInduk = $this->unitkerja_model->find_by_id($kgb_data->unit_kerja_induk_id);
-
-        $this->load->helper('aplikasi');
-        $template_data=$this->db->query("select * from mst_templates where id = ?",array(TEMPLATE_SK_KGB_KOLEKTIF))->first_row();
+        $template_data= $this->riwayat_kgb_model->getTemplate(TEMPLATE_SK_KGB_KOLEKTIF);
         if(!$kgb_data){
             $output = array(
                 'success'=>false,
@@ -194,8 +191,7 @@ class Riwayat_kgb extends Admin_Controller
             die();
         }
         // header('Set-Cookie: fileDownload=true; path=/');
-        $gaji = $this->db->query("select * from wage where wage.\"GOLONGAN\" = ? and wage.\"WORKING_PERIOD\" = ? ",array(str_replace("/","",$kgb_data->golongan2_name),$kgb_data->masa_kerja_thn))->first_row();
-        
+        $gaji_baru = $this->riwayat_kgb_model->getWage($kgb_data->golongan2_name,$kgb_data->n_masakerja_thn);
         $this->load->library('Template_doc_lib');
         $TBS = $this->template_doc_lib->gen_xls(BASEPATH."../../assets/templates/".$template_data->template_file);
         $tembusan_data = array();
@@ -219,15 +215,15 @@ class Riwayat_kgb extends Admin_Controller
             'p_birth_date'=>'',
             'lokasi_sk'=>'',
             'pp'=>'PP No 30 Tahun 2015',
-            'masa_kerja_thn'=>$kgb_data->masa_kerja_thn,
-            'masa_kerja_bln'=>$kgb_data->masa_kerja_bln,
-            'tmt'=>$kgb_data->dt_kgb_yad,
+            'masa_kerja_thn'=>$kgb_data->n_masakerja_thn,
+            'masa_kerja_bln'=>$kgb_data->n_masakerja_bln,
+            'tmt'=>$kgb_data->tmt_sk,
             'pangkat_text'=>$list_golongan->NAMA_PANGKAT . "-".$list_golongan->NAMA,
             'jabatan_text'=>$kgb_data->n_jabatan_text,
-            'gapok_baru_number'=>rupiah($data_kgb->n_gapok),
-            'gapok_baru_text'=>Terbilang($data_kgb->n_gapok),
-            'gapok_lama_number'=>$data_kgb->o_gapok,
-            'gapok_lama_text'=>Terbilang($data_kgb->o_gapok),
+            'gapok_baru_number'=>rupiah($kgb_data->n_gapok),
+            'gapok_baru_text'=>Terbilang($kgb_data->n_gapok),
+            'gapok_lama_number'=>$kgb_data->o_gapok,
+            'gapok_lama_text'=>Terbilang($kgb_data->o_gapok),
             'satuan_kerja'=>$kgb_data->unit_kerja_text,
             'p_instansi'=>'',
             'kepala_satker_ybs'=>'',
@@ -237,11 +233,12 @@ class Riwayat_kgb extends Admin_Controller
             'lastpangkat_tmt'=>'',
             'lastpangkat_wpy'=>'',
             'lastpangkat_wpm'=>'',
-            'gol_notation'=>'',
+            'gol_notation'=>$list_golongan,
 
             'pejabat'=>$kgb_data->nama_pejabat,
             'pejabat'=>$kgb_data->nama_pejabat,
         );
+        print_r($sk_data);
         $sk_datas = array();
         $sk_datas[] = $sk_data;
         $TBS->MergeBlock('o',$sk_datas);
@@ -252,17 +249,11 @@ class Riwayat_kgb extends Admin_Controller
             $fullpath_docx =  $dir.DIRECTORY_SEPARATOR.$output_file_name.".docx";
             $fullpath_pdf =  $dir.DIRECTORY_SEPARATOR.$output_file_name.".pdf";
             $TBS->Show(OPENTBS_FILE,$fullpath_docx);
-            //echo shell_exec("export HOME=/tmp && libreoffice --invisible --nologo --headless --convert-to pdf $fullpath_docx --outdir ./tmp $dir");
-            shell_exec($dir."/script.sh");
-            echo $dir."/script.sh";
-            exec($dir."/script.sh");
-            echo shell_exec("echo 123");
-            echo "libreoffice --headless --convert-to pdf $fullpath_docx ";
-            echo "oke";
+            $output = shell_exec('unoconv -f pdf '.$file_word.' 2>&1');
+            $data_base64 = file_get_contents($fullpath_pdf);
+            $base64 = 'data:application/pdf;base64,' . base64_encode($data_base64);
+            echo '<embed src="'.$base64.'" width="100%" height="700" alt="pdf">';
             die();
-            //$output_file_name = $output_file_name.".docx";
-            //$TBS->Show(OPENTBS_DOWNLOAD, $output_file_name); // Also merges all [onshow] automatic fields
-            
         }
         else {
             $output_file_name = $output_file_name.".docx";
@@ -370,8 +361,7 @@ class Riwayat_kgb extends Admin_Controller
             $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
         }
         // end upload berkas
-       	$this->pegawai_model->where("PNS_ID",$this->input->post("PNS_ID"));
-        $pegawai_data = $this->pegawai_model->find_first_row();  
+       	$pegawai_data = $this->pegawai_model->find_by("PNS_ID",$this->input->post("PNS_ID"));
         $golongan_data = $this->golongan_model->find($this->input->post('n_golongan_id'));
         $unit_kerja_induk_data = $this->unitkerja_model->find($this->input->post('unit_kerja_induk_id'));
         $lokasi_lahir_data = $this->lokasi_model->find($pegawai_data->TEMPAT_LAHIR_ID);
@@ -381,7 +371,8 @@ class Riwayat_kgb extends Admin_Controller
         $data["birth_date"] = $pegawai_data->TGL_LAHIR;
         $data["pegawai_id"] = $pegawai_data->ID;
         $data["n_gol_ruang"] = $golongan_data->NAMA_PANGKAT." - ".$golongan_data->NAMA;
-        $data["unit_kerja_induk_text"] = $unit_kerja_induk_data->NAMA_UNOR;
+        $data["unit_kerja_text"]        = $unit_kerja_induk_data->NAMA_UNOR;
+        $data["unit_kerja_induk_text"]  = $unit_kerja_induk_data->ABBREVIATION;
         
         if(empty($data["tgl_sk"])){
             unset($data["tgl_sk"]);

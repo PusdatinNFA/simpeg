@@ -52,4 +52,16 @@ class Golongan_model extends BF_Model
 	);
 	protected $insert_validation_rules  = array();
 	protected $skip_validation 			= false;
+	public function getGolongan($id="")
+	{
+		$data = $this->cache->get('golongan');
+		if ($data == null) {
+			$rows =  $this->db->query('select * from golongan')->result();
+			foreach ($rows as $row) {
+				$data[$row->ID] = $row;
+			}
+			$this->cache->write($data, 'golongan');
+		}
+		return isset($data[$id]) ? $data[$id] : null;
+	}
 }
