@@ -107,10 +107,10 @@ class Riwayatkepangkatan extends Admin_Controller
                 }
                 if($this->auth->has_permission($this->permissionEdit))
                 {    
-                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayatkepangkatan/edit/".$NIP_BARU."/".$record->ID."' data-toggle='tooltip' title='Ubah data' tooltip='Ubah data' class='btn btn-sm btn-success show-modal-custom'><i class='fa fa-pencil'></i> </a>";
+                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayatkepangkatan/edit/".$record->PNS_NIP."/".$record->ID."' data-toggle='tooltip' title='Ubah data' tooltip='Ubah data' class='btn btn-sm btn-success show-modal-custom'><i class='fa fa-pencil'></i> </a>";
                 }
                 if($this->auth->has_permission("RiwayatKepangkatan.Kepegawaian.VerifikasiS")){
-                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayatkepangkatan/verifikasi/".$NIP_BARU."/".$record->ID."' data-toggle='tooltip' title='Verifikasi data' tooltip='Verifikasi data' class='btn btn-sm btn-warning show-modal-custom'><i class='fa fa-key'></i> </a>";
+                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayatkepangkatan/verifikasi/".$record->PNS_NIP."/".$record->ID."' data-toggle='tooltip' title='Verifikasi data' tooltip='Verifikasi data' class='btn btn-sm btn-warning show-modal-custom'><i class='fa fa-key'></i> </a>";
                 }
                 if($this->auth->has_permission($this->permissionDelete))
                 {    
@@ -284,9 +284,21 @@ class Riwayatkepangkatan extends Admin_Controller
             $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
         }
         // end upload berkas
-        $this->pegawai_model->where("PNS_ID",$this->input->post("PNS_ID"));
-        $pegawai_data = $this->pegawai_model->find_first_row();  
+        $pegawai_data = $this->pegawai_model->find_by("NIP_BARU",$this->input->post("NIP_BARU"));
         $NIP_BARU = $pegawai_data->NIP_BARU;
+        if($NIP_BARU == ""){
+            $response['msg'] = "
+            <div class='alert alert-block alert-error fade in note note-danger'>
+                <a class='close' data-dismiss='alert'>&times;</a>
+                <h4 class='alert-heading'>
+                    Ada kesalahan
+                </h4>
+                <p>NIP Tidak ditemukan</p>
+            </div>
+            ";
+            echo json_encode($response);
+            exit();
+        }
         $data["PNS_NIP"] = $pegawai_data->NIP_BARU;
         $data["PNS_ID"] = $pegawai_data->PNS_ID;
         $data["PNS_NAMA"] = $pegawai_data->NAMA;
@@ -308,26 +320,29 @@ class Riwayatkepangkatan extends Admin_Controller
         if(empty($data["TANGGAL_BKN"])){
             unset($data["TANGGAL_BKN"]);
         }
-        if($this->input->post("STATUS_SATKER") == "1"){
-            $data["STATUS_SATKER"]    = 1;
-        }else{
-            $data["STATUS_SATKER"]    = 0;
-        }
-        if($this->input->post("STATUS_BIRO") == "1"){
-            $data["STATUS_BIRO"]    = 1;
-        }else{
-            $data["STATUS_BIRO"]    = 0;
-        }
+        $dataupdate['BASIC']          = $this->input->post('BASIC') ? $this->input->post('BASIC') : NULL;
+        $data["STATUS_SATKER"]    = null;
+        $data["STATUS_BIRO"]    = null;
+        // if($this->input->post("STATUS_SATKER") == "1"){
+        //     $data["STATUS_SATKER"]    = 1;
+        // }else{
+        //     $data["STATUS_SATKER"]    = 0;
+        // }
+        // if($this->input->post("STATUS_BIRO") == "1"){
+        //     $data["STATUS_BIRO"]    = 1;
+        // }else{
+        //     $data["STATUS_BIRO"]    = 0;
+        // }
         if($this->input->post("PANGKAT_TERAKHIR") == "1"){
             $dataupdate = array();
             $dataupdate["PANGKAT_TERAKHIR"] = 0;
             $this->riwayat_kepangkatan_model->skip_validation(true);
-            $this->riwayat_kepangkatan_model->update_where("PNS_ID",$this->input->post("PNS_ID"), $dataupdate);
+            $this->riwayat_kepangkatan_model->update_where("PNS_NIP",$this->input->post("NIP_BARU"), $dataupdate);
             $dataupdate = array();
             $dataupdate['GOL_ID']           = $this->input->post('ID_GOLONGAN');
             $dataupdate['TMT_GOLONGAN']     = $this->input->post('TMT_GOLONGAN') ? $this->input->post('TMT_GOLONGAN') : null;
             $this->pegawai_model->skip_validation(true);
-            $this->pegawai_model->update_where("PNS_ID",$this->input->post("PNS_ID"), $dataupdate);
+            $this->pegawai_model->update_where("NIP_BARU",$this->input->post("NIP_BARU"), $dataupdate);
 
             $data["PANGKAT_TERAKHIR"]    = 1;
         }
@@ -348,8 +363,6 @@ class Riwayatkepangkatan extends Admin_Controller
             log_activity_pegawai($NIP_BARU,$this->auth->user_id(),"Update data Riwayat Pangkat", 'rwt_pangkat');
         }
         else{
-            $ID_GOLONGAN = $this->input->post('ID_GOLONGAN');
-            $PNS_ID = $this->input->post('PNS_ID');
             $insert_id = $this->riwayat_kepangkatan_model->insert($data);
             // add log
             log_activity_pegawai($NIP_BARU,$this->auth->user_id(),"Tambah data Riwayat Pangkat", 'rwt_pangkat');

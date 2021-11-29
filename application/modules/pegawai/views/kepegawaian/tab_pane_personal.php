@@ -21,13 +21,23 @@
             <!-- /.box-header -->
             <div class="box-body">
             <fieldset>
-                <div class="control-group col-sm-12">
+                 <div class="control-group col-sm-12">
                      <div class="row">
                          <div class="col-sm-4">
                              NIP
                          </div>
                          <div class="form-group col-sm-8">
                             <b><?php echo isset($pegawai->NIP_BARU) ? $pegawai->NIP_BARU : ''; ?></b>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="control-group col-sm-12">
+                     <div class="row">
+                         <div class="col-sm-4">
+                             Username Intra
+                         </div>
+                         <div class="form-group col-sm-8">
+                            <b><?php echo isset($pegawai->username_intra) ? $pegawai->username_intra : '-'; ?></b>
                          </div>
                      </div>
                  </div>

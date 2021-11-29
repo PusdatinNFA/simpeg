@@ -945,6 +945,7 @@ class Pegawai_model extends BF_Model
 			,jenis_pegawai.NAMA as JENIS_PEGAWAI,kedudukan_hukum.NAMA AS KEDUDUKAN_HUKUM,pa.masa_kerja_th,
 			pa.masa_kerja_bl,
 			ref,
+			username_intra,
 			kawasan_id,
 			tusi_id
 			');

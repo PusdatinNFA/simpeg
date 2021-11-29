@@ -1,4 +1,4 @@
-<div id="container-sk-kgb" class="admin-box box box-primary expanded-box">
+<div id="container-sk-kgb" class="admin-box box box-danger expanded-box">
 	<div class="box-header">
               <h3 class="box-title">Pencarian Lanjut</h3>
 			   <div class="box-tools pull-right">
@@ -17,39 +17,50 @@
 				}
 			</style>
 			<table class="filter_pegawai" sborder=0 width='100%' cellpadding="10">
+                <tr>
+                    <td width="150px"><label for="example-text-input" class="col-form-label">Pegawai</label></td>
+                    <td colspan=2>
+                        <select id="nip_sk" name="nip_sk" width="100%" class="form-control select2 class_pegawai">
+                        <?php
+                        if($pegawai){
+                            echo "<option selected value='".$pegawai->PNS_ID."'>".$pegawai->NAMA."</option>";
+                        }
+                        ?>
+                    </select>
+                    </td>
+                </tr>
 				<tr>
-					<td width="20px"><input type="checkbox" name="unit_id_cb"></td>
-					<td width="200px"><label for="example-text-input" class="col-form-label">Satuan Kerja</label></td>
+					<td width="150px"><label for="example-text-input" class="col-form-label">Satuan Kerja</label></td>
 					<td colspan=2><select id="filter_unit_kerja" name="filter_unit_kerja" width="100%" class=" col-md-10 format-control"></select></td>
 				</tr>
 				
 				<tr>
-					<td width="20px"><input type="checkbox" name="umur_cb"></td>
-					<td width="200px"><label for="example-text-input" class="col-form-label">Periode</label></td>
+					<td ><label for="example-text-input" class="col-form-label">Periode</label></td>
 					<td style="padding-right:10px;" width="200px" >
 						<select class="form-control select2" name="filter_bulan">
                             <?php 
                                 $bulans = array(
-                                    'Januari',
-                                    'Februari',
-                                    'Maret',
-                                    'April',
-                                    'Mei',
-                                    'Juni',
-                                    'Juli',
-                                    'Agustus',
-                                    'September',
-                                    'Oktober',
-                                    'Nopember',
-                                    'Desember'
+                                    '01'=>'Januari',
+                                    '02'=>'Februari',
+                                    '03'=>'Maret',
+                                    '04'=>'April',
+                                    '05'=>'Mei',
+                                    '06'=>'Juni',
+                                    '07'=>'Juli',
+                                    '08'=>'Agustus',
+                                    '09'=>'September',
+                                    '10'=>'Oktober',
+                                    '11'=>'Nopember',
+                                    '12'=>'Desember'
                                 );
                                 foreach($bulans as  $key=>$value){
-                                    echo "<option value='".((int)($key+1))."'>$value</option>";
+
+                                    echo "<option value='".$key."'>$value</option>";
                                 }
                             ?>
 						</select>
 					</td>
-					<td ><input class="form-control" type="text" name="filter_tahun" readonly value="<?php echo date('Y');?>" ></td>
+					<td ><input class="form-control" type="text" name="filter_tahun" value="<?php echo date('Y');?>" ></td>
 				</tr>
 				
 				<tr>
@@ -64,7 +75,7 @@
 	</div>
 </div>
 
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
     <div class="box-header">
         DAFTAR PEGAWAI YANG MENDAPATKAN KENAIKAN GAJI BERKALA    
         <div class="box-tools pull-right">
@@ -79,9 +90,8 @@
 			<tr>
 				<th style="width:10px">No</th>
 				<th>Pegawai</th>
-				<th>Pangkat</th>
-                <th>Golongan</th>
-                <th>Masa Kerja Golongan (Thn)/Bulan</th>
+				<th>Pangkat|Golongan</th>
+                <th>Masa Kerja</th>
                 <th>Gaji Pokok</th>
                 <th>Satuan Kerja</th> 
                 <th>Keterangan</th>                   
@@ -128,7 +138,8 @@
             processing: true,
             serverSide: true,
             "columnDefs": [
-                            {"className": "dt-center", "targets": [4]}
+                            {"className": "text-center", "targets": [0,7]},
+                            {"className": "text-right", "targets": [4]}
                         ],
             ajax: {
             url: "kgb_instansi/ajax_list",
@@ -142,5 +153,22 @@
             $table.ajax.reload(null,true);
             return false;
         });
+    });
+$(".class_pegawai").select2({
+        placeholder: 'Cari Pegawai.....',
+        width: '100%',
+        minimumInputLength: 3,
+        allowClear: true,
+        ajax: {
+            url: '<?php echo site_url("pegawai/kepegawaian/ajaxnip");?>',
+            dataType: 'json',
+            data: function(params) {
+                return {
+                    term: params.term || '',
+                    page: params.page || 1
+                }
+            },
+            cache: true
+        }
     });
 </script>

@@ -10,7 +10,7 @@
     <?php echo form_open($this->uri->uri_string(), 'id="frmkepangkatan"'); ?>
         <fieldset>
             <input type='hidden' class="form-control" name='ID' maxlength='32' value="<?php echo set_value('ID', isset($detail_riwayat->ID) ? trim($detail_riwayat->ID) : ''); ?>" />
-            <input id='PNS_ID' type='hidden' class="form-control" name='PNS_ID' maxlength='32' value="<?php echo set_value('PNS_ID', isset($PNS_ID) ? trim($PNS_ID) : ''); ?>" />
+            <input id='NIP_BARU' type='hidden' class="form-control" name='NIP_BARU' maxlength='32' value="<?php echo set_value('PNS_ID', isset($PNS_ID) ? trim($PNS_ID) : ''); ?>" />
            
            <div class="control-group<?php echo form_error('GOLONGAN') ? ' error' : ''; ?> col-sm-12">
                 <?php echo form_label('Jenis KP', 'Jenis KP', array('class' => 'control-label')); ?>
@@ -112,6 +112,23 @@
                 <div class='controls'>
                     <input id='MK_GOLONGAN_BULAN' type='text' class="form-control" name='MK_GOLONGAN_BULAN' maxlength='32' value="<?php echo set_value('MK_GOLONGAN_BULAN', isset($detail_riwayat->MK_GOLONGAN_BULAN) ? $detail_riwayat->MK_GOLONGAN_BULAN : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('MK_GOLONGAN_BULAN'); ?></span>
+                </div>
+            </div>
+            <div class="control-group col-sm-12">
+                <label for="inputNAMA" class="control-label">GAJI POKOK</label>
+                <div class="input-group">
+                  <div class="input-group-addon">
+                    <i class="fa fa-money"></i>
+                  </div>
+                    <input type='text' class="form-control pull-right" name='BASIC'  value="<?php echo set_value('BASIC', isset($detail_riwayat->BASIC) ? $detail_riwayat->BASIC : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('BASIC'); ?></span>
+                </div>
+            </div> 
+            <div class="control-group<?php echo form_error('KETERANGAN') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label("KETERANGAN", 'KETERANGAN', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <input id='KETERANGAN' type='text' class="form-control" name='KETERANGAN' maxlength='32' value="<?php echo set_value('KETERANGAN', isset($detail_riwayat->KETERANGAN) ? $detail_riwayat->KETERANGAN : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('KETERANGAN'); ?></span>
                 </div>
             </div>
             <div class="control-group col-sm-9">

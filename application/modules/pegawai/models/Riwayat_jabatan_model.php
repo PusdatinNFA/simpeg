@@ -308,4 +308,34 @@ class Riwayat_jabatan_model extends BF_Model
 		$row = $query->first_row();
 		return $row->jml;
 	}
+	public function find_aktif($PNS_NIP = "")
+	{
+
+		if (empty($this->selects)) {
+			$this->select(
+				'ID_BKN,
+				TRIM("PNS_ID") "PNS_ID",
+				TRIM("PNS_NIP") "PNS_NIP",
+				TRIM("PNS_NAMA") "PNS_NAMA",
+				TRIM("ID_UNOR") "ID_UNOR",
+				TRIM("UNOR") "UNOR",
+				TRIM("ID_JENIS_JABATAN") "ID_JENIS_JABATAN",
+				TRIM("JENIS_JABATAN") "JENIS_JABATAN",
+				TRIM("ID_JABATAN") "ID_JABATAN",
+				TRIM("rwt_jabatan"."NAMA_JABATAN") "NAMA_JABATAN",
+				TRIM("ID_ESELON") "ID_ESELON",
+				TMT_JABATAN "TMT_JABATAN",
+				TRIM("NOMOR_SK") "NOMOR_SK"'
+			);
+			//$this->select($this->table_name .'.STATUS_SATKER');
+		}
+		if ($PNS_NIP != "") {
+			$this->db->where('PNS_NIP', $PNS_NIP);
+		}
+		$this->db->where('TERMINATED_DATE IS NULL');
+		$this->db->join("hris.unitkerja as unit", "rwt_jabatan.ID_UNOR=unit.KODE_INTERNAL", 'left');
+		$this->db->join("hris.unitkerja as satker", 'unit.UNOR_INDUK=satker.ID', 'left');
+		$this->db->order_by("TMT_JABATAN","DESC");
+		return parent::find_all();
+	}
 }

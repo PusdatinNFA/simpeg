@@ -15,7 +15,7 @@
             	</a>
             <?php endif; ?>
             <?php if ($this->auth->has_permission('riwayatjabatan.Kepegawaian.Create')) : ?>
-            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatjabatan/add/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Jabatan">
+            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatjabatan/add/<?php echo $NIP_BARU ?>" tooltip="Tambah Riwayat Jabatan">
 				<i class="fa fa-plus"></i> Tambah
             </a>
             <?php endif; ?>

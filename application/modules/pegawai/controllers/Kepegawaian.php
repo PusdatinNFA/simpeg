@@ -1153,7 +1153,6 @@ class Kepegawaian extends Admin_Controller
 			Template::set('tusi_name', $tusis->name);
 		}
 		
-		$JABATAN_ID = $pegawai->JABATAN_INSTANSI_ID;
 		$JABATAN_INSTANSI_REAL_ID = $pegawai->JABATAN_INSTANSI_REAL_ID;
 		$recjabatan = null;
 		$jenis_jabatan = null;
@@ -1167,12 +1166,6 @@ class Kepegawaian extends Admin_Controller
 			$recjenis_jabatan = $this->jenis_jabatan_model->find($jenis_jabatan);
 			Template::set('JENIS_JABATAN', $recjenis_jabatan->NAMA);
 		}
-		if($JABATAN_ID != ""){
-			$recjabatan = $this->jabatan_model->find_by("KODE_JABATAN",TRIM($JABATAN_ID));
-			Template::set('NAMA_JABATAN', $recjabatan->NAMA_JABATAN);
-			Template::set('NAMA_JABATAN_BKN', $recjabatan->NAMA_JABATAN_BKN);
-		}
-		
 		$unor = $this->unitkerja_model->find_by("ID",trim($pegawai->UNOR_ID));
 		$pemimpin_pns_id = isset($unor->PEMIMPIN_PNS_ID) ? $unor->PEMIMPIN_PNS_ID : "";
 		$nama_jabatan_struktural = isset($unor->NAMA_JABATAN) ? $unor->NAMA_JABATAN : "";
@@ -1183,15 +1176,15 @@ class Kepegawaian extends Admin_Controller
 			
 		}
 		Template::set('nama_unor',$unor->NAMA_UNOR);
-		$unor_induk = $this->unitkerja_model->find_by("ID",$unor->DIATASAN_ID);
-		Template::set('unor_induk',$unor_induk->NAMA_UNOR);
-
 		$this->Riwayat_pns_cpns_model->order_by("ID","DESC");
 		$riwayat_pns_cpns = $this->Riwayat_pns_cpns_model->find_by("PNS_NIP",$pegawai->NIP_BARU);
 		Template::set('riwayat_pns_cpns',$riwayat_pns_cpns);
-		
+		// jabatan aktif
+		$this->load->model('pegawai/riwayat_jabatan_model');
+		$jabatan_aktifs = $this->riwayat_jabatan_model->find_aktif($pegawai->NIP_BARU);
+		Template::set('jabatan_aktifs',$jabatan_aktifs);
+		// end jabatan aktif
 		Template::set('selectedPendidikanID',$this->pendidikan_model->find(trim($pegawai->PENDIDIKAN_ID)));
-		
 		Template::set("parent_path_array_unor",$this->unitkerja_model->get_parent_path($unor->ID,true,true));
         Template::set('toolbar_title',"Profile Pegawai");
 		Template::set('model',$model);

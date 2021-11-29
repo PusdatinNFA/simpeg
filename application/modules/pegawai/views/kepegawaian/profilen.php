@@ -126,9 +126,13 @@ endif;
             <div class="box-body">
               <strong><i class="fa fa-user margin-r-5"></i> Jabatan Aktif</strong>
               <p class="text-muted">
-                  <?php
-                    echo isset($NAMA_JABATAN) ? $NAMA_JABATAN : "-";
+                  <ul>
+                  <?php 
+                      foreach($jabatan_aktifs as $jabatan){
+                          echo "<li><strong>".$jabatan->NAMA_JABATAN."</strong></li>";        
+                      }
                   ?>
+                </ul>
               </p>
               <hr>
               <strong><i class="fa fa-book margin-r-5"></i> Kawasan</strong>
@@ -167,19 +171,6 @@ endif;
                     <?php echo isset($recpns_aktif->masa_kerja_bl) ? $recpns_aktif->masa_kerja_bl  : ""; ?> Bulan
               </p>
               <hr>
-              <!--
-              <strong><i class="fa fa-pencil margin-r-5"></i> Keahlian</strong>
-
-              <p>
-                <span class="label label-danger">UI Design</span>
-                <span class="label label-success">Coding</span>
-                <span class="label label-info">Javascript</span>
-                <span class="label label-warning">PHP</span>
-                <span class="label label-primary">Node.js</span>
-              </p>
-
-              <hr>
-              -->
               <strong><i class="fa fa-file-text-o margin-r-5"></i> Unit Organisasi</strong>
               <p> 
                 <ul>

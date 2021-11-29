@@ -241,7 +241,7 @@ class Riwayatjabatan extends Admin_Controller
     
     public function save(){
          // Validate the data
-        $this->auth->restrict($this->permissionVerifikasiS);
+        $this->auth->restrict($this->permissionCreate);
         if (!$this->input->is_ajax_request()) {
             die("Only ajax request");
         }
@@ -325,8 +325,20 @@ class Riwayatjabatan extends Admin_Controller
             $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
         }
         // end upload berkas
-        $this->pegawai_model->where("PNS_ID",$this->input->post("PNS_ID"));
-        $pegawai_data = $this->pegawai_model->find_first_row();  
+        $pegawai_data = $this->pegawai_model->find_by("NIP_BARU",$this->input->post("PNS_ID"));
+        if ($pegawai_data->NIP_BARU == "") {
+            $response['msg'] = "
+            <div class='alert alert-block alert-error fade in'>
+                <a class='close' data-dismiss='alert'>&times;</a>
+                <h4 class='alert-heading'>
+                    Error
+                </h4>
+                Pegawai tidak ditemukan
+            </div>
+            ";
+            echo json_encode($response);
+            exit();
+        }
         $NIP_BARU = $pegawai_data->NIP_BARU;
         $data["PNS_NIP"] = $pegawai_data->NIP_BARU;
         $data["PNS_ID"] = $pegawai_data->PNS_ID;
@@ -353,8 +365,8 @@ class Riwayatjabatan extends Admin_Controller
                     $UNOR_ID           = isset($rec_jabatan_struktural->ID) ? $rec_jabatan_struktural->ID : "";
                     // jika jabatan aktif set ke update tabel pejabat pada tabel unitkerja
                     $dataupdate = array(
-                        'PEMIMPIN_PNS_ID'     => $this->input->post("PNS_ID"),
-                        'JABATAN_ID'     => $this->input->post("ID_JABATAN")
+                        'PEMIMPIN_PNS_ID'       => $this->input->post("PNS_ID"),
+                        'JABATAN_ID'            => $this->input->post("ID_JABATAN")
                     );
                     $this->unitkerja_model->skip_validation(true);
                     $this->unitkerja_model->update($UNOR_ID, $dataupdate);
@@ -370,10 +382,10 @@ class Riwayatjabatan extends Admin_Controller
         }
         if($this->input->post("IS_ACTIVE") == "1"){
            $dataupdate = array();
-            $dataupdate['JABATAN_INSTANSI_REAL_ID']           = $this->input->post('ID_JABATAN');
-            $dataupdate['JABATAN_INSTANSI_ID']           = $this->input->post('ID_JABATAN');
-            $dataupdate['UNOR_ID']           = $this->input->post('ID_UNOR');
-            $dataupdate['UNOR_INDUK_ID']           = $this->input->post('ID_SATUAN_KERJA');
+            $dataupdate['JABATAN_INSTANSI_REAL_ID']     = $this->input->post('ID_JABATAN');
+            $dataupdate['JABATAN_INSTANSI_ID']          = $this->input->post('ID_JABATAN');
+            $dataupdate['UNOR_ID']                      = $this->input->post('ID_UNOR');
+            $dataupdate['UNOR_INDUK_ID']                = $this->input->post('ID_SATUAN_KERJA');
 
             $this->pegawai_model->skip_validation(true);
             $this->pegawai_model->update_where("PNS_ID",$this->input->post("PNS_ID"), $dataupdate);
@@ -388,19 +400,14 @@ class Riwayatjabatan extends Admin_Controller
         if(empty($data["TMT_PELANTIKAN"])){
             unset($data["TMT_PELANTIKAN"]);
         }
-        
-        $data["LAST_UPDATED"] 	= date("Y-m-d");
+        if(empty($data["TERMINATED_DATE"])){
+            unset($data["TERMINATED_DATE"]);
+        }
+        $data['SK_PEMBERHENTIAN_TANGGAL']            = $this->input->post('TERMINATED_DATE') ? $this->input->post('TERMINATED_DATE') : null;
+        $data["LAST_UPDATED"] 	                     = date("Y-m-d");
         $id_data = $this->input->post("ID");
         if(isset($id_data) && !empty($id_data)){
             $this->riwayat_jabatan_model->update($id_data,$data,$this->input->post());
-            // Update status pada update data mandiri untuk riwayat pendidikan berdasarkan ID
-            $dataupdate = array();
-            $data_update['STATUS']          = $data["STATUS_BIRO"];
-            $data_update['VERIFIKASI_BY']   = $this->auth->user_id();
-            $data_update['VERIFIKASI_TGL']  = date("Y-m-d");
-            $this->update_mandiri_model->where("KOLOM","RIWAYAT_JABATAN");
-            $result = $this->update_mandiri_model->update_where("ID_TABEL",$id_data,$data_update);
-            // end update histori update mandiri
             // add log
             log_activity_pegawai($NIP_BARU,$this->auth->user_id(),"Update data Riwayat Jabatan", 'rwt_jabatan');
         }

@@ -41,8 +41,8 @@ class Riwayat_kepangkatan_model extends BF_Model
 	// be updating a portion of the data.
 	protected $validation_rules 		= array(
 		array(
-			'field' => 'PNS_ID',
-			'label' => 'PNS ID',
+			'field' => 'NIP_BARU',
+			'label' => 'NIP',
 			'rules' => 'max_length[32]|required',
 		),
 		array(

@@ -118,6 +118,23 @@
 					<input type='text' class="form-control pull-right datepicker" name='TMT_PELANTIKAN'  value="<?php echo set_value('TMT_PELANTIKAN', isset($detail_riwayat->TMT_PELANTIKAN) ? $detail_riwayat->TMT_PELANTIKAN : ''); ?>" />
 					<span class='help-inline'><?php echo form_error('TMT_PELANTIKAN'); ?></span>
 				</div>
+			</div>
+			<div class="control-group col-sm-3">
+				<label for="inputNAMA" class="control-label">TGL PEMBERHENTIAN</label>
+				<div class="input-group date">
+				  <div class="input-group-addon">
+					<i class="fa fa-calendar"></i>
+				  </div>
+					<input type='text' class="form-control pull-right datepicker" name='TERMINATED_DATE'  value="<?php echo set_value('TERMINATED_DATE', isset($detail_riwayat->TERMINATED_DATE) ? $detail_riwayat->TERMINATED_DATE : ''); ?>" />
+					<span class='help-inline'><?php echo form_error('TERMINATED_DATE'); ?></span>
+				</div>
+			</div>   
+			<div class="control-group col-sm-9">
+				<label for="inputNAMA" class="control-label">NO SK PEMBERHENTIAN</label>
+				<div class='controls'>
+					<input type='text' class="form-control pull-right" name='SK_PEMBERHENTIAN_NOMOR'  value="<?php echo set_value('SK_PEMBERHENTIAN_NOMOR', isset($detail_riwayat->SK_PEMBERHENTIAN_NOMOR) ? $detail_riwayat->SK_PEMBERHENTIAN_NOMOR : ''); ?>" />
+					<span class='help-inline'><?php echo form_error('SK_PEMBERHENTIAN_NOMOR'); ?></span>
+				</div>
 			</div> 
 			 <div class="control-group col-sm-9">
                 <label for="inputNAMA" class="control-label">Berkas</label>

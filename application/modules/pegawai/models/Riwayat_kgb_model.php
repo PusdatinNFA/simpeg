@@ -98,11 +98,17 @@ class Riwayat_kgb_model extends BF_Model
 		if ($data == null) {
 			$rows = $this->db->query("select * from wage")->result();
 			foreach ($rows as $row) {
+				print_r($row->GOLONGAN."_".$row->WORKING_PERIOD."<br>");
 				$adata[$row->GOLONGAN."_".$row->WORKING_PERIOD] = $row;
 			}
 			$data = $adata;
 			$this->cache->write($data, 'wage');
 		}
 		return isset($data[$golongan."_".$working_periode]) ? $data[$golongan."_".$working_periode] : null;
+	}
+	public function getLastRiwayat($nip = "",$tanggal = ""){
+		$data = $this->db->query("select * from mv_kgb_all  where pegawai_nip = ? and tmt_sk < ? order by tmt_sk desc NULLS LAST",array($nip,$tanggal))->first_row();
+		return $data;
 	}	
+	
 }

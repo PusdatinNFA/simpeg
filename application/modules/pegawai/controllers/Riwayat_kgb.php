@@ -26,61 +26,61 @@ class Riwayat_kgb extends Admin_Controller
         $this->load->model('pegawai/jenis_jabatan_model');
         $this->load->model('ref_jabatan/jabatan_model');
         $jenis_jabatans = $this->jenis_jabatan_model->find_all();
-		Template::set('jenis_jabatans', $jenis_jabatans);
-		
-		$this->load->model('pegawai/unitkerja_model');
-		
+        Template::set('jenis_jabatans', $jenis_jabatans);
+        
+        $this->load->model('pegawai/unitkerja_model');
+        
     }
     public function ajax_list(){
         $this->load->library('convert');
- 		$convert = new convert();
+        $convert = new convert();
         $draw = $this->input->post('draw');
-		$iSortCol = $this->input->post('iSortCol_1');
-		$sSortCol = $this->input->post('sSortDir_1');
+        $iSortCol = $this->input->post('iSortCol_1');
+        $sSortCol = $this->input->post('sSortDir_1');
         $PNS_ID = $this->input->post('PNS_ID');
 
         $this->pegawai_model->where("PNS_ID",$PNS_ID);
         $pegawai_data = $this->pegawai_model->find_first_row();
        
-		$length= $this->input->post('length');
-		$start= $this->input->post('start');
+        $length= $this->input->post('length');
+        $start= $this->input->post('start');
 
-		$search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
-		$this->riwayat_kgb_model->where("pegawai_nip",$pegawai_data->NIP_BARU);
-		$total= $this->riwayat_kgb_model->count_all();;
-		$output=array();
-		$output['draw']=$draw;
+        $search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+        $this->riwayat_kgb_model->where("pegawai_nip",$pegawai_data->NIP_BARU);
+        $total= $this->riwayat_kgb_model->count_all();;
+        $output=array();
+        $output['draw']=$draw;
 
-		
-		$output['recordsTotal']= $output['recordsFiltered']=$total;
-		$output['data']=array();
         
-		
+        $output['recordsTotal']= $output['recordsFiltered']=$total;
+        $output['data']=array();
         
-		/*Jika $search mengandung nilai, berarti user sedang telah 
-		memasukan keyword didalam filed pencarian*/
-		if($search!=""){
-			$this->riwayat_kgb_model->where('upper("SEBAGAI") LIKE \''.strtoupper($search).'%\'');
-		}
-		$this->riwayat_kgb_model->limit($length,$start);
-		
+        
+        
+        /*Jika $search mengandung nilai, berarti user sedang telah 
+        memasukan keyword didalam filed pencarian*/
+        if($search!=""){
+            $this->riwayat_kgb_model->where('upper("SEBAGAI") LIKE \''.strtoupper($search).'%\'');
+        }
+        $this->riwayat_kgb_model->limit($length,$start);
+        
         $this->riwayat_kgb_model->where("pegawai_nip",$pegawai_data->NIP_BARU); 
         $records=$this->riwayat_kgb_model->find_all();
             
-		/*Ketika dalam mode pencarian, berarti kita harus
-		'recordsTotal' dan 'recordsFiltered' sesuai dengan jumlah baris
-		yang mengandung keyword tertentu
-		*/
-		if($search != "")
-		{
-			$this->riwayat_kgb_model->where('upper("SEBAGAI") LIKE \''.strtoupper($search).'%\'');
-			$jum	= $this->riwayat_kgb_model->count_all();
-			$output['recordsTotal']=$output['recordsFiltered']=$jum;
-		}
-		$this->load->helper('aplikasi');
-		$nomor_urut=$start+1;
-		if(isset($records) && is_array($records) && count($records)):
-			foreach ($records as $record) {
+        /*Ketika dalam mode pencarian, berarti kita harus
+        'recordsTotal' dan 'recordsFiltered' sesuai dengan jumlah baris
+        yang mengandung keyword tertentu
+        */
+        if($search != "")
+        {
+            $this->riwayat_kgb_model->where('upper("SEBAGAI") LIKE \''.strtoupper($search).'%\'');
+            $jum    = $this->riwayat_kgb_model->count_all();
+            $output['recordsTotal']=$output['recordsFiltered']=$jum;
+        }
+        $this->load->helper('aplikasi');
+        $nomor_urut=$start+1;
+        if(isset($records) && is_array($records) && count($records)):
+            foreach ($records as $record) {
                 $row = array();
                 $row []  = $nomor_urut;
                 
@@ -105,17 +105,17 @@ class Riwayat_kgb extends Admin_Controller
                 }
                 if($this->auth->has_permission($this->permissionDelete))
                 {    
-                    $btn_actions  [] = "<a href='#' kode='$record->ref' data-toggle='tooltip' title='Hapus Data' class='btn btn-sm btn-danger btn-hapus-kgb'><i class='fa fa-trash-o'></i> </a>";
+                    $btn_actions  [] = "<a href='#' kode='$record->id' data-toggle='tooltip' title='Hapus Data' class='btn btn-sm btn-danger btn-hapus-kgb'><i class='fa fa-trash-o'></i> </a>";
                 }
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
 
                  
                 $output['data'][] = $row;
-				$nomor_urut++;
-			}
-		endif;
-		echo json_encode($output);
-		die();
+                $nomor_urut++;
+            }
+        endif;
+        echo json_encode($output);
+        die();
     }
     public function show($PNS_ID,$record_id=''){
         if(empty($record_id)){
@@ -126,7 +126,7 @@ class Riwayat_kgb extends Admin_Controller
             Template::render();
         }
         else {
-    		$datadetil = $this->riwayat_kgb_model->find($record_id); 
+            $datadetil = $this->riwayat_kgb_model->find($record_id); 
             $this->auth->restrict($this->permissionEdit);
             Template::set_view("kepegawaian/riwayat_kgb_crud");
            
@@ -176,9 +176,10 @@ class Riwayat_kgb extends Admin_Controller
         $this->auth->restrict($this->permissionCreate);
         $this->load->helper('aplikasi');
         $kgb_data = $this->riwayat_kgb_model->find_ref($ref_id);
-        // print_r($kgb_data);
-        $this->pegawai_model->where("NIP_BARU",trim($kgb_data->pegawai_nip));
-        $pegawai_data = $this->pegawai_model->find_first_row();  
+        
+        $pegawai_data       = $this->pegawai_model->find_by("NIP_BARU",trim($kgb_data->pegawai_nip));
+        $sk_sebelum         = $this->riwayat_kgb_model->getLastRiwayat($kgb_data->pegawai_nip,$kgb_data->tmt_sk);
+        $golongan_terakhir  = $this->golongan_model->getGolongan($sk_sebelum->golongan_id);
         $list_golongan = $this->golongan_model->getGolongan($kgb_data->n_golongan_id);
         $selectedUnitKerjaInduk = $this->unitkerja_model->find_by_id($kgb_data->unit_kerja_induk_id);
         $template_data= $this->riwayat_kgb_model->getTemplate(TEMPLATE_SK_KGB_KOLEKTIF);
@@ -195,14 +196,15 @@ class Riwayat_kgb extends Admin_Controller
         $this->load->library('Template_doc_lib');
         $TBS = $this->template_doc_lib->gen_xls(BASEPATH."../../assets/templates/".$template_data->template_file);
         $tembusan_data = array();
-        $tembusan_data []['name'] = 'Kepala BKN, u.p. Deputi Bidang Sistem Informasi Kepegawaian';
-        $tembusan_data []['name'] = 'Kepala Kantor Tata Usaha Anggaran, Kementerian Keuangan';
+        $tembusan_data []['name'] = 'Kepala Badan Kepegawaian Negara, u.p.Deputi Bidang Sistem Informasi Kepegawaian di Jakarta;';
+        $tembusan_data []['name'] = 'Kepala Biro Perencanaan dan Keuangan BRIN di Jakarta;';
+        $tembusan_data []['name'] = 'Kepala Unit Kerja terkait di Lingkungan BRIN;';
         $tembusan_data []['name'] = 'Pegawai yang bersangkutan';
         $TBS->MergeBlock('tb', $tembusan_data);
         $sk_data = array(
             'p_nip'=>$kgb_data->nip,
             'no_sk'=>$kgb_data->no_sk,
-            'dt_header'=>date("d-m-Y", strtotime($kgb_data->tgl_sk)),
+            'dt_header'=>getIndonesiaFormat($kgb_data->tgl_sk),
             'pre'=>"",
             'name_bergelar'=>$pegawai_data->NAMA,
             'nip'=>$pegawai_data->NIP_BARU,
@@ -217,28 +219,27 @@ class Riwayat_kgb extends Admin_Controller
             'pp'=>'PP No 30 Tahun 2015',
             'masa_kerja_thn'=>$kgb_data->n_masakerja_thn,
             'masa_kerja_bln'=>$kgb_data->n_masakerja_bln,
-            'tmt'=>$kgb_data->tmt_sk,
-            'pangkat_text'=>$list_golongan->NAMA_PANGKAT . "-".$list_golongan->NAMA,
-            'jabatan_text'=>$kgb_data->n_jabatan_text,
-            'gapok_baru_number'=>rupiah($kgb_data->n_gapok),
-            'gapok_baru_text'=>Terbilang($kgb_data->n_gapok),
-            'gapok_lama_number'=>$kgb_data->o_gapok,
-            'gapok_lama_text'=>Terbilang($kgb_data->o_gapok),
-            'satuan_kerja'=>$kgb_data->unit_kerja_text,
-            'p_instansi'=>'',
-            'kepala_satker_ybs'=>'',
-            'foto'=>"",
-            'lastpangkat_tgl_sk'=>'',
-            'lastpangkat_no_sk'=>'',
-            'lastpangkat_tmt'=>'',
-            'lastpangkat_wpy'=>'',
-            'lastpangkat_wpm'=>'',
-            'gol_notation'=>$list_golongan,
+            'tmt'                   => getIndonesiaFormat($kgb_data->tmt_sk),
+            'pangkat_text'          => $list_golongan->NAMA_PANGKAT . "-".$list_golongan->NAMA,
+            'jabatan_text'          => $kgb_data->n_jabatan_text,
+            'gapok_baru_number'     => rupiah($kgb_data->n_gapok),
+            'gapok_baru_text'       => Terbilang($kgb_data->n_gapok),
+            'gapok_lama_number'     => rupiah($sk_sebelum->n_gapok),
+            'gapok_lama_text'       => Terbilang($sk_sebelum->n_gapok),
+            'satuan_kerja'          => $kgb_data->unit_kerja_text,
+            'p_instansi'            => '',
+            'kepala_satker_ybs'     => '',
+            'foto'                  => "",
+            'lastpangkat_tgl_sk'    => $sk_sebelum->tgl_sk ? getIndonesiaFormat($sk_sebelum->tgl_sk) : "",
+            'lastpangkat_no_sk'     => $sk_sebelum->no_sk ? $sk_sebelum->no_sk : "",
+            'lastpangkat_tmt'       => $sk_sebelum->tmt_sk ? getIndonesiaFormat($sk_sebelum->tmt_sk) : "",
+            'lastpangkat_wpy'       => $sk_sebelum->masa_kerja_thn ? $sk_sebelum->masa_kerja_thn : "",
+            'lastpangkat_wpm'       => $sk_sebelum->masa_kerja_bln ? $sk_sebelum->masa_kerja_bln : "",
+            'gol_notation'          => $list_golongan->NAMA_PANGKAT."-".$list_golongan->NAMA,
 
             'pejabat'=>$kgb_data->nama_pejabat,
-            'pejabat'=>$kgb_data->nama_pejabat,
         );
-        print_r($sk_data);
+        // print_r($sk_data);
         $sk_datas = array();
         $sk_datas[] = $sk_data;
         $TBS->MergeBlock('o',$sk_datas);
@@ -249,10 +250,151 @@ class Riwayat_kgb extends Admin_Controller
             $fullpath_docx =  $dir.DIRECTORY_SEPARATOR.$output_file_name.".docx";
             $fullpath_pdf =  $dir.DIRECTORY_SEPARATOR.$output_file_name.".pdf";
             $TBS->Show(OPENTBS_FILE,$fullpath_docx);
-            $output = shell_exec('unoconv -f pdf '.$file_word.' 2>&1');
+            $output = shell_exec('unoconv -f pdf '.$fullpath_docx.' 2>&1');
             $data_base64 = file_get_contents($fullpath_pdf);
             $base64 = 'data:application/pdf;base64,' . base64_encode($data_base64);
             echo '<embed src="'.$base64.'" width="100%" height="700" alt="pdf">';
+
+            // Header content type
+            // header('Content-type: application/pdf');
+            // header('Content-Disposition: inline; filename="' . $output_file_name . '"');
+            // header('Content-Transfer-Encoding: binary');
+            // header('Accept-Ranges: bytes');
+            // // Read the file
+            // @readfile($fullpath_pdf);
+            die();
+        }
+        else {
+            $output_file_name = $output_file_name.".docx";
+            $TBS->Show(OPENTBS_DOWNLOAD, $output_file_name); // Also merges all [onshow] automatic fields.  
+        }
+    }
+    public function create_sk($pegawai_nip,$tanggal){
+        $this->auth->restrict($this->permissionCreate);
+        $this->load->helper('aplikasi');
+        $golongan           = $this->input->get("golongan");
+        $mk_tahun           = $this->input->get("mk_tahun");
+        $pegawai_data       = $this->pegawai_model->find_by("NIP_BARU",trim($pegawai_nip));
+        $datajabatan        = $this->jabatan_model->find_by("KODE_JABATAN",trim($pegawai_data->JABATAN_INSTANSI_REAL_ID));
+        $sk_sebelum         = $this->riwayat_kgb_model->getLastRiwayat($pegawai_nip,$tanggal);
+        $wages              = $this->riwayat_kgb_model->getWage($golongan,$mk_tahun);
+        $list_golongan      = $this->golongan_model->getGolongan($sk_sebelum->golongan_id);
+
+        $unit_kerja_induk_data = $this->unitkerja_model->find($pegawai_data->UNOR_ID);
+        $template_data          = $this->riwayat_kgb_model->getTemplate(TEMPLATE_SK_KGB_KOLEKTIF);
+        // save to riwayat KGB baru
+        $data = array();
+        $data["pegawai_nip"]            = $pegawai_data->NIP_BARU;
+        $data["pegawai_nama"]           = $pegawai_data->NAMA;
+        $data["birth_place"]            = $lokasi_lahir_data->NAMA;
+        $data["birth_date"]             = $pegawai_data->TGL_LAHIR;
+        $data["pegawai_id"]             = $pegawai_data->ID;
+        $data["n_jabatan_text"]         = $datajabatan->NAMA_JABATAN;
+        $data["n_gol_ruang"]            = $list_golongan->NAMA_PANGKAT;
+        $data["unit_kerja_text"]        = $unit_kerja_induk_data->NAMA_UNOR;
+        $data["unit_kerja_induk_text"]  = $unit_kerja_induk_data->ABBREVIATION;
+        $data["unit_kerja_induk_id"]    = $unit_kerja_induk_data->UNOR_INDUK;
+        $data["tgl_sk"]                 = date("Y-m-d");
+        $data["tmt_sk"]                 = $tanggal;
+        $data["n_golongan_id"]          = $list_golongan->ID;
+        $data["id_golongan"]            = $golongan;
+        $data["n_masakerja_thn"]        = $mk_tahun;
+        $data["n_masakerja_bln"]        = 0;
+        $data["n_gapok"]                = $wages->BASIC;
+        $data['pejabat']                = trim($this->settings_lib->item('site.pejabat_kgb_nama'));
+        // jabatan terakhir
+        $data["o_gol_ruang"]            = $list_golongan->NAMA_PANGKAT." - ".$list_golongan->NAMA;
+        $data["o_gol_tmt"]              = $sk_sebelum->tmt_sk;
+        $data["o_masakerja_thn"]        = $sk_sebelum->masa_kerja_thn;
+        $data["o_masakerja_bln"]        = $sk_sebelum->masa_kerja_bln;
+        if(empty($data["tgl_sk"])){
+            unset($data["tgl_sk"]);
+        }
+        if(empty($data["tmt_sk"])){
+            unset($data["tmt_sk"]);
+        }
+        $id = $this->riwayat_kgb_model->insert($data);
+        // end save
+        $kgb_data = $this->riwayat_kgb_model->find($id);
+        $ref_id = $kgb_data->ref;
+        if(!$kgb_data){
+            $output = array(
+                'success'=>false,
+                'message'=>'Data tidak ditemukan'
+            );
+            echo json_encode($output);
+            die();
+        }
+        // header('Set-Cookie: fileDownload=true; path=/');
+        $gaji_baru = $this->riwayat_kgb_model->getWage($kgb_data->golongan2_name,$kgb_data->n_masakerja_thn);
+        $this->load->library('Template_doc_lib');
+        $TBS = $this->template_doc_lib->gen_xls(BASEPATH."../../assets/templates/".$template_data->template_file);
+        $tembusan_data = array();
+        $tembusan_data []['name'] = 'Kepala Badan Kepegawaian Negara, u.p.Deputi Bidang Sistem Informasi Kepegawaian di Jakarta;';
+        $tembusan_data []['name'] = 'Kepala Biro Perencanaan dan Keuangan BRIN di Jakarta;';
+        $tembusan_data []['name'] = 'Kepala Unit Kerja terkait di Lingkungan BRIN;';
+        $tembusan_data []['name'] = 'Pegawai yang bersangkutan';
+        $TBS->MergeBlock('tb', $tembusan_data);
+        $sk_data = array(
+            'p_nip'=>$kgb_data->nip,
+            'no_sk'=>$kgb_data->no_sk,
+            'dt_header'=>getIndonesiaFormat($kgb_data->tgl_sk),
+            'pre'=>"",
+            'name_bergelar'=>$pegawai_data->NAMA,
+            'nip'=>$pegawai_data->NIP_BARU,
+            'location'=>"Jakarta",
+            'to'=>'Kepala Kantor Pelayanan Perbendaharaan Negara',
+            'kantor_kppn_region'=>$kgb_data->kantor_pembayaran,
+            'tgl_sk'=>date('d-m-Y'),
+            'tempat'=>'Jakarta',
+            'p_birth_place'=>'',
+            'p_birth_date'=>'',
+            'lokasi_sk'=>'',
+            'pp'=>'PP No 30 Tahun 2015',
+            'masa_kerja_thn'=>$kgb_data->n_masakerja_thn,
+            'masa_kerja_bln'=>$kgb_data->n_masakerja_bln,
+            'tmt'                   => getIndonesiaFormat($kgb_data->tmt_sk),
+            'pangkat_text'          => $list_golongan->NAMA_PANGKAT . "-".$list_golongan->NAMA,
+            'jabatan_text'          => $kgb_data->n_jabatan_text,
+            'gapok_baru_number'     => rupiah($kgb_data->n_gapok),
+            'gapok_baru_text'       => Terbilang($kgb_data->n_gapok),
+            'gapok_lama_number'     => rupiah($sk_sebelum->n_gapok),
+            'gapok_lama_text'       => Terbilang($sk_sebelum->n_gapok),
+            'satuan_kerja'          => $kgb_data->unit_kerja_text,
+            'p_instansi'            => '',
+            'kepala_satker_ybs'     => '',
+            'foto'                  => "",
+            'lastpangkat_tgl_sk'    => $sk_sebelum->tgl_sk ? getIndonesiaFormat($sk_sebelum->tgl_sk) : "",
+            'lastpangkat_no_sk'     => $sk_sebelum->no_sk ? $sk_sebelum->no_sk : "",
+            'lastpangkat_tmt'       => $sk_sebelum->tmt_sk ? getIndonesiaFormat($sk_sebelum->tmt_sk) : "",
+            'lastpangkat_wpy'       => $sk_sebelum->masa_kerja_thn ? $sk_sebelum->masa_kerja_thn : "",
+            'lastpangkat_wpm'       => $sk_sebelum->masa_kerja_bln ? $sk_sebelum->masa_kerja_bln : "",
+            'gol_notation'          => $list_golongan->NAMA_PANGKAT."-".$list_golongan->NAMA,
+            'pejabat'               =>  $kgb_data->nama_pejabat,
+        );
+        // print_r($sk_data);
+        $sk_datas = array();
+        $sk_datas[] = $sk_data;
+        $TBS->MergeBlock('o',$sk_datas);
+        //$TBS->MergeField('r', $sk_data);
+        $output_file_name = $kgb_data->ref;
+        if($type=="pdf"){
+            $dir = trim($this->settings_lib->item('site.pathsk'))."kgb";
+            $fullpath_docx =  $dir.DIRECTORY_SEPARATOR.$output_file_name.".docx";
+            $fullpath_pdf =  $dir.DIRECTORY_SEPARATOR.$output_file_name.".pdf";
+            $TBS->Show(OPENTBS_FILE,$fullpath_docx);
+            $output = shell_exec('unoconv -f pdf '.$fullpath_docx.' 2>&1');
+            $data_base64 = file_get_contents($fullpath_pdf);
+            $base64 = 'data:application/pdf;base64,' . base64_encode($data_base64);
+            echo '<embed src="'.$base64.'" width="100%" height="700" alt="pdf">';
+
+            // Header content type
+            // header('Content-type: application/pdf');
+            // header('Content-Disposition: inline; filename="' . $output_file_name . '"');
+            // header('Content-Transfer-Encoding: binary');
+            // header('Accept-Ranges: bytes');
+            // // Read the file
+            // @readfile($fullpath_pdf);
             die();
         }
         else {
@@ -276,7 +418,7 @@ class Riwayat_kgb extends Admin_Controller
         Template::set('toolbar_title', "Riwayat Pekerjaan");
         Template::set('selectedUnitKerjaInduk',$selectedUnitKerjaInduk);   
         Template::render();
-		Template::render();
+        Template::render();
     }
     
     public function save(){
@@ -299,8 +441,8 @@ class Riwayat_kgb extends Admin_Controller
             echo json_encode($response);
             exit();
         }
-		
-		
+        
+        
         $data = $this->riwayat_kgb_model->prep_data($this->input->post());
         // Make sure we only pass in the fields we want
         $base64     = "";
@@ -361,7 +503,7 @@ class Riwayat_kgb extends Admin_Controller
             $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
         }
         // end upload berkas
-       	$pegawai_data = $this->pegawai_model->find_by("PNS_ID",$this->input->post("PNS_ID"));
+        $pegawai_data = $this->pegawai_model->find_by("PNS_ID",$this->input->post("PNS_ID"));
         $golongan_data = $this->golongan_model->find($this->input->post('n_golongan_id'));
         $unit_kerja_induk_data = $this->unitkerja_model->find($this->input->post('unit_kerja_induk_id'));
         $lokasi_lahir_data = $this->lokasi_model->find($pegawai_data->TEMPAT_LAHIR_ID);
@@ -392,15 +534,15 @@ class Riwayat_kgb extends Admin_Controller
     }
     public function delete($record_id){
         $this->auth->restrict($this->permissionDelete);
-		if ($this->riwayat_kgb_model->delete($record_id)) {
-			 log_activity($this->auth->user_id(), 'delete data Riwayat KGB : ' . $record_id . ' : ' . $this->input->ip_address(), 'pegawai');
-			 Template::set_message("Sukses Hapus data", 'success');
-			 echo "Sukses";
-		}else{
-			echo "Gagal";
-		}
+        if ($this->riwayat_kgb_model->delete($record_id)) {
+             log_activity($this->auth->user_id(), 'delete data Riwayat KGB : ' . $record_id . ' : ' . $this->input->ip_address(), 'pegawai');
+             Template::set_message("Sukses Hapus data", 'success');
+             echo "Sukses";
+        }else{
+            echo "Gagal";
+        }
 
-		exit();
+        exit();
     }
     public function index($PNS_ID='1552260645'){
         Template::set_view("kepegawaian/tab_pane_riwayat_kgb");
