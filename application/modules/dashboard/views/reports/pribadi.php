@@ -7,56 +7,60 @@
 ?>
 
 <div class="row">
+		<div class="col-md-4 col-sm-6 col-xs-12">
+	        <div class="info-box bg-aqua">
+	          <span class="info-box-icon"><i class="fa fa-files-o"></i></span>
+	          <div class="info-box-content">
+	            <span class="info-box-text">SK Sedang Proses</span>
+	            <span class="info-box-number"><?php echo isset($jumlah_sk_proses) ? number_format($jumlah_sk_proses,0,"",".") : "0"; ?> Dokumen</span>
+	            <div class="progress">
+	              <div class="progress-bar" style="width: 100%"></div>
+	            </div>
+	            <span class="progress-description">
+	              Jumlah Pegawai
+	            </span>
+	          </div><!-- /.info-box-content -->
+	        </div><!-- /.info-box -->
+	      </div>
         <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-aqua"><i class="fa fa-file-o"></i></span>
-
-            <div class="info-box-content">
-              <span class="info-box-text">SK Sedang Proses</span>
-              <span class="info-box-number"><?php echo isset($jumlah_sk_proses) ? number_format($jumlah_sk_proses,0,"",".") : "0"; ?> <small>Dokumen</small></span>
-            </div>
-            <!-- /.info-box-content -->
+            <div class="info-box bg-green">
+              <span class="info-box-icon"><i class="fa fa-file-o"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">SK Sudah Terbit</span>
+                <span class="info-box-number white"><a href="<?php echo base_url(); ?>admin/kepegawaian/pegawai/listultah" class="show-modal" tooltip="Pegawai Ulang tahun hari ini"><a href="<?php echo base_url(); ?>admin/arsip/sk_ds/viewallpegawai"><?php echo isset($jumlah_sk_selesai) ? $jumlah_sk_selesai : "0"; ?> <small> Dokumen	</small></a></span>
+                <div class="progress">
+                  <div class="progress-bar" style="width: 100%"></div>
+                </div>
+                <span class="progress-description">
+                  Hari ini <?php echo date("d M Y"); ?>
+                </span>
+              </div><!-- /.info-box-content -->
+            </div><!-- /.info-box -->
           </div>
-          <!-- /.info-box -->
-        </div>
         <!-- /.col -->
         <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-green"><i class="fa fa-file-o"></i></span>
-
-            <div class="info-box-content">
-              <span class="info-box-text">SK Sudah Terbit</span>
-              <span class="info-box-number"><a href="<?php echo base_url(); ?>admin/arsip/sk_ds/viewallpegawai"><?php echo isset($jumlah_sk_selesai) ? $jumlah_sk_selesai : "0"; ?> <small> Dokumen	</small></a></span>
-            </div>
-            <!-- /.info-box-content -->
-          </div>
-          <!-- /.info-box -->
-        </div>
-        <!-- /.col -->
-        <!-- fix for small devices only -->
-        <div class="clearfix visible-sm-block"></div>
-
-        <div class="col-md-4 col-sm-4 col-xs-12">
-          <div class="info-box">
-            <span class="info-box-icon bg-red"><i class="fa fa-files-o"></i></span>
-
-            <div class="info-box-content">
-              <span class="info-box-text">Jumlah SK</span>
-               <span class="info-box-number">
-               <?php echo isset($jumlah_all) ? number_format($jumlah_all,0,"",".") : ""; ?>
+            <div class="info-box bg-red">
+              <span class="info-box-icon"><i class="fa fa-folder"></i></span>
+              <div class="info-box-content">
+                <span class="info-box-text">Jumlah SK</span>
+                <span class="info-box-number"><?php echo isset($jumlah_all) ? number_format($jumlah_all,0,"",".") : ""; ?>
                <small> Dokumen</small></span>
-            </div>
-            <!-- /.info-box-content -->
+                <div class="progress">
+                  <div class="progress-bar" style="width: 100%"></div>
+                </div>
+                <span class="progress-description">
+                  Jumlah Unit Satuan Kerja
+                </span>
+              </div><!-- /.info-box-content -->
+            </div><!-- /.info-box -->
           </div>
-          <!-- /.info-box -->
-        </div>
-        
+        <!-- /.col -->
 </div>
 
-<div class="callout callout-success">
+<div class="callout callout-warning">
    <h4>Perubahan data anda</h4>
  </div>
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
 	<div class="box-body">
 		<table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-data table-hover">
 			<thead>
@@ -64,7 +68,6 @@
 				<th style="width:10px">No</th>
 				<th>Perubahan</th>
 				<th width="70px">Status</th>
-				<th width="70px" align="center">#</th></tr>
 			</thead>
 		</table>
 	</div>
@@ -79,7 +82,7 @@ $table = $(".table-data").DataTable({
 	processing: true,
 	serverSide: true,
 	"columnDefs": [
-					{"className": "text-center", "targets": [2,3]},
+					{"className": "text-center", "targets": [2]},
 					{ "targets": [0,1], "orderable": false }
 				],
 	ajax: {
