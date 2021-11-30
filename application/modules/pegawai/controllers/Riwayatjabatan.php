@@ -25,7 +25,8 @@ class Riwayatjabatan extends Admin_Controller
         $jenis_jabatans = $this->jenis_jabatan_model->find_all();
 		Template::set('jenis_jabatans', $jenis_jabatans);
         $this->load->model('pegawai/update_mandiri_model');
-		
+		$this->load->model('pegawai/kawasan_model');
+        $this->load->model('pegawai/tusi_model');
 		$this->load->model('pegawai/unitkerja_model');
 		
     }
@@ -133,6 +134,12 @@ class Riwayatjabatan extends Admin_Controller
     }
     public function show($PNS_ID,$record_id=''){
     	Template::set('recsatker', $this->unitkerja_model->find_satker());
+        $kawasans = $this->kawasan_model->find_all();
+        Template::set('kawasans', $kawasans);
+        $this->load->model('pegawai/tusi_model');
+        $tusis = $this->tusi_model->find_all();
+        Template::set('tusis', $tusis);
+
         if(empty($record_id)){
             $this->auth->restrict($this->permissionCreate);
             Template::set_view("kepegawaian/riwayat_jabatan_crud");
@@ -143,7 +150,7 @@ class Riwayatjabatan extends Admin_Controller
         else {
     		//$this->auth->restrict($this->permissionEdit);
             $datadetil = $this->riwayat_jabatan_model->find($record_id); 
-        	$recordunors = $this->unitkerja_model->find_all($datadetil->ID_SATUAN_KERJA);
+        	$recordunors = $this->unitkerja_model->find_all(trim($datadetil->ID_SATUAN_KERJA));
         	Template::set('recunor', $recordunors);
         	
             
@@ -380,16 +387,7 @@ class Riwayatjabatan extends Admin_Controller
             }
 
         }
-        if($this->input->post("IS_ACTIVE") == "1"){
-           $dataupdate = array();
-            $dataupdate['JABATAN_INSTANSI_REAL_ID']     = $this->input->post('ID_JABATAN');
-            $dataupdate['JABATAN_INSTANSI_ID']          = $this->input->post('ID_JABATAN');
-            $dataupdate['UNOR_ID']                      = $this->input->post('ID_UNOR');
-            $dataupdate['UNOR_INDUK_ID']                = $this->input->post('ID_SATUAN_KERJA');
-
-            $this->pegawai_model->skip_validation(true);
-            $this->pegawai_model->update_where("PNS_ID",$this->input->post("PNS_ID"), $dataupdate);
-        }
+        
         $data["ID_SATUAN_KERJA"]    = trim($this->input->post("ID_SATUAN_KERJA"));
         if(empty($data["TMT_JABATAN"])){
             unset($data["TMT_JABATAN"]);
@@ -400,10 +398,11 @@ class Riwayatjabatan extends Admin_Controller
         if(empty($data["TMT_PELANTIKAN"])){
             unset($data["TMT_PELANTIKAN"]);
         }
-        if(empty($data["TERMINATED_DATE"])){
-            unset($data["TERMINATED_DATE"]);
-        }
+        
         $data['SK_PEMBERHENTIAN_TANGGAL']            = $this->input->post('TERMINATED_DATE') ? $this->input->post('TERMINATED_DATE') : null;
+        $data['TERMINATED_DATE']                     = $this->input->post('TERMINATED_DATE') ? $this->input->post('TERMINATED_DATE') : null;
+        $data['kawasan_id']                          = $this->input->post('kawasan_id') ? $this->input->post('kawasan_id') : null;
+        $data['tusi_id']                             = $this->input->post('tusi_id') ? $this->input->post('tusi_id') : null;
         $data["LAST_UPDATED"] 	                     = date("Y-m-d");
         $id_data = $this->input->post("ID");
         if(isset($id_data) && !empty($id_data)){
@@ -416,10 +415,30 @@ class Riwayatjabatan extends Admin_Controller
              // add log
             log_activity_pegawai($NIP_BARU,$this->auth->user_id(),"Tambah data Riwayat Jabatan", 'rwt_jabatan');
          }
+        $this->set_jabatan_aktif($NIP_BARU);
         $response ['success']= true;
         $response ['msg']= "berhasil";
         echo json_encode($response);    
 
+    }
+    private function set_jabatan_aktif($nip){
+        $jabatan_aktifs = $this->riwayat_jabatan_model->limit(1)->find_aktif($nip);
+        if($jabatan_aktifs[0]->ID_JABATAN != ""){
+            $jabatan_aktifs = $jabatan_aktifs[0];
+            $rec_jabatan    = $this->jabatan_model->find_by("KODE_JABATAN",$jabatan_aktifs->ID_JABATAN);
+            $rec_unitkerja  = $this->unitkerja_model->find_by("KODE_INTERNAL",$rec_jabatan->ID_UNOR); // POST
+            $dataupdate = array();
+            $dataupdate['JABATAN_INSTANSI_REAL_ID']     = $jabatan_aktifs->ID_JABATAN;
+            $dataupdate['kawasan_id']                   = $jabatan_aktifs->kawasan_id;
+            $dataupdate['tusi_id']                      = $jabatan_aktifs->tusi_id;
+            $dataupdate['JABATAN_NAMA']                 = $rec_jabatan->NAMA_JABATAN ? $rec_jabatan->NAMA_JABATAN : null;
+            $dataupdate['JABATAN_INSTANSI_ID']          = $jabatan_aktifs->ID_JABATAN;
+            $dataupdate['UNOR_ID']                      = $rec_jabatan->ID_UNOR ? $rec_jabatan->ID_UNOR : null;
+            $dataupdate['UNOR_INDUK_ID']                = $rec_unitkerja->UNOR_INDUK ? $rec_unitkerja->UNOR_INDUK : null;
+
+            $this->pegawai_model->skip_validation(true);
+            $this->pegawai_model->update_where("NIP_BARU",$nip, $dataupdate);
+        }
     }
     public function savemandiri(){
          // Validate the data

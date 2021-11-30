@@ -5,9 +5,11 @@
  */
 class Kgb_satker extends Admin_Controller
 {
-   protected $permissionProsesKGB   = 'LayananKGB.ProsesKGB';
-   protected $permissionCetakPersonal   = 'LayananKGB.CetakSKPersonal';
-   protected $permissionCetakKolektif   = 'LayananKGB.CetakSKKolektif';
+   protected $permissionProsesKGB   		= 'LayananKGB.ProsesKGB';
+   protected $permissionCetakPersonal   	= 'LayananKGB.CetakSKPersonal';
+   protected $permissionCetakKolektif   	= 'LayananKGB.CetakSKKolektif';
+   protected $permissionViewKgbInstansi   	= 'LayananKGB.View.PengelolaKGBInstansi';
+   protected $permissionViewKgbKawasan   	= 'LayananKGB.View.PengelolaKGBSatker';
 	
     /**
      * Constructor
@@ -18,10 +20,11 @@ class Kgb_satker extends Admin_Controller
     {
         parent::__construct();
 		$this->load->model('pegawai/pegawai_model');
-		$this->load->model('pegawai/unitkerja_model');
+		$this->load->model('golongan/golongan_model');
+        $this->load->model('kgb/vw_kgb_model');
+
 		$this->load->helper('aplikasi');
 		$this->satker_pegawai = getSatkerPegawai($this->auth->username());
-		$this->selectedSatker = $this->unitkerja_model->find($this->satker_pegawai);
 		Template::set('module_url',base_url('kgb/kgb-satker'));
 		Template::set('canCetakSKKolektif',$this->permissionCetakKolektif);
     }
@@ -33,26 +36,27 @@ class Kgb_satker extends Admin_Controller
      */
     public function index()
     {
-		if(!$this->auth->has_permission('LayananKGB.View.PengelolaKGBSatker')){
-			redirect("");
-		}
-	
+    	$this->auth->restrict($this->permissionViewKgbKawasan);
+		Template::set('toolbar_title', "KGB Kawasan");
 		Template::set('selectedSatker',$this->selectedSatker);
     	Template::set_view('kgb_satker/v_list');
         Template::render();
 	}
 	
     public function ajax_list(){
-        $draw = $this->input->post('draw');
-		$iSortCol = $this->input->post('iSortCol_1');
-		$sSortCol = $this->input->post('sSortDir_1');
+    	$this->auth->restrict($this->permissionViewKgbKawasan);
+    	$this->load->helper('aplikasi');
+    	$this->load->library('convert');
+    	$akawasan 	= json_decode($this->auth->kawasans());
+        $draw 		= $this->input->post('draw');
+		$iSortCol 	= $this->input->post('iSortCol_1');
+		$sSortCol 	= $this->input->post('sSortDir_1');
 		
-		$length= $this->input->post('length') != "" ? $this->input->post('length') : 10;
-		$start= $this->input->post('start') != "" ? $this->input->post('start') : 0;
+		$length	= $this->input->post('length') != "" ? $this->input->post('length') : 10;
+		$start 	= $this->input->post('start') != "" ? $this->input->post('start') : 0;
 
-		$search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
-		$searchKey = isset($_REQUEST['search']["key"]) ? $_REQUEST['search']["key"] : "";
-
+		$search 	= isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+		$searchKey 	= isset($_REQUEST['search']["key"]) ? $_REQUEST['search']["key"] : "";
 		$selectedUnors = array();
 		$advanced_search_filters  = $this->input->post("search[advanced_search_filters]");
 		if($advanced_search_filters){
@@ -62,148 +66,83 @@ class Kgb_satker extends Admin_Controller
 			}
 			
 		}
-
 		$this->db->start_cache();
-        
-        $this->db->from("mv.mv_kgb");
-        $this->db->join("hris.pegawai p",'mv_kgb.pegawai_id = p."ID"',"INNER");
-		$this->db->join("hris.vw_unit_list vw",'p.UNOR_ID=vw.ID','INNER');
-		$this->db->join("hris.unitkerja vw_satker",'vw_satker.ID=vw.UNOR_INDUK','INNER');
-		$this->db->join("hris.golongan g",'g.ID=p.GOL_ID','INNER');
-		$this->db->join("hris.rwt_kgb",'mv_kgb.id=rwt_kgb.mv_kgb_id','left');
-		$this->db->join("mv.kgb_tunda kgbt","kgbt.mv_kgb_id=mv_kgb.id","LEFT");
-
-		if($this->selectedSatker){
-			$this->db->group_start();
-				$this->db->where('vw."ID"',$this->selectedSatker->ID);	
-				$this->db->or_where('vw."ESELON_1"',$this->selectedSatker->ID);	;	
-				$this->db->or_where('vw."ESELON_2"',$this->selectedSatker->ID);	
-				$this->db->or_where('vw."ESELON_3"',$this->selectedSatker->ID);	
-				$this->db->or_where('vw."ESELON_4"',$this->selectedSatker->ID);	
-			$this->db->group_end();
-		}
-
-		/*Jika $search mengandung nilai, berarti user sedang telah 
-		memasukan keyword didalam filed pencarian*/
 		$advanced_search_filters  = $this->input->post("search[advanced_search_filters]");
 		if($advanced_search_filters){
 			$filters = array();
 			foreach($advanced_search_filters as  $filter){
 				$filters[$filter['name']] = $filter["value"];
 			}
-			
 			if($filters['filter_unit_kerja']){
-				
 				$this->db->group_start();
-				$this->db->where('vw."ID"',$filters['filter_unit_kerja']);	
-				$this->db->or_where('vw."ESELON_1"',$filters['filter_unit_kerja']);	
-				$this->db->or_where('vw."ESELON_2"',$filters['filter_unit_kerja']);	
-				$this->db->or_where('vw."ESELON_3"',$filters['filter_unit_kerja']);	
-				$this->db->or_where('vw."ESELON_4"',$filters['filter_unit_kerja']);	
+				$this->db->where('unitkerja."UNOR_INDUK"',$filters['filter_unit_kerja']);
 				$this->db->group_end();
 			}
-			if($filters['filter_tahun']) {
-				$this->db->where("date_part('year',mv_kgb.dt_kgb_yad)",date('Y'));
-			}
-			if($filters['filter_bulan']) {
-				$this->db->where("date_part('month',mv_kgb.dt_kgb_yad)",$filters['filter_bulan']);
-			}
-			
-			if($filters['golongan_cb']){
-				//$this->pegawai_model->where('"GOL_ID"',strtoupper($filters['golongan_key']));	
+			if($filters['nip_sk']){
+				$this->db->group_start();
+				$this->db->where('pegawai_nip',$filters['nip_sk']);	
+				$this->db->group_end();
 			}
 		}
-		
+		$this->vw_kgb_model->where_in('kawasan_id',$akawasan);
 		$this->db->stop_cache();
-		$output=array();
-		$output['draw']=$draw;
-		$total= $this->db->get()->num_rows();
-		$output['recordsTotal']= $output['recordsFiltered']=$total;
-		$this->db->select("kgbt.id as tunda_id,kgbt.alasan as kgbt_alasan,mv_kgb.pegawai_id,
-		rwt_kgb.id as riwayat_kgb_id,vw_satker.NAMA_UNOR as nama_satker,mv_kgb.id,vw.NAMA_UNOR_FULL as unor_full,p.NAMA as name,p.NIP_BARU as nip,mv_kgb.masa_kerja_thn,mv_kgb.masa_kerja_bln,g.NAMA as golongan_name,g.NAMA_PANGKAT as pangkat_name,
-			(
-				select count(*) as total from rwt_hukdis where  \"ID_JENIS_HUKUMAN\" = '04' and trim(\"PNS_NIP\") = trim(p.\"NIP_BARU\")
-			) as riwayat_hukdis,
-			(
-				select \"BASIC\" from wage 
-				left join golongan g on wage.\"GOLONGAN\" = g.\"NAMA2\"
-				where g.\"ID\" = mv_kgb.golongan_id and wage.\"WORKING_PERIOD\" = mv_kgb.masa_kerja_thn
-				limit 1
-			) as gaji ");
-		$this->db->limit($length,$start);
-		$rows = $this->db->get()->result();
+		$tanggal 				= $filters['filter_tahun']."-".$filters['filter_bulan']."-01";
+		$output 				= array();
+		$output['draw']			= $draw;
+		$total 					= $this->vw_kgb_model->getEstimasiKgbCount($tanggal)[0]->jml;
+		$output['recordsTotal']	= $output['recordsFiltered']=$total;
+		$output['data']			=array();
+		$this->vw_kgb_model->limit($length,$start);
+		$records = $this->vw_kgb_model->getEstimasiKgb($tanggal);
+
 		$this->db->flush_cache();
-		$data = array();
-		$index = 1;
-		foreach($rows as $row){
-			$btn_actions_array = array();
-			if($row->riwayat_kgb_id){
-				if($this->auth->has_permission($this->permissionCetakPersonal)){
+		$nomor_urut = 1;
+		if(isset($records) && is_array($records) && count($records)):
+			foreach ($records as $record) {
+				$rec_golongan = $this->golongan_model->getGolongan($record->golongan_id);
+				$mk_tahun = $record->n_jml_bulan/12;
+				// print_r($rec_golongan);
+				$btn_actions_array = array();
+				if($record->riwayat_kgb_id){
 					$btn_actions_array  [] = "
-						<a class='download-ajax btn-cetak-personal' href='".base_url()."kgb/kgb_satker/cetak_personal/".$row->id."'  data-toggle='tooltip' title='Cetak KGB DOCX'><span class='fa-stack'>
-							<i class='fa fa-square fa-stack-2x'></i>
-								<i class='fa fa-print fa-stack-1x fa-inverse'></i>
-								</span>
-								</a>
+						Sudah di Proses
 					";	
 				}
-				if($this->auth->has_permission($this->permissionProsesKGB)){
+				else {
 					$btn_actions_array  [] = "
-						<a class='btn-proses-kgb' href='".base_url()."kgb/kgb_satker/proses_kgb_form/".$row->id."/".$row->pegawai_id."'  data-toggle='modal' data-toggle='tooltip' title='Proses KGB'><span class='fa-stack'>
-							<i class='fa fa-square fa-stack-2x'></i>
-							<i class='fa fa-cog fa-stack-1x fa-inverse'></i>
-							</span>
-						</a>
-					";	
-					$btn_actions_array  [] = "
-						<a class='btn-proses-kgb' href='".base_url()."kgb/kgb_satker/tunda_kgb/".$row->id."'  data-toggle='modal' data-toggle='tooltip' title='Tunda KGB'><span class='fa-stack'>
-							<i class='fa fa-square fa-stack-2x'></i>
-							<i class='fa fa-lock fa-stack-1x fa-inverse'></i>
-							</span>
-						</a>
-					";	
-				}	
-			}
-			else {
-				if($this->auth->has_permission($this->permissionProsesKGB)){
-					$btn_actions_array  [] = "
-					<a class='btn-proses-kgb' href='".base_url()."kgb/kgb_satker/proses_kgb_form/".$row->id."/".$row->pegawai_id."'  data-toggle='modal' data-toggle='tooltip' title='Proses KGB'><span class='fa-stack'>
-						<i class='fa fa-square fa-stack-2x'></i>
-							<i class='fa fa-cog fa-stack-1x fa-inverse'></i>
-							</span>
-							</a>
-					";	
-					$btn_actions_array  [] = "
-						<a class='btn-proses-kgb' href='".base_url()."kgb/kgb_satker/tunda_kgb/".$row->id."'  data-toggle='modal' data-toggle='tooltip' title='Tunda KGB'><span class='fa-stack'>
-							<i class='fa fa-square fa-stack-2x'></i>
-							<i class='fa fa-lock fa-stack-1x fa-inverse'></i>
-							</span>
-						</a>
+						Belum di Proses
 					";	
 				}
+				$informasi_hukdis = "";
+				if($record->total>0){
+					$informasi_hukdis = "HUKDIS";
+				}
+				else $informasi_hukdis = "-";
+				$row = array();
+                $row []  = $nomor_urut;
+                $row []  = $record->nama_pegawai."<br>".$record->pegawai_nip;
+                $row []  = $rec_golongan->NAMA_PANGKAT." - ".$rec_golongan->NAMA."<br><b><i>Sk Terakhir:</i></b> ".date("d-m-Y", strtotime($record->tmt_sk));
+                $row []  = "<b><i>Lama</i></b> ".$record->o_masa_kerja_thn."th ".$record->o_masa_kerja_bln."bln, <br><b><i>Baru </i></b>".($record->n_jml_bulan/12)."th 0bln";
+               	$row []  = "<b><i>Lama</i></b> ".number_format($record->gaji_lama,0,",",".").",<br><b><i>Baru </i></b>".number_format($record->gaji_baru,0,",",".");
+               	$row []  = $record->ABBREVIATION;
+                $row []  = $informasi_hukdis;
+                $btn_actions = array();
+                if($record->tmt_sk == $tanggal){
+                	if($record->riwayat == 'kgb'){
+                		$btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/printsk/".$record->ref."/pdf' data-toggle='tooltip' title='Print Ulang SK KGB' tooltip='Print Ulang SK KGB' class='btn btn-sm btn-success show-modal'><i class='fa fa-print'></i> </a>";	
+                		$btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/printsk/".$record->ref."' data-toggle='tooltip' title='Download Dokumen word' tooltip='Download word' class='btn btn-sm btn-info'><i class='fa fa-download'></i> </a>";
+                	}
+                }else{
+                	$btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/create_sk/".$record->pegawai_nip."/".$tanggal."?golongan=$rec_golongan->NAMA2&mk_tahun=$mk_tahun' data-toggle='tooltip' title='Print SK' tooltip='Print SK' class='btn btn-sm btn-warning show-modal'><i class='fa fa-print'></i> </a>";
+                }
+                
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+
+                 
+                $output['data'][] = $row;
+                $nomor_urut++;
 			}
-			$informasi = array();
-			if($row->riwayat_hukdis>0){
-				$informasi[]= "HUKDIS";
-			}
-			$tunda_class=  '';
-			if($row->tunda_id){
-				$tunda_class='tunda';
-				$informasi[] = $row->kgbt_alasan;
-			}
-			$data [] = array(
-				$index,
-				"<div class='$tunda_class'>".$row->name ."<Br>". $row->nip."</div>",
-				$row->pangkat_name."-".$row->golongan_name,
-				$row->masa_kerja_thn."/".$row->masa_kerja_bln,
-				rupiah($row->gaji),
-				$row->nama_satker,
-				implode("<br>",$informasi),
-				implode(" ",$btn_actions_array)
-			);
-			$index++;
-		}
-		$output['data']= $data;
+		endif;
 		echo json_encode($output);
     }
 	public function proses_kgb_form($id,$pegawai_id){

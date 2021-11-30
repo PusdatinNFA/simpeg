@@ -78,6 +78,19 @@ class Riwayat_kgb_model extends BF_Model
 		}
 		return parent::find_all();
 	}
+	public function is_uniq($nip ="",$n_golongan_id = "",$n_masakerja_thn = "",$n_masakerja_bln = "")
+	{
+		
+		if(empty($this->selects))
+		{
+			$this->select($this->table_name .'.*');
+		}
+		$this->db->where('pegawai_nip',$nip);
+		$this->db->where('n_golongan_id',$n_golongan_id);
+		$this->db->where('n_masakerja_thn',$n_masakerja_thn);
+		$this->db->where('n_masakerja_bln',$n_masakerja_bln);
+		return parent::count_all()>0;
+	}
 	public function find_ref($ref ="")
 	{
 		

@@ -155,21 +155,23 @@ class Base_Controller extends MX_Controller
             // Load the currently logged-in user for convenience
             if ($this->auth->is_logged_in()) {
                 $this->current_user = clone $this->auth->user();
-                $pegawai = $this->pegawai_model->find_by("NIP_BARU",trim($this->auth->username()));
-                $aphoto = isset($pegawai->PHOTO) ? $pegawai->PHOTO : "";
-                $foto_pegawai = trim($this->settings_lib->item('site.urlphoto'))."noimage.jpg";
-                if(file_exists(trim($this->settings_lib->item('site.urlphoto')).$aphoto) and $aphoto != ""){
-                    $foto_pegawai =  trim($this->settings_lib->item('site.urlphoto')).$aphoto;
+                if($this->auth->photo()!=""){
+                    $this->current_user->PHOTO = $this->auth->photo();
+                }else{
+                    $pegawai = $this->pegawai_model->find_by("NIP_BARU",trim($this->auth->username()));
+                    $aphoto = isset($pegawai->PHOTO) ? $pegawai->PHOTO : "";
+                    $foto_pegawai = trim($this->settings_lib->item('site.urlphoto'))."noimage.jpg";
+                    if(file_exists(trim($this->settings_lib->item('site.urlphoto')).$aphoto) and $aphoto != ""){
+                        $foto_pegawai =  trim($this->settings_lib->item('site.urlphoto')).$aphoto;
+                    }
+                    $this->current_user->PHOTO = $foto_pegawai;
                 }
-                $this->current_user->PHOTO = $foto_pegawai;
-
                 // If the user has a language setting then use it
                 if (isset($this->current_user->language)) {
                     $this->config->set_item('language', $this->current_user->language);
                     $this->session->set_userdata('language', $this->current_user->language);
                 }
             }
-
             // Make the current user available in the views
             if (! class_exists('template', false)) {
                 $this->load->library('template');

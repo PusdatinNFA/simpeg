@@ -1,8 +1,4 @@
-<?php 
-	
-?>
-
-<div id="container-sk-kgb" class="admin-box box box-primary expanded-box">
+<div id="container-sk-kgb" class="admin-box box box-danger expanded-box">
 	<div class="box-header">
               <h3 class="box-title">Pencarian Lanjut</h3>
 			   <div class="box-tools pull-right">
@@ -21,46 +17,55 @@
 				}
 			</style>
 			<table class="filter_pegawai" sborder=0 width='100%' cellpadding="10">
-				<tr>
-					<td width="20px"></td>
-					<td width="200px"><label for="example-text-input" class="col-form-label">Satuan Kerja</label></td>
-					<td colspan=2>
-                        <?php echo $selectedSatker->NAMA_UNOR?>
+                <tr>
+                    <td width="150px"><label for="example-text-input" class="col-form-label">Pegawai</label></td>
+                    <td colspan=2>
+                        <select id="nip_sk" name="nip_sk" width="100%" class="form-control select2 class_pegawai">
+                        <?php
+                        if($pegawai){
+                            echo "<option selected value='".$pegawai->PNS_ID."'>".$pegawai->NAMA."</option>";
+                        }
+                        ?>
+                    </select>
                     </td>
+                </tr>
+				<tr>
+					<td width="150px"><label for="example-text-input" class="col-form-label">Satuan Kerja</label></td>
+					<td colspan=2><select id="filter_unit_kerja" name="filter_unit_kerja" width="100%" class=" col-md-10 format-control"></select></td>
 				</tr>
 				
 				<tr>
-					<td width="20px"></td>
-					<td width="200px"><label for="example-text-input" class="col-form-label">Periode</label></td>
+					<td ><label for="example-text-input" class="col-form-label">Periode</label></td>
 					<td style="padding-right:10px;" width="200px" >
 						<select class="form-control select2" name="filter_bulan">
                             <?php 
                                 $bulans = array(
-                                    'Januari',
-                                    'Februari',
-                                    'Maret',
-                                    'April',
-                                    'Mei',
-                                    'Juni',
-                                    'Juli',
-                                    'Agustus',
-                                    'September',
-                                    'Oktober',
-                                    'Nopember',
-                                    'Desember'
+                                    '01'=>'Januari',
+                                    '02'=>'Februari',
+                                    '03'=>'Maret',
+                                    '04'=>'April',
+                                    '05'=>'Mei',
+                                    '06'=>'Juni',
+                                    '07'=>'Juli',
+                                    '08'=>'Agustus',
+                                    '09'=>'September',
+                                    '10'=>'Oktober',
+                                    '11'=>'Nopember',
+                                    '12'=>'Desember'
                                 );
                                 foreach($bulans as  $key=>$value){
-                                    echo "<option value='".((int)($key+1))."'>$value</option>";
+
+                                    echo "<option value='".$key."'>$value</option>";
                                 }
                             ?>
 						</select>
 					</td>
-					<td ><input class="form-control" type="text" name="filter_tahun" readonly value="<?php echo date('Y');?>" ></td>
+					<td ><input class="form-control" type="text" name="filter_tahun" value="<?php echo date('Y');?>" ></td>
 				</tr>
 				
 				<tr>
 					<td colspan=4>
-						<button type="submit" class="btn btn-box-tool btn-default pull-right "><i class="fa fa-search"></i> Cari</button>
+						<button type="submit" class="btn btn-success pull-right "><i class="fa fa-search"></i> Cari</button>
 					</td>
 				</tr>
 			</table>
@@ -70,19 +75,14 @@
 	</div>
 </div>
 
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
     <div class="box-header">
-        DAFTAR PEGAWAI YANG MENDAPATKAN KENAIKAN GAJI BERKALA 
-		<div class="box-tools pull-right">
-			<?php if ($canCetakSKKolektif) : ?>
-				<button type="button" id="btn-cetak-sk-kolektif" class="btn btn-box-tool btn-default " >
-					<i class="fa fa-print"></i> Surat SK Kolektif
-				</button>
-			<?php endif; ?>					
-			<button href="<?php echo $module_url?>/form_settings" type="button" id="btn-kgb-settings-satker" class="btn btn-box-tool btn-default " >
-					<i class="fa fa-cog"></i> Setting
-			</button>								
-        </div>                       
+        DAFTAR PEGAWAI YANG MENDAPATKAN KENAIKAN GAJI BERKALA    
+        <!-- <div class="box-tools pull-right">
+            <button type="button" id="btn-cetak-surat-pengantar" class="btn btn-box-tool btn-default " >
+                <i class="fa fa-print"></i> Cetak Surat Pengantar SK 
+            </button>
+        </div>                    -->
     </div>
 	<div class="box-body">
 		<table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-data table-hover">
@@ -90,11 +90,11 @@
 			<tr>
 				<th style="width:10px">No</th>
 				<th>Pegawai</th>
-				<th>Pangkat<BR>Golongan</th>
-                <th>MKG (Thn)/Bulan</th>
+				<th>Pangkat|Golongan</th>
+                <th>Masa Kerja</th>
                 <th>Gaji Pokok</th>
-                <th>Satuan Kerja</th>                    
-				<th>Keterangan</th>   
+                <th>Satuan Kerja</th> 
+                <th>Keterangan</th>                   
 				<th width="70px" align="center">#</th></tr>
 			</thead>
 		</table>
@@ -102,43 +102,34 @@
 </div>
 <script>
     $(document).ready(function(){
-		
-		$('body').on('click','#btn-kgb-settings-satker',function(event){
-			showModalX.call(this,'sukses-settings-kgb',function(){
-				$table.ajax.reload();
-			},this);
-			event.preventDefault();
-		});
-		$('body').on('click','#btn-cetak-sk-kolektif',function(event){
-			$.fileDownload(BASE_URL+'kgb/kgb_satker/cetak_sk_kolektif/'+$("[name=filter_tahun]").val()+"/"+$("[name=filter_bulan]").val(), {
-				successCallback: function (url) {
-					//alert('You just got a file download dialog or ribbon for this URL :' + url);
-				},
-				failCallback: function (responseHtml, url) {
-					var responseCode = JSON.parse(responseHtml);
-					swal("Informasi", responseCode.message, "error");
-				}
-			});
-		});
-		$('body').on('click','.btn-cetak-personal1',function(event){
-			$.fileDownload(BASE_URL+'kgb/kgb_satker/cetak_sk_kolektif/'+$("[name=filter_tahun]").val()+"/"+$("[name=filter_bulan]").val(), {
-				successCallback: function (url) {
-					//alert('You just got a file download dialog or ribbon for this URL :' + url);
-				},
-				failCallback: function (responseHtml, url) {
-					var responseCode = JSON.parse(responseHtml);
-					swal("Informasi", responseCode.message, "error");
-				}
-			});
-		});
-		$('body').on('click','.btn-proses-kgb',function(event){
+        $("#btn-cetak-surat-pengantar").click(function(event){
+            window.location  = 'kgb_instansi/cetak_surat_pengantar/'+$("[name=filter_tahun]").val()+"/"+$("[name=filter_bulan]").val();
+        });
+		var $container = $("#container-sk-kgb");
+		$container.on('click','.show-modal-custom',function(event){
+			
 			showModalX.call(this,'sukses-proses-kgb',function(){
 				$table.ajax.reload();
 			},this);
 			event.preventDefault();
 		});
-		
-        
+        $("#filter_unit_kerja").select2({
+            placeholder: 'Filter Unit Kerja...',
+            width: '100%',
+            minimumInputLength: 0,
+            allowClear: true,
+            ajax: {
+                url: '<?php echo base_url('pegawai/kepegawaian/ajax_unit_list');?>',
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        term: params.term || '',
+                        page: params.page || 1
+                    }
+                },
+                cache: true
+            }
+        });
         $table = $(".table-data").DataTable({
 	
             dom : "<'row'<'col-sm-6'><'col-sm-6'>>" +
@@ -147,10 +138,11 @@
             processing: true,
             serverSide: true,
             "columnDefs": [
-                            {"className": "dt-center", "targets": [4]}
+                            {"className": "text-center", "targets": [0,7]},
+                            {"className": "text-right", "targets": [4]}
                         ],
             ajax: {
-            url: "<?php echo $module_url?>/ajax_list",
+            url: "kgb_satker/ajax_list",
             type:'POST',
             "data": function ( d ) {
                     d.search['advanced_search_filters']=  $("#form_search_pegawai").serializeArray();
@@ -162,12 +154,21 @@
             return false;
         });
     });
+$(".class_pegawai").select2({
+        placeholder: 'Cari Pegawai.....',
+        width: '100%',
+        minimumInputLength: 3,
+        allowClear: true,
+        ajax: {
+            url: '<?php echo site_url("pegawai/kepegawaian/ajaxnip");?>',
+            dataType: 'json',
+            data: function(params) {
+                return {
+                    term: params.term || '',
+                    page: params.page || 1
+                }
+            },
+            cache: true
+        }
+    });
 </script>
-
-<style>
-	.tunda {
-		background-color:red;
-		color:white;
-		font-weight:bold;
-	}
-</style>

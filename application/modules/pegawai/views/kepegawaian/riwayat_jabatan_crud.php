@@ -119,6 +119,34 @@
 					<span class='help-inline'><?php echo form_error('TMT_PELANTIKAN'); ?></span>
 				</div>
 			</div>
+			<div class="control-group<?php echo form_error('kawasan_id') ? ' error' : ''; ?> col-sm-6">
+                <?php echo form_label("Kawasan", 'kawasan_id', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <select name="kawasan_id" id="kawasan_id" class="form-control select2">
+                         <option value="">Silahkan Pilih</option>
+                         <?php if (isset($kawasans) && is_array($kawasans) && count($kawasans)):?>
+                            <?php foreach($kawasans as $record):?>
+                                <option value="<?php echo $record->id?>" <?php if(isset($detail_riwayat->kawasan_id))  echo  ($detail_riwayat->kawasan_id==$record->id) ? "selected" : ""; ?>><?php echo $record->name; ?></option>
+                                <?php endforeach;?>
+                            <?php endif;?>
+                    </select>
+                    <span class='help-inline'><?php echo form_error('kawasan_id'); ?></span>
+                </div>
+            </div> 
+            <div class="control-group<?php echo form_error('tusi_id') ? ' error' : ''; ?> col-sm-6">
+                <?php echo form_label("Tusi", 'tusi_id', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <select name="tusi_id" id="tusi_id" class="form-control select2">
+                         <option value="">Silahkan Pilih</option>
+                         <?php if (isset($tusis) && is_array($tusis) && count($tusis)):?>
+                            <?php foreach($tusis as $record):?>
+                                <option value="<?php echo $record->id?>" <?php if(isset($detail_riwayat->tusi_id))  echo  ($detail_riwayat->tusi_id==$record->id) ? "selected" : ""; ?>><?php echo $record->name; ?></option>
+                                <?php endforeach;?>
+                            <?php endif;?>
+                    </select>
+                    <span class='help-inline'><?php echo form_error('tusi_id'); ?></span>
+                </div>
+            </div>
 			<div class="control-group col-sm-3">
 				<label for="inputNAMA" class="control-label">TGL PEMBERHENTIAN</label>
 				<div class="input-group date">

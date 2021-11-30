@@ -5,7 +5,8 @@
  */
 class Kgb_instansi extends Admin_Controller
 {
-
+	protected $permissionViewKgbInstansi   	= 'LayananKGB.View.PengelolaKGBInstansi';
+   	protected $permissionViewKgbKawasan   	= 'LayananKGB.View.PengelolaKGBSatker';
     /**
      * Constructor
      *
@@ -26,7 +27,7 @@ class Kgb_instansi extends Admin_Controller
      */
     public function index()
     {
-
+    	$this->auth->restrict($this->permissionViewKgbInstansi);
     	Template::set('toolbar_title', "KGB Instansi");
 		Template::set("collapse",true);
 		Template::set_view("kgb_instansi/v_kgb_instansi");
@@ -39,6 +40,7 @@ class Kgb_instansi extends Admin_Controller
 		*/
 	}
     public function ajax_list(){
+    	$this->auth->restrict($this->permissionViewKgbInstansi);
     	$this->load->helper('aplikasi');
         $draw = $this->input->post('draw');
 		$iSortCol = $this->input->post('iSortCol_1');
@@ -114,7 +116,7 @@ class Kgb_instansi extends Admin_Controller
 				$row = array();
                 $row []  = $nomor_urut;
                 $row []  = $record->nama_pegawai."<br>".$record->pegawai_nip;
-                $row []  = $rec_golongan->NAMA_PANGKAT." - ".$rec_golongan->NAMA."<br><b><i>Sk Terakhir:</i></b> ".$record->tmt_sk;
+                $row []  = $rec_golongan->NAMA_PANGKAT." - ".$rec_golongan->NAMA."<br><b><i>Sk Terakhir:</i></b> ".date("d-m-Y", strtotime($record->tmt_sk));
                 $row []  = "<b><i>Lama</i></b> ".$record->o_masa_kerja_thn."th ".$record->o_masa_kerja_bln."bln, <br><b><i>Baru </i></b>".($record->n_jml_bulan/12)."th 0bln";
                	$row []  = "<b><i>Lama</i></b> ".number_format($record->gaji_lama,0,",",".").",<br><b><i>Baru </i></b>".number_format($record->gaji_baru,0,",",".");
                	$row []  = $record->ABBREVIATION;

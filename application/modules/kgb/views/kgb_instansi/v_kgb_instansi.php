@@ -65,7 +65,7 @@
 				
 				<tr>
 					<td colspan=4>
-						<button type="submit" class="btn btn-box-tool btn-default pull-right "><i class="fa fa-search"></i> Cari</button>
+						<button type="submit" class="btn btn-success pull-right "><i class="fa fa-search"></i> Cari</button>
 					</td>
 				</tr>
 			</table>
@@ -78,11 +78,11 @@
 <div class="admin-box box box-danger">
     <div class="box-header">
         DAFTAR PEGAWAI YANG MENDAPATKAN KENAIKAN GAJI BERKALA    
-        <div class="box-tools pull-right">
+        <!-- <div class="box-tools pull-right">
             <button type="button" id="btn-cetak-surat-pengantar" class="btn btn-box-tool btn-default " >
                 <i class="fa fa-print"></i> Cetak Surat Pengantar SK 
             </button>
-        </div>                   
+        </div>                    -->
     </div>
 	<div class="box-body">
 		<table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-data table-hover">

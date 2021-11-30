@@ -283,7 +283,9 @@ class Riwayat_kgb extends Admin_Controller
         $unit_kerja_induk_data = $this->unitkerja_model->find($pegawai_data->UNOR_ID);
         $template_data          = $this->riwayat_kgb_model->getTemplate(TEMPLATE_SK_KGB_KOLEKTIF);
         // save to riwayat KGB baru
-        $data = array();
+        $no_sk  = $this->create_nomor();
+        $data   = array();
+        $data["no_sk"]                  = $no_sk;
         $data["pegawai_nip"]            = $pegawai_data->NIP_BARU;
         $data["pegawai_nama"]           = $pegawai_data->NAMA;
         $data["birth_place"]            = $lokasi_lahir_data->NAMA;
@@ -313,94 +315,121 @@ class Riwayat_kgb extends Admin_Controller
         if(empty($data["tmt_sk"])){
             unset($data["tmt_sk"]);
         }
-        $id = $this->riwayat_kgb_model->insert($data);
-        // end save
-        $kgb_data = $this->riwayat_kgb_model->find($id);
-        $ref_id = $kgb_data->ref;
-        if(!$kgb_data){
-            $output = array(
-                'success'=>false,
-                'message'=>'Data tidak ditemukan'
+        // print_r($data);
+        // die($no_sk);
+        if(!$this->riwayat_kgb_model->is_uniq($pegawai_data->NIP_BARU,$list_golongan->ID,$mk_tahun,0)){
+            $id = $this->riwayat_kgb_model->insert($data);    
+            if($id){
+                $this->update_nomor($nomor_kgb);
+            }
+            // end save
+            $kgb_data = $this->riwayat_kgb_model->find($id);
+            $ref_id = $kgb_data->ref;
+            if(!$kgb_data){
+                $output = array(
+                    'success'=>false,
+                    'message'=>'Data tidak ditemukan'
+                );
+                echo json_encode($output);
+                die();
+            }
+            // header('Set-Cookie: fileDownload=true; path=/');
+            $gaji_baru = $this->riwayat_kgb_model->getWage($kgb_data->golongan2_name,$kgb_data->n_masakerja_thn);
+            $this->load->library('Template_doc_lib');
+            $TBS = $this->template_doc_lib->gen_xls(BASEPATH."../../assets/templates/".$template_data->template_file);
+            $tembusan_data = array();
+            $tembusan_data []['name'] = 'Kepala Badan Kepegawaian Negara, u.p.Deputi Bidang Sistem Informasi Kepegawaian di Jakarta;';
+            $tembusan_data []['name'] = 'Kepala Biro Perencanaan dan Keuangan BRIN di Jakarta;';
+            $tembusan_data []['name'] = 'Kepala Unit Kerja terkait di Lingkungan BRIN;';
+            $tembusan_data []['name'] = 'Pegawai yang bersangkutan';
+            $TBS->MergeBlock('tb', $tembusan_data);
+            $sk_data = array(
+                'p_nip'=>$kgb_data->nip,
+                'no_sk'=>$kgb_data->no_sk,
+                'dt_header'=>getIndonesiaFormat($kgb_data->tgl_sk),
+                'pre'=>"",
+                'name_bergelar'=>$pegawai_data->NAMA,
+                'nip'=>$pegawai_data->NIP_BARU,
+                'location'=>"Jakarta",
+                'to'=>'Kepala Kantor Pelayanan Perbendaharaan Negara',
+                'kantor_kppn_region'=>$kgb_data->kantor_pembayaran,
+                'tgl_sk'=>date('d-m-Y'),
+                'tempat'=>'Jakarta',
+                'p_birth_place'=>'',
+                'p_birth_date'=>'',
+                'lokasi_sk'=>'',
+                'pp'=>'PP No 30 Tahun 2015',
+                'masa_kerja_thn'=>$kgb_data->n_masakerja_thn,
+                'masa_kerja_bln'=>$kgb_data->n_masakerja_bln,
+                'tmt'                   => getIndonesiaFormat($kgb_data->tmt_sk),
+                'pangkat_text'          => $list_golongan->NAMA_PANGKAT . "-".$list_golongan->NAMA,
+                'jabatan_text'          => $kgb_data->n_jabatan_text,
+                'gapok_baru_number'     => rupiah($kgb_data->n_gapok),
+                'gapok_baru_text'       => Terbilang($kgb_data->n_gapok),
+                'gapok_lama_number'     => rupiah($sk_sebelum->n_gapok),
+                'gapok_lama_text'       => Terbilang($sk_sebelum->n_gapok),
+                'satuan_kerja'          => $kgb_data->unit_kerja_text,
+                'p_instansi'            => '',
+                'kepala_satker_ybs'     => '',
+                'foto'                  => "",
+                'lastpangkat_tgl_sk'    => $sk_sebelum->tgl_sk ? getIndonesiaFormat($sk_sebelum->tgl_sk) : "",
+                'lastpangkat_no_sk'     => $sk_sebelum->no_sk ? $sk_sebelum->no_sk : "",
+                'lastpangkat_tmt'       => $sk_sebelum->tmt_sk ? getIndonesiaFormat($sk_sebelum->tmt_sk) : "",
+                'lastpangkat_wpy'       => $sk_sebelum->masa_kerja_thn ? $sk_sebelum->masa_kerja_thn : "",
+                'lastpangkat_wpm'       => $sk_sebelum->masa_kerja_bln ? $sk_sebelum->masa_kerja_bln : "",
+                'gol_notation'          => $list_golongan->NAMA_PANGKAT."-".$list_golongan->NAMA,
+                'pejabat'               =>  $kgb_data->nama_pejabat,
             );
-            echo json_encode($output);
-            die();
-        }
-        // header('Set-Cookie: fileDownload=true; path=/');
-        $gaji_baru = $this->riwayat_kgb_model->getWage($kgb_data->golongan2_name,$kgb_data->n_masakerja_thn);
-        $this->load->library('Template_doc_lib');
-        $TBS = $this->template_doc_lib->gen_xls(BASEPATH."../../assets/templates/".$template_data->template_file);
-        $tembusan_data = array();
-        $tembusan_data []['name'] = 'Kepala Badan Kepegawaian Negara, u.p.Deputi Bidang Sistem Informasi Kepegawaian di Jakarta;';
-        $tembusan_data []['name'] = 'Kepala Biro Perencanaan dan Keuangan BRIN di Jakarta;';
-        $tembusan_data []['name'] = 'Kepala Unit Kerja terkait di Lingkungan BRIN;';
-        $tembusan_data []['name'] = 'Pegawai yang bersangkutan';
-        $TBS->MergeBlock('tb', $tembusan_data);
-        $sk_data = array(
-            'p_nip'=>$kgb_data->nip,
-            'no_sk'=>$kgb_data->no_sk,
-            'dt_header'=>getIndonesiaFormat($kgb_data->tgl_sk),
-            'pre'=>"",
-            'name_bergelar'=>$pegawai_data->NAMA,
-            'nip'=>$pegawai_data->NIP_BARU,
-            'location'=>"Jakarta",
-            'to'=>'Kepala Kantor Pelayanan Perbendaharaan Negara',
-            'kantor_kppn_region'=>$kgb_data->kantor_pembayaran,
-            'tgl_sk'=>date('d-m-Y'),
-            'tempat'=>'Jakarta',
-            'p_birth_place'=>'',
-            'p_birth_date'=>'',
-            'lokasi_sk'=>'',
-            'pp'=>'PP No 30 Tahun 2015',
-            'masa_kerja_thn'=>$kgb_data->n_masakerja_thn,
-            'masa_kerja_bln'=>$kgb_data->n_masakerja_bln,
-            'tmt'                   => getIndonesiaFormat($kgb_data->tmt_sk),
-            'pangkat_text'          => $list_golongan->NAMA_PANGKAT . "-".$list_golongan->NAMA,
-            'jabatan_text'          => $kgb_data->n_jabatan_text,
-            'gapok_baru_number'     => rupiah($kgb_data->n_gapok),
-            'gapok_baru_text'       => Terbilang($kgb_data->n_gapok),
-            'gapok_lama_number'     => rupiah($sk_sebelum->n_gapok),
-            'gapok_lama_text'       => Terbilang($sk_sebelum->n_gapok),
-            'satuan_kerja'          => $kgb_data->unit_kerja_text,
-            'p_instansi'            => '',
-            'kepala_satker_ybs'     => '',
-            'foto'                  => "",
-            'lastpangkat_tgl_sk'    => $sk_sebelum->tgl_sk ? getIndonesiaFormat($sk_sebelum->tgl_sk) : "",
-            'lastpangkat_no_sk'     => $sk_sebelum->no_sk ? $sk_sebelum->no_sk : "",
-            'lastpangkat_tmt'       => $sk_sebelum->tmt_sk ? getIndonesiaFormat($sk_sebelum->tmt_sk) : "",
-            'lastpangkat_wpy'       => $sk_sebelum->masa_kerja_thn ? $sk_sebelum->masa_kerja_thn : "",
-            'lastpangkat_wpm'       => $sk_sebelum->masa_kerja_bln ? $sk_sebelum->masa_kerja_bln : "",
-            'gol_notation'          => $list_golongan->NAMA_PANGKAT."-".$list_golongan->NAMA,
-            'pejabat'               =>  $kgb_data->nama_pejabat,
-        );
-        // print_r($sk_data);
-        $sk_datas = array();
-        $sk_datas[] = $sk_data;
-        $TBS->MergeBlock('o',$sk_datas);
-        //$TBS->MergeField('r', $sk_data);
-        $output_file_name = $kgb_data->ref;
-        if($type=="pdf"){
-            $dir = trim($this->settings_lib->item('site.pathsk'))."kgb";
-            $fullpath_docx =  $dir.DIRECTORY_SEPARATOR.$output_file_name.".docx";
-            $fullpath_pdf =  $dir.DIRECTORY_SEPARATOR.$output_file_name.".pdf";
-            $TBS->Show(OPENTBS_FILE,$fullpath_docx);
-            $output = shell_exec('unoconv -f pdf '.$fullpath_docx.' 2>&1');
-            $data_base64 = file_get_contents($fullpath_pdf);
-            $base64 = 'data:application/pdf;base64,' . base64_encode($data_base64);
-            echo '<embed src="'.$base64.'" width="100%" height="700" alt="pdf">';
+            // print_r($sk_data);
+            $sk_datas = array();
+            $sk_datas[] = $sk_data;
+            $TBS->MergeBlock('o',$sk_datas);
+            //$TBS->MergeField('r', $sk_data);
+            $output_file_name = $kgb_data->ref;
+            if($type=="pdf"){
+                $dir = trim($this->settings_lib->item('site.pathsk'))."kgb";
+                $fullpath_docx =  $dir.DIRECTORY_SEPARATOR.$output_file_name.".docx";
+                $fullpath_pdf =  $dir.DIRECTORY_SEPARATOR.$output_file_name.".pdf";
+                $TBS->Show(OPENTBS_FILE,$fullpath_docx);
+                $output = shell_exec('unoconv -f pdf '.$fullpath_docx.' 2>&1');
+                $data_base64 = file_get_contents($fullpath_pdf);
+                $base64 = 'data:application/pdf;base64,' . base64_encode($data_base64);
+                echo '<embed src="'.$base64.'" width="100%" height="700" alt="pdf">';
 
-            // Header content type
-            // header('Content-type: application/pdf');
-            // header('Content-Disposition: inline; filename="' . $output_file_name . '"');
-            // header('Content-Transfer-Encoding: binary');
-            // header('Accept-Ranges: bytes');
-            // // Read the file
-            // @readfile($fullpath_pdf);
-            die();
+                // Header content type
+                // header('Content-type: application/pdf');
+                // header('Content-Disposition: inline; filename="' . $output_file_name . '"');
+                // header('Content-Transfer-Encoding: binary');
+                // header('Accept-Ranges: bytes');
+                // // Read the file
+                // @readfile($fullpath_pdf);
+                die();
+            }
+            else {
+                $output_file_name = $output_file_name.".docx";
+                $TBS->Show(OPENTBS_DOWNLOAD, $output_file_name); // Also merges all [onshow] automatic fields.  
+            }
+        }else{
+            die("SK sudah pernah di print, silahkan print ulang");
         }
-        else {
-            $output_file_name = $output_file_name.".docx";
-            $TBS->Show(OPENTBS_DOWNLOAD, $output_file_name); // Also merges all [onshow] automatic fields.  
-        }
+    }
+    private function create_nomor(){
+        $nomor_terakhir = trim($this->settings_lib->item('site.nomor_kgb'));
+        $format_nomor   = trim($this->settings_lib->item('site.format_kgb'));
+        $nomor          = (int)$nomor_terakhir+1;
+        $tahun          = date("Y");
+        $bulan          = date("m");
+        $param = array($nomor, $bulan,$tahun);
+        // echo "%s/KGB/%s/{$tahun}";
+        return "{$nomor}/KGB/{$bulan}/{$tahun}";
+    }
+    private function update_nomor($nomor){
+        $nomor_terakhir = trim($this->settings_lib->item('site.nomor_kgb'));
+        $nomor          = (int)$nomor_terakhir+1;
+        $this->load->model('settings/settings_model', 'settings_model');
+        $dataupdate = array();
+        $dataupdate["value"] = $nomor;
+        $this->settings_model->update_where("name",'site.nomor_kgb', $dataupdate);
     }
     public function detil($ref_id=''){
         $list_golongan = $this->golongan_model->find_all();

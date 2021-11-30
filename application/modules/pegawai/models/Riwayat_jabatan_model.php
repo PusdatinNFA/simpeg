@@ -325,7 +325,9 @@ class Riwayat_jabatan_model extends BF_Model
 				TRIM("rwt_jabatan"."NAMA_JABATAN") "NAMA_JABATAN",
 				TRIM("ID_ESELON") "ID_ESELON",
 				TMT_JABATAN "TMT_JABATAN",
-				TRIM("NOMOR_SK") "NOMOR_SK"'
+				TRIM("NOMOR_SK") "NOMOR_SK",
+				kawasan_id, tusi_id
+				'
 			);
 			//$this->select($this->table_name .'.STATUS_SATKER');
 		}
