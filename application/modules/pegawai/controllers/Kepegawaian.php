@@ -1093,7 +1093,7 @@ class Kepegawaian extends Admin_Controller
     	}
         if (empty($id)) {
             $pegawai = $this->pegawai_model->find_by("NIP_BARU",trim($this->auth->username()));
-    		$id = isset($pegawai->ref) ? $pegawai->ref : "";
+    		$id = isset($pegawai->ID) ? $pegawai->ID : "";
     		if($id == ""){
 	            Template::set_message(lang('pegawai_invalid_id'), 'error');
             	redirect(SITE_AREA . '/kepegawaian/pegawai');
