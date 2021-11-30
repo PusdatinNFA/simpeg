@@ -1089,11 +1089,11 @@ class Kepegawaian extends Admin_Controller
     	Template::set('collapse', true);
     	if(!$this->auth->has_permission($this->permissionViewProfileOther)){
     		$pegawai = $this->pegawai_model->find_by("NIP_BARU",trim($this->auth->username()));
-    		$id = isset($pegawai->ID) ? $pegawai->ID : "";
+    		$id = isset($pegawai->ref) ? $pegawai->ref : "";
     	}
         if (empty($id)) {
             $pegawai = $this->pegawai_model->find_by("NIP_BARU",trim($this->auth->username()));
-    		$id = isset($pegawai->ID) ? $pegawai->ID : "";
+    		$id = isset($pegawai->ref) ? $pegawai->ref : "";
     		if($id == ""){
 	            Template::set_message(lang('pegawai_invalid_id'), 'error');
             	redirect(SITE_AREA . '/kepegawaian/pegawai');
