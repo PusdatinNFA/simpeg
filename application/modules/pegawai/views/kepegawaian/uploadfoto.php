@@ -3,7 +3,7 @@
 <!-- sweet alert -->
 <script src="<?php echo base_url(); ?>themes/admin/js/sweetalert.js"></script>
 <link rel="stylesheet" href="<?php echo base_url(); ?>themes/admin/css/sweetalert.css">
-<div class="box box-info">
+<div class="box box-danger">
   <div class="box-body">
 	  	<div class="control-group col-sm-12">
 		  <div class='controls'>
@@ -24,7 +24,7 @@ Dropzone.autoDiscover = true;
 		 method:"post",
 		 acceptedFiles:"image/*",
 		 paramName:"userfile",
-		 dictDefaultMessage:"<img src='<?php echo base_url(); ?>assets/images/dropico.png' width='50px'/><br>drop foto disini, <br> Ketentuan : Ukuran file Max 1MB,Max dimensi 800x1200px, Tipe pas foto, file yang di perkenankan .png|jpg|jpeg)",
+		 dictDefaultMessage:"<img src='<?php echo base_url(); ?>assets/images/dropico.png' width='50px'/><br>Silahkan klik/drop disini (.png|jpg|jpeg)",
 		 dictInvalidFileType:"Type file ini tidak dizinkan",
 		 addRemoveLinks:true,
 		 init: function () {

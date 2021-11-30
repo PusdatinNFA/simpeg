@@ -1641,7 +1641,7 @@ class Kepegawaian extends Admin_Controller
                 // }
                 $row = array();
                 $row []  = $nomor_urut.".";
-                $row []  = "<img src='".$foto_pegawai."' width='70%'>";
+                $row []  = "<img src='".$foto_pegawai."' width='90px'>";
                 $row []  = $record->NIP_BARU;
                 $row []  = $record->NAMA;
                 $row []  = $record->NAMA_PANGKAT."/".$record->NAMA_GOLONGAN;
@@ -1755,7 +1755,10 @@ class Kepegawaian extends Admin_Controller
 			if($filters['kedudukan_hukum'] != ""){
 				$kedudukan_hukum = $filters['kedudukan_hukum'];
 			}
-			$this->pegawai_model->where_in('kawasan_id',$akawasan);
+			$this->db->group_start();
+				$this->pegawai_model->where_in('kawasan_id',$akawasan);
+				$this->pegawai_model->where('kawasan_id is not null');
+			$this->db->group_end();
 		}
 		
 		$this->db->stop_cache();

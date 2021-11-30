@@ -157,13 +157,14 @@ class Base_Controller extends MX_Controller
                 $this->current_user = clone $this->auth->user();
                 if($this->auth->photo()!=""){
                     $this->current_user->PHOTO = $this->auth->photo();
+                    // dir($this->current_user->PHOTO);
                 }else{
                     $pegawai = $this->pegawai_model->find_by("NIP_BARU",trim($this->auth->username()));
                     $aphoto = isset($pegawai->PHOTO) ? $pegawai->PHOTO : "";
                     $foto_pegawai = trim($this->settings_lib->item('site.urlphoto'))."noimage.jpg";
-                    if(file_exists(trim($this->settings_lib->item('site.urlphoto')).$aphoto) and $aphoto != ""){
-                        $foto_pegawai =  trim($this->settings_lib->item('site.urlphoto')).$aphoto;
-                    }
+                    // if(file_exists(trim($this->settings_lib->item('site.urlphoto')).$aphoto) and $aphoto != ""){
+                        $foto_pegawai =  $aphoto;
+                    // }
                     $this->current_user->PHOTO = $foto_pegawai;
                 }
                 // If the user has a language setting then use it
