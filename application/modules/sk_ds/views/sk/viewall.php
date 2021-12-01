@@ -1,4 +1,4 @@
-<div class="admin-box box box-primary expanded-box">
+<div class="admin-box box box-danger expanded-box">
         <div class="box-header">
         <?php echo form_open($this->uri->uri_string(),"id=form_search_pegawai","form"); ?>
                 <style>
@@ -8,37 +8,30 @@
                 </style>
                 <table class="filter_pegawai" sborder=0 width='100%' cellpadding="10">
                     <tr>
-                        <td width="20px"><input type="checkbox" name="unit_id_cb"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">Satuan Kerja</label></td>
                         <td colspan=2><select id="unit_id_key" name="unit_id_key" width="100%" class=" col-md-10 format-control"></select></td>
                     </tr>
                     <tr>
-                        <td width="20px"><input type="checkbox" name="nama_cb"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">NAMA</label></td>
                         <td colspan=2><input class="form-control" type="text" name="nama_key" value="" ></td>
                     </tr>
                     <tr>
-                        <td width="20px"><input type="checkbox" name="nip_cb"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">NIP</label></td>
                         <td colspan=2><input class="form-control" type="text" name="nip_key" value="" ></td>
                     </tr>
                     <tr>
-                        <td width="20px"><input type="checkbox" name="chkpenandatangan"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">ID Penandatangan (ID Pegawai)</label></td>
                         <td colspan=2><input class="form-control" type="text" name="id_pegawai_ttd" value="" ></td>
                     </tr>
                     <tr>
-                        <td width="20px"><input type="checkbox" name="chkidfile"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">ID File DS</label></td>
                         <td colspan=2><input class="form-control" type="text" name="id_file" value="" ></td>
                     </tr>
                     <tr>
-                        <td width="20px"><input type="checkbox" name="ch_nosk"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">Nomor SK</label></td>
                         <td colspan=2><input class="form-control" type="text" name="nomor_sk" value="" ></td>
                     </tr>
                     <tr>
-                        <td width="20px"><input type="checkbox" name="golongan_cb"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">Golongan</label></td>
                         <td colspan=2>
                             <select name="golongan_key" class="form-control">
@@ -52,7 +45,6 @@
                     </tr>
                     
                     <tr>
-                        <td width="20px"><input type="checkbox" name="kategori_cb"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">Jabatan</label></td>
                         <td colspan=2>
                             <select name="kategori_jabatan" id="kategori_jabatan" class="form-control select2">
@@ -69,7 +61,6 @@
                         </td>
                     </tr>
                     <tr>
-                        <td width="20px"><input type="checkbox" name="kategori_cb"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">Kategori SK</label></td>
                         <td colspan=2>
                             <select name="kategori_sk" id="kategori_sk" class="form-control">
@@ -85,7 +76,6 @@
                         </td>
                     </tr>
                     <tr>
-                        <td width="20px"><input type="checkbox" disabled name="jenis"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">Jenis</label></td>
                         <td colspan=2>
                             <select name="ds_ok" id="ds_ok" class="form-control select2">
@@ -96,7 +86,6 @@
                         </td>
                     </tr>
                     <tr>
-                        <td width="20px"><input type="checkbox" name="chkstatus"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">Status TTD</label></td>
                         <td colspan=2>
                             <select name="is_signed" id="is_signed" class="form-control select2">
@@ -108,7 +97,6 @@
                     </tr>
 
                     <tr>
-                        <td width="20px"><input type="checkbox" name="chkstatuskoreksi"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">Status Koreksi</label></td>
                         <td colspan=2>
                             <select name="is_corrected" id="is_corrected" class="form-control select2">
@@ -116,19 +104,6 @@
                             <option value="1">Sudah Koreksi</option>
                             <option value="0">Belum Koreksi</option>
                             <option value="3">Dikembalikan</option>
-                        </select>
-                        </td>
-                    </tr>
-
-
-                    
-                    <tr>
-                        <td width="20px"><input type="checkbox" class="chkqr" name="chkqr"></td>
-                        <td width="200px"><label for="example-text-input" class="col-form-label">Qr</label></td>
-                        <td colspan=2>
-                            <a href="<?php echo base_url(); ?>admin/sk/sk_ds/scanqr" id="linkqr" data-toggle="tooltip" class="btn btn-sm btn-info show-modal" data-original-title="Scan QR"><i class="glyphicon glyphicon-eye-open"></i> Scan Qrcode </a>
-                            <input type="text" id="textqrcode" name="textqrcode" class="form-control">
-                            
                         </select>
                         </td>
                     </tr>
@@ -147,6 +122,8 @@
             echo form_close();    
             ?>
          </div>
+</div>
+<div class="admin-box box box-danger expanded-box">
         <div class="box-body">
             <table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-data table-hover">
                 <thead>

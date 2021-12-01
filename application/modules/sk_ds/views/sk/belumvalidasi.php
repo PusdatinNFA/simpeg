@@ -34,27 +34,22 @@ if ($can_delete) {
 			</style>
 			<table class="filter_pegawai" sborder=0 width='100%' cellpadding="10">
 				<tr>
-					<td width="20px"><input type="checkbox" name="unit_id_cb"></td>
 					<td width="200px"><label for="example-text-input" class="col-form-label">Satuan Kerja</label></td>
 					<td colspan=2><select id="unit_id_key" name="unit_id_key" width="100%" class=" col-md-10 format-control"></select></td>
 				</tr>
 				<tr>
-					<td width="20px"><input type="checkbox" name="nama_cb"></td>
 					<td width="200px"><label for="example-text-input" class="col-form-label">NAMA</label></td>
 					<td colspan=2><input class="form-control" type="text" name="nama_key" value="" ></td>
 				</tr>
 				<tr>
-					<td width="20px"><input type="checkbox" name="nip_cb"></td>
 					<td width="200px"><label for="example-text-input" class="col-form-label">NIP</label></td>
 					<td colspan=2><input class="form-control" type="text" name="nip_key" value="" ></td>
 				</tr>
 				<tr>
-                    <td width="20px"><input type="checkbox" name="ch_nosk"></td>
                     <td width="200px"><label for="example-text-input" class="col-form-label">Nomor SK</label></td>
                     <td colspan=2><input class="form-control" type="text" name="nomor_sk" value="" ></td>
                 </tr>
 				<tr>
-					<td width="20px"><input type="checkbox" name="golongan_cb"></td>
 					<td width="200px"><label for="example-text-input" class="col-form-label">Golongan</label></td>
 					<td colspan=2>
 						<select name="golongan_key" class="form-control">
@@ -68,7 +63,6 @@ if ($can_delete) {
 				</tr>
 				
 				<tr>
-					<td width="20px"><input type="checkbox" name="kategori_jb"></td>
 					<td width="200px"><label for="example-text-input" class="col-form-label">Jabatan</label></td>
 					<td colspan=2>
 						<select name="kategori_jabatan" id="kategori_jabatanblm" class="form-control select2">
@@ -85,7 +79,6 @@ if ($can_delete) {
 					</td>
 				</tr>
 				<tr>
-                        <td width="20px"><input type="checkbox" name="kategori_cb"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">Kategori SK</label></td>
                         <td colspan=2>
                             <select name="kategori_sk" class="form-control">
@@ -127,6 +120,7 @@ if ($can_delete) {
 		?>
 	</div>
 </div>
+
 <div class="admin-box box box-danger">
 	<div class="box-body">
 		<?php echo form_open($this->uri->uri_string(), 'id="frm-koreksi"'); ?> 

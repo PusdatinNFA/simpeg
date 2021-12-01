@@ -1011,15 +1011,13 @@ echo $file;
 
         $this->db->start_cache();
         
-        /*Jika $search mengandung nilai, berarti user sedang telah 
-        memasukan keyword didalam filed pencarian*/
         $advanced_search_filters  = $this->input->post("search[advanced_search_filters]");
         if($advanced_search_filters){
             $filters = array();
             foreach($advanced_search_filters as  $filter){
                 $filters[$filter['name']] = $filter["value"];
             }
-            if($filters['unit_id_cb']){
+            if($filters['unit_id_key']){
                 $this->db->group_start();
                 $this->db->where('vw."ID"',$filters['unit_id_key']);    
                 $this->db->or_where('vw."ESELON_1"',$filters['unit_id_key']);   
@@ -1028,45 +1026,45 @@ echo $file;
                 $this->db->or_where('vw."ESELON_4"',$filters['unit_id_key']);   
                 $this->db->group_end();
             }
-            if($filters['nama_cb']){
+            if($filters['nama_key']){
                 $this->db->group_start();
                 $this->sk_ds_model->like('upper(pegawai."NAMA")',strtoupper($filters['nama_key']),"BOTH");    
                 $this->sk_ds_model->or_like('upper("nama_pemilik_sk")',strtoupper($filters['nama_key']),"BOTH");    
                 $this->db->group_end();
             }
-            if($filters['nip_cb']){
+            if($filters['nip_key']){
                 $this->db->group_start();
                 $this->sk_ds_model->like('upper(pegawai."NIP_BARU")',strtoupper($filters['nip_key']),"BOTH"); 
                 $this->sk_ds_model->or_like('upper("nip_sk")',strtoupper($filters['nip_key']),"BOTH");    
                 $this->db->group_end();
                 
             }
-            if($filters['ch_nosk']){
+            if($filters['nomor_sk']){
                 $this->sk_ds_model->like('upper(tbl_file_ds."nomor_sk")',strtoupper($filters['nomor_sk']),"BOTH"); 
             }
              
-            if($filters['golongan_cb']){
+            if($filters['golongan_key']){
                 $this->sk_ds_model->where('"GOL_ID"',strtoupper($filters['golongan_key']));   
             }
             
-            if($filters['chkqr']){
-                $this->sk_ds_model->where('tbl_file_ds.lokasi_file',$filters['textqrcode']); 
-            }
-             if($filters['chkpenandatangan']){
+            // if($filters['textqrcode']){
+            //     $this->sk_ds_model->where('tbl_file_ds.lokasi_file',$filters['textqrcode']); 
+            // }
+            if($filters['id_pegawai_ttd']){
                 $this->sk_ds_model->where('id_pegawai_ttd',$filters['id_pegawai_ttd']); 
             }
-            if($filters['chkidfile']){
+            if($filters['id_file']){
                 $this->sk_ds_model->where('tbl_file_ds.id_file',$filters['id_file']); 
             }
             
-            if($filters['chkstatus']){
+            if($filters['is_signed']){
                 //if($filters['is_signed'] == "1" or $filters['is_signed'] == "3"){
                 $this->sk_ds_model->where('tbl_file_ds.is_signed',$filters['is_signed']);     
                 
             }
 
             
-            if($filters['chkstatuskoreksi']){
+            if($filters['is_corrected']){
                 $this->sk_ds_model->where('tbl_file_ds.is_corrected',$filters['is_corrected']);     
             }
             
@@ -1082,7 +1080,7 @@ echo $file;
             }else{
                 $this->sk_ds_model->where('tbl_file_ds.ds_ok',1);
             }
-            if($filters['kategori_cb']){
+            if($filters['kategori_sk']){
                 $this->sk_ds_model->where('tbl_file_ds.kategori',$filters['kategori_sk']); 
             }
             
@@ -1567,7 +1565,7 @@ echo $file;
             foreach($advanced_search_filters as  $filter){
                 $filters[$filter['name']] = $filter["value"];
             }
-            if($filters['unit_id_cb']){
+            if($filters['unit_id_key']){
                 $this->db->group_start();
                 $this->db->where('vw."ID"',$filters['unit_id_key']);    
                 $this->db->or_where('vw."ESELON_1"',$filters['unit_id_key']);   
@@ -1576,32 +1574,32 @@ echo $file;
                 $this->db->or_where('vw."ESELON_4"',$filters['unit_id_key']);   
                 $this->db->group_end();
             }
-            if($filters['nama_cb']){
+            if($filters['nama_key']){
                 $this->db->group_start();
                 $this->sk_ds_model->like('upper(pegawai."NAMA")',strtoupper($filters['nama_key']),"BOTH");    
                 $this->sk_ds_model->or_like('upper("nama_pemilik_sk")',strtoupper($filters['nama_key']),"BOTH");    
                 $this->db->group_end();
             }
-            if($filters['nip_cb']){
+            if($filters['nip_key']){
                 $this->db->group_start();
                 $this->sk_ds_model->like('upper(pegawai."NIP_BARU")',strtoupper($filters['nip_key']),"BOTH"); 
                 $this->sk_ds_model->or_like('upper("nip_sk")',strtoupper($filters['nip_key']),"BOTH");    
                 $this->db->group_end();
             }
-            if($filters['ch_nosk']){
+            if($filters['nomor_sk']){
                 $this->sk_ds_model->like('upper(tbl_file_ds."nomor_sk")',strtoupper($filters['nomor_sk']),"BOTH"); 
             }
-            if($filters['golongan_cb']){
+            if($filters['golongan_key']){
                 $this->sk_ds_model->where('"GOL_ID"',strtoupper($filters['golongan_key']));   
             }
             
-            if($filters['kategori_jb']){
+            if($filters['kategori_jabatan']){
                 $this->sk_ds_model->where('"KATEGORI_JABATAN"',$filters['kategori_jabatan']); 
             }
             // if($filters['chkqr']){
             //     $this->sk_ds_model->where('tbl_file_ds.lokasi_file',$filters['textqrcode']); 
             // }
-            if($filters['kategori_cb']){
+            if($filters['kategori_sk']){
                 $this->sk_ds_model->where('tbl_file_ds.kategori',$filters['kategori_sk']); 
             }
             
@@ -1699,7 +1697,7 @@ echo $file;
             foreach($advanced_search_filters as  $filter){
                 $filters[$filter['name']] = $filter["value"];
             }
-            if($filters['unit_id_cb']){
+            if($filters['unit_id_key']){
                 $this->db->group_start();
                 $this->db->where('vw."ID"',$filters['unit_id_key']);    
                 $this->db->or_where('vw."ESELON_1"',$filters['unit_id_key']);   
@@ -1708,32 +1706,32 @@ echo $file;
                 $this->db->or_where('vw."ESELON_4"',$filters['unit_id_key']);   
                 $this->db->group_end();
             }
-            if($filters['nama_cb']){
+            if($filters['nama_key']){
                 $this->db->group_start();
                 $this->sk_ds_model->like('upper(pegawai."NAMA")',strtoupper($filters['nama_key']),"BOTH");    
                 $this->sk_ds_model->or_like('upper("nama_pemilik_sk")',strtoupper($filters['nama_key']),"BOTH");    
                 $this->db->group_end();
             }
-            if($filters['nip_cb']){
+            if($filters['nip_key']){
                 $this->db->group_start();
                 $this->sk_ds_model->like('upper(pegawai."NIP_BARU")',strtoupper($filters['nip_key']),"BOTH"); 
                 $this->sk_ds_model->or_like('upper("nip_sk")',strtoupper($filters['nip_key']),"BOTH");    
                 $this->db->group_end();
             }
              
-            if($filters['golongan_cb']){
+            if($filters['golongan_key']){
                 $this->sk_ds_model->where('"GOL_ID"',strtoupper($filters['golongan_key']));   
             }
-            if($filters['ch_nosk']){
+            if($filters['nomor_sk']){
                 $this->sk_ds_model->like('upper(tbl_file_ds."nomor_sk")',strtoupper($filters['nomor_sk']),"BOTH"); 
             }
-            if($filters['kategori_jb']){
+            if($filters['kategori_jabatan']){
                 $this->sk_ds_model->where('"KATEGORI_JABATAN"',$filters['kategori_jabatan']); 
             }
-            if($filters['chkqr']){
-                $this->sk_ds_model->where('tbl_file_ds.lokasi_file',$filters['textqrcode']); 
-            }
-            if($filters['kategori_cb']){
+            // if($filters['chkqr']){
+            //     $this->sk_ds_model->where('tbl_file_ds.lokasi_file',$filters['textqrcode']); 
+            // }
+            if($filters['kategori_sk']){
                 $this->sk_ds_model->where('tbl_file_ds.kategori',$filters['kategori_sk']); 
             }
         }
