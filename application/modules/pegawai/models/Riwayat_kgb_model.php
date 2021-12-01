@@ -111,7 +111,7 @@ class Riwayat_kgb_model extends BF_Model
 		if ($data == null) {
 			$rows = $this->db->query("select * from wage")->result();
 			foreach ($rows as $row) {
-				print_r($row->GOLONGAN."_".$row->WORKING_PERIOD."<br>");
+				// print_r($row->GOLONGAN."_".$row->WORKING_PERIOD."<br>");
 				$adata[$row->GOLONGAN."_".$row->WORKING_PERIOD] = $row;
 			}
 			$data = $adata;
