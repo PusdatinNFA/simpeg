@@ -7,7 +7,7 @@
 <div class="tab-pane active" id="<?php echo $TAB_ID;?>">
     <div class="callout callout-info">
        <h4>Perhatian</h4>
-       <p>Perubahan data yang anda lakukan beberapa informasi akan diverifikasi oleh kepegawaian</p>
+       <p>Jika ada kesalahan data, silahkan laporkan ke bagian kepegawaian kawasan anda</p>
      </div>
 	<form role="form" action="#" id="frmprofile">
 	<input id='ID' type='hidden' class="form-control" name='ID' maxlength='25' value="<?php echo set_value('ID', isset($pegawai->ID) ? $pegawai->ID : ''); ?>" />
@@ -310,9 +310,7 @@
 
         </fieldset>
             <fieldset>
-                <legend>Data Pendukung</legend>
-                   
-                        
+                <legend>Data Lainnya</legend>
                     <div class="control-group col-sm-6">
                          <div class="row">
                              <div class="form-group col-sm-8">

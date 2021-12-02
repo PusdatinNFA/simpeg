@@ -15,7 +15,7 @@ endif;
 $id = isset($peraturan_otk->id_peraturan) ? $peraturan_otk->id_peraturan : '';
 
 ?>
-<div class='admin-box box box-primary'>
+<div class='admin-box box box-danger'>
     <div class="box-header">
         <h3>Tambah Jenis Satker</h3>
     </div>        

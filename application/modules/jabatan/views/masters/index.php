@@ -9,7 +9,7 @@ if ($can_delete) {
     $num_columns++;
 }
 ?>
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
 	<div class="box-header">
 		<h3>
 			Jabatan

@@ -23,7 +23,10 @@ function getIndonesiaFormat($date){
 	$bulans = array('Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','Nopember','Desember');
 	return $dt->format('d')." ".$bulans[$dt->format('m')-1]." ".$dt->format('Y');
 }
- 
+function getRomawiBulan($bulan){
+	$bulans = array('','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII');
+	return $bulans[$bulan];
+}
 function Terbilang($x) {
 	$abil = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
 	  if ($x < 12)

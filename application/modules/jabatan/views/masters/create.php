@@ -15,7 +15,7 @@ endif;
 $id = isset($ref_jabatan->ID) ? $ref_jabatan->ID : '';
 
 ?>
-<div class='admin-box box box-primary'>
+<div class='admin-box box box-danger'>
     <div class="box-header">
         <h3>Tambah Jabatan</h3>
     </div>        

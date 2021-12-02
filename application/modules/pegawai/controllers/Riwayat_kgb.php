@@ -269,7 +269,7 @@ class Riwayat_kgb extends Admin_Controller
             $TBS->Show(OPENTBS_DOWNLOAD, $output_file_name); // Also merges all [onshow] automatic fields.  
         }
     }
-    public function create_sk($pegawai_nip,$tanggal){
+    public function create_sk($type,$pegawai_nip,$tanggal){
         $this->auth->restrict($this->permissionCreate);
         $this->load->helper('aplikasi');
         $golongan           = $this->input->get("golongan");
@@ -280,10 +280,10 @@ class Riwayat_kgb extends Admin_Controller
         $wages              = $this->riwayat_kgb_model->getWage($golongan,$mk_tahun);
         $list_golongan      = $this->golongan_model->getGolongan($sk_sebelum->golongan_id);
 
-        $unit_kerja_induk_data = $this->unitkerja_model->find($pegawai_data->UNOR_ID);
-        $template_data          = $this->riwayat_kgb_model->getTemplate(TEMPLATE_SK_KGB_KOLEKTIF);
+        $unit_kerja_induk_data          = $this->unitkerja_model->find($pegawai_data->UNOR_ID);
+        $template_data                  = $this->riwayat_kgb_model->getTemplate(TEMPLATE_SK_KGB_KOLEKTIF);
         // save to riwayat KGB baru
-        $no_sk  = $this->create_nomor();
+        $no_sk                          = $this->create_nomor();
         $data   = array();
         $data["no_sk"]                  = $no_sk;
         $data["pegawai_nip"]            = $pegawai_data->NIP_BARU;
@@ -344,23 +344,23 @@ class Riwayat_kgb extends Admin_Controller
             $tembusan_data []['name'] = 'Pegawai yang bersangkutan';
             $TBS->MergeBlock('tb', $tembusan_data);
             $sk_data = array(
-                'p_nip'=>$kgb_data->nip,
-                'no_sk'=>$kgb_data->no_sk,
-                'dt_header'=>getIndonesiaFormat($kgb_data->tgl_sk),
-                'pre'=>"",
-                'name_bergelar'=>$pegawai_data->NAMA,
-                'nip'=>$pegawai_data->NIP_BARU,
-                'location'=>"Jakarta",
-                'to'=>'Kepala Kantor Pelayanan Perbendaharaan Negara',
-                'kantor_kppn_region'=>$kgb_data->kantor_pembayaran,
-                'tgl_sk'=>date('d-m-Y'),
-                'tempat'=>'Jakarta',
-                'p_birth_place'=>'',
-                'p_birth_date'=>'',
-                'lokasi_sk'=>'',
-                'pp'=>'PP No 30 Tahun 2015',
-                'masa_kerja_thn'=>$kgb_data->n_masakerja_thn,
-                'masa_kerja_bln'=>$kgb_data->n_masakerja_bln,
+                'p_nip'                 => $kgb_data->nip,
+                'no_sk'                 => $kgb_data->no_sk,
+                'dt_header'             => getIndonesiaFormat($kgb_data->tgl_sk),
+                'pre'                   => "",
+                'name_bergelar'         => $pegawai_data->NAMA,
+                'nip'                   => $pegawai_data->NIP_BARU,
+                'location'              => "Jakarta",
+                'to'                    => 'Kepala Kantor Pelayanan Perbendaharaan Negara',
+                'kantor_kppn_region'    => $kgb_data->kantor_pembayaran,
+                'tgl_sk'                => date('d-m-Y'),
+                'tempat'                => 'Jakarta',
+                'p_birth_place'         => '',
+                'p_birth_date'          => '',
+                'lokasi_sk'             => '',
+                'pp'                    => 'PP No 30 Tahun 2015',
+                'masa_kerja_thn'        => $kgb_data->n_masakerja_thn,
+                'masa_kerja_bln'        => $kgb_data->n_masakerja_bln,
                 'tmt'                   => getIndonesiaFormat($kgb_data->tmt_sk),
                 'pangkat_text'          => $list_golongan->NAMA_PANGKAT . "-".$list_golongan->NAMA,
                 'jabatan_text'          => $kgb_data->n_jabatan_text,
@@ -378,7 +378,7 @@ class Riwayat_kgb extends Admin_Controller
                 'lastpangkat_wpy'       => $sk_sebelum->masa_kerja_thn ? $sk_sebelum->masa_kerja_thn : "",
                 'lastpangkat_wpm'       => $sk_sebelum->masa_kerja_bln ? $sk_sebelum->masa_kerja_bln : "",
                 'gol_notation'          => $list_golongan->NAMA_PANGKAT."-".$list_golongan->NAMA,
-                'pejabat'               =>  $kgb_data->nama_pejabat,
+                'pejabat'               => $kgb_data->nama_pejabat,
             );
             // print_r($sk_data);
             $sk_datas = array();
@@ -388,12 +388,12 @@ class Riwayat_kgb extends Admin_Controller
             $output_file_name = $kgb_data->ref;
             if($type=="pdf"){
                 $dir = trim($this->settings_lib->item('site.pathsk'))."kgb";
-                $fullpath_docx =  $dir.DIRECTORY_SEPARATOR.$output_file_name.".docx";
-                $fullpath_pdf =  $dir.DIRECTORY_SEPARATOR.$output_file_name.".pdf";
+                $fullpath_docx  = $dir.DIRECTORY_SEPARATOR.$output_file_name.".docx";
+                $fullpath_pdf   = $dir.DIRECTORY_SEPARATOR.$output_file_name.".pdf";
                 $TBS->Show(OPENTBS_FILE,$fullpath_docx);
-                $output = shell_exec('unoconv -f pdf '.$fullpath_docx.' 2>&1');
-                $data_base64 = file_get_contents($fullpath_pdf);
-                $base64 = 'data:application/pdf;base64,' . base64_encode($data_base64);
+                $output         = shell_exec('unoconv -f pdf '.$fullpath_docx.' 2>&1');
+                $data_base64    = file_get_contents($fullpath_pdf);
+                $base64         = 'data:application/pdf;base64,' . base64_encode($data_base64);
                 echo '<embed src="'.$base64.'" width="100%" height="700" alt="pdf">';
 
                 // Header content type
@@ -414,14 +414,14 @@ class Riwayat_kgb extends Admin_Controller
         }
     }
     private function create_nomor(){
+        $this->load->helper('aplikasi');
         $nomor_terakhir = trim($this->settings_lib->item('site.nomor_kgb'));
         $format_nomor   = trim($this->settings_lib->item('site.format_kgb'));
         $nomor          = (int)$nomor_terakhir+1;
         $tahun          = date("Y");
-        $bulan          = date("m");
+        $bulan          = getRomawiBulan((int)date("m"));
         $param = array($nomor, $bulan,$tahun);
-        // echo "%s/KGB/%s/{$tahun}";
-        return "{$nomor}/KGB/{$bulan}/{$tahun}";
+        return sprintf($format_nomor,$nomor,$bulan,$tahun);
     }
     private function update_nomor($nomor){
         $nomor_terakhir = trim($this->settings_lib->item('site.nomor_kgb'));

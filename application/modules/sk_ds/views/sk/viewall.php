@@ -1,4 +1,4 @@
-<div class="admin-box box box-danger expanded-box">
+<div class="admin-box box box-primary expanded-box">
         <div class="box-header">
         <?php echo form_open($this->uri->uri_string(),"id=form_search_pegawai","form"); ?>
                 <style>
@@ -118,12 +118,11 @@
                         </td>
                     </tr>
                 </table>
+
             <?php
             echo form_close();    
             ?>
          </div>
-</div>
-<div class="admin-box box box-danger expanded-box">
         <div class="box-body">
             <table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-data table-hover">
                 <thead>

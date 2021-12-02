@@ -54,8 +54,7 @@
                                     '12'=>'Desember'
                                 );
                                 foreach($bulans as  $key=>$value){
-
-                                    echo "<option value='".$key."'>$value</option>";
+                                    echo $key = date("m") ? "<option selected value='".$key."'>$value</option>" : "<option value='".$key."'>$value</option>";
                                 }
                             ?>
 						</select>

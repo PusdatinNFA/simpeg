@@ -105,11 +105,11 @@ endif;
 
                 <?php if($model!="update"){ ?>
                 <?php if ($this->auth->has_permission('Pegawai.Kepegawaian.Updatemandiri')) : ?>
-                    <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/profilen/<?php echo $pegawai->ref; ?>/update" tooltip="Upload Foto" class="btn btn-danger btn-block"><i class="fa fa-edit"></i> Edit Data </a>
+                    <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/profilen/<?php echo $pegawai->ref; ?>/update" tooltip="Upload Foto" class="btn btn-danger btn-block"><i class="fa fa-edit"></i> Edit Profile </a>
                 <?PHP endif; ?>
                 <?PHP }else{
                 ?>
-                    <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/profilen/<?php echo $id; ?>" class="btn btn-success btn-block"><i class="fa fa-user"></i> Lihat Profile </a>
+                    <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/profilen/<?php echo $pegawai->ref; ?>" class="btn btn-danger btn-block"><i class="fa fa-user"></i> Kembali Ke Profile </a>
                 <?php
                 } ?>
             </div>
@@ -118,7 +118,7 @@ endif;
           <!-- /.box -->
 
           <!-- About Me Box -->
-          <div class="box box-primary">
+          <div class="box box-danger">
             <div class="box-header with-border">
               <h3 class="box-title">Profile Pegawai</h3>
             </div>
