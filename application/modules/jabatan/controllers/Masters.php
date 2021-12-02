@@ -249,26 +249,16 @@ class Masters extends Admin_Controller
 				$row []  = $record->PENSIUN;
                 $row []  = $record->KATEGORI_JABATAN;
                 $btn_actions = array();
-                $btn_actions  [] = "
-                    <a href='".base_url()."admin/masters/jabatan/edit/".$record->NO."'  data-toggle='tooltip' title='Ubah Data'><span class='fa-stack'>
-					   	<i class='fa fa-square fa-stack-2x'></i>
-					   	<i class='fa fa-pencil fa-stack-1x fa-inverse'></i>
-					   	</span>
-					   	</a>
-                ";
-
-                $btn_actions  [] = "
-                        <a href='#' kode='$record->NO' class='btn-hapus' data-toggle='tooltip' title='Hapus data' >
-					   	<span class='fa-stack'>
-					   	<i class='fa fa-square fa-stack-2x'></i>
-					   	<i class='fa fa-trash-o fa-stack-1x fa-inverse'></i>
-					   	</span>
-					   	</a>
-                ";
+                if($this->auth->has_permission($this->permissionEdit))
+                {    
+                    $btn_actions  [] = "<a href='".base_url()."admin/masters/jabatan/edit/".$record->NO."' data-toggle='tooltip' title='Ubah data' tooltip='Ubah data' class='btn btn-sm btn-success show-modal-custom'><i class='fa fa-pencil'></i> </a>";
+                }
                 
-                $row[] = implode(" ",$btn_actions);
-                
-
+                if($this->auth->has_permission($this->permissionDelete))
+                {    
+                    $btn_actions  [] = "<a href='#' kode='$record->NO' data-toggle='tooltip' title='Hapus Data' class='btn btn-sm btn-danger btn-hapus-tb'><i class='fa fa-trash-o'></i> </a>";
+                }
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
                 $output['data'][] = $row;
 				$nomor_urut++;
 			}

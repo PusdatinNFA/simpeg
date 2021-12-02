@@ -3,7 +3,7 @@
 <!-- sweet alert -->
 <script src="<?php echo base_url(); ?>themes/admin/js/sweetalert.js"></script>
 <link rel="stylesheet" href="<?php echo base_url(); ?>themes/admin/css/sweetalert.css">
-<div class="box box-info">
+<div class="box box-danger">
   <div class="box-body">
         <div class="control-group<?php echo form_error('name') ? ' error' : ''; ?> col-sm-12">
                 <?php echo form_label("Nama Template", 'Nama Template', array('class' => 'control-label')); ?>
@@ -41,7 +41,7 @@ Dropzone.autoDiscover = true;
 		 method:"post",
 		 acceptedFiles:"application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 		 paramName:"userfile",
-		 dictDefaultMessage:"<img src='<?php echo base_url(); ?>assets/images/dropico.png' width='50px'/><br>drop File disini, <br> Ketentuan : Ukuran file Max 1MB Tipe pas foto, file yang di perkenankan .xlsx|.docx)",
+		 dictDefaultMessage:"<img src='<?php echo base_url(); ?>assets/images/dropico.png' width='50px'/><br>Silahkan pilih dokumen template anda (.doc,.docx)",
 		 dictInvalidFileType:"Type file ini tidak dizinkan",
 		 addRemoveLinks:true,
 		 init: function () {

@@ -10,12 +10,12 @@ if ($can_delete) {
     $num_columns++;
 }
 ?>
-<div class="admin-box box box-primary expanded-box">
+<div class="admin-box box box-danger expanded-box">
     <div class="box-header">
               <h3 class="box-title">Pencarian Lanjut</h3>
                <div class="box-tools pull-right">
                     <button type="button" class="btn btn-box-tool btn-default btn-advanced-search" data-widget="collapse">
-                        <i class="fa fa-minus"></i> Tampilkan
+                        <i class="fa fa-minus"></i>
                     </button>
               </div>
     </div>
@@ -59,14 +59,11 @@ if ($can_delete) {
         ?>
     </div>
 </div>
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
     <div class="box-header box-tools">
             <div class="btn-group pull-right">
                <?php if ($this->auth->has_permission('Petajabatan.Masters.Create')) : ?>
                     <a class='btn btn-warning' href="<?php echo site_url($areaUrl . '/addkuota'); ?>"><i class="fa fa-plus"></i> Tambah Data</a>
-                <?php endif; ?>
-                <?php if ($this->auth->has_permission('Petajabatan.Masters.Create')) : ?>
-                    <button class='btn btn-danger import_peta'><i class="fa fa-plus"> </i> Import Data</button>
                 <?php endif; ?>
              </div>
  

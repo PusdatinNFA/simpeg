@@ -15,9 +15,9 @@ endif;
 $id = isset($permen->id) ? $permen->id : '';
 
 ?>
-<div class='admin-box box box-primary'>
+<div class='admin-box box box-danger'>
     <div class="box-header">
-        <h3>Tambah Data</h3>
+        <h3>Tambah Data Permen Petajabatan</h3>
     </div>        
         <?php echo form_open($this->uri->uri_string(), ''); ?>
            <input id='id' type='hidden' class="form-control" required='required' name='id' maxlength='100' value="<?php echo set_value('id', isset($permen->id) ? $permen->id : ''); ?>" />

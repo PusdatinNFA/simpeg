@@ -4,7 +4,7 @@
         <div class="btn-group">
             <a class="show-modal-custom btn btn-small btn-success" title="Tambah Unit Kerja dibawah kementerian" href="<?php echo base_url(); ?>pegawai/manage_unitkerja/createNew" tooltip="Tambah Riwayat Diklat"><i class="fa fa-plus"> </i> Tambah Baru</a>
 
-            <a class="btn btn-small btn-danger" title="Lihat Unit Kerja dibawah kementerian" href="<?php echo base_url(); ?>pegawai/manage_unitkerja/tabel" tooltip="Tabel"><i class="fa fa-table"> </i>  Lihat Table</a>
+            <!-- <a class="btn btn-small btn-danger" title="Lihat Unit Kerja dibawah kementerian" href="<?php echo base_url(); ?>pegawai/manage_unitkerja/tabel" tooltip="Tabel"><i class="fa fa-table"> </i>  Lihat Table</a> -->
             <a class="btn btn-small btn-warning" title="Lihat Unit Kerja dibawah kementerian" href="<?php echo base_url(); ?>pegawai/manage_unitkerja/downloadexcell" tooltip="download excell"><i class="fa fa-download"> </i>  Download excell</a>
         </div>
     </div>

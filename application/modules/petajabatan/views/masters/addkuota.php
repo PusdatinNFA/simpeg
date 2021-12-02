@@ -5,7 +5,7 @@
 $id = isset($kuota_jabatan->ID) ? $kuota_jabatan->ID : '';
 
 ?>
-<div class='admin-box box box-warning'>
+<div class='admin-box box box-danger'>
     <?php echo form_open($this->uri->uri_string(), 'id="frm"'); ?>
 		 <div class="box-body">
             <div class="control-group col-sm-12">

@@ -9,11 +9,10 @@ if ($can_delete) {
     $num_columns++;
 }
 ?>
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
 	<div class="box-header">
 		<h3>
-			Pangkat/Golongan
-			
+	
 			 <?php if ($this->auth->has_permission('Golongan.Masters.Create')) : ?>
               <a href="<?php echo site_url($areaUrl . '/create'); ?>">
               	<button type="button" class="btn btn-default btn-warning margin pull-right "><i class="fa fa-plus"></i> Tambah</button>
@@ -55,7 +54,7 @@ $('body').on('click','.btn-hapus',function () {
 	var kode =$(this).attr("kode");
 	swal({
 		title: "Anda Yakin?",
-		text: "Hapus data Jabatan!",
+		text: "Hapus data Pangkat Golongan!",
 		type: "warning",
 		showCancelButton: true,
 		confirmButtonClass: 'btn-danger',

@@ -40,7 +40,7 @@ class Masters extends Admin_Controller
     public function index()
     {
         
-    	Template::set('toolbar_title', "Peta Jabatan");
+    	Template::set('toolbar_title', "Master Peta Jabatan");
 		Template::set("collapse",true);
         Template::render();
     }
@@ -55,7 +55,6 @@ class Masters extends Admin_Controller
         Template::set("permen",$permen);
         Template::set('toolbar_title', "Peta Jabatan ".$data_unit->NAMA_UNOR);
         Template::set("collapse",true);
-
         Template::render();
     }
     public function permen()
@@ -183,12 +182,10 @@ class Masters extends Admin_Controller
                 $row []  = $record->JUMLAH_PEMANGKU_JABATAN;
                 $row []  = $record->PERATURAN;
                 $btn_actions = array();
-                 
-                
-                if($this->auth->has_permission("Petajabatan.Masters.Edit")){
+                if($this->auth->has_permission($this->$permissionEdit)){
                 $btn_actions  [] = "<a href='".base_url()."admin/masters/petajabatan/editkuota/".$record->ID."' class='btn btn-sm btn-warning' title='Update data'><i class='glyphicon glyphicon-edit'></i> </a>";
                 }
-                if($this->auth->has_permission("Petajabatan.Masters.Delete")){
+                if($this->auth->has_permission($this->permissionDelete)){
                     $btn_actions  [] = "<a kode='$record->ID' class='btn btn-sm btn-danger btn-hapus' data-toggle='tooltip' data-placement='top' data-original-title='Hapus data' title='Hapus data' tooltip='Hapus'><i class='glyphicon glyphicon-remove'></i> </a>";
                 }
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";

@@ -83,7 +83,7 @@ class Riwayat_tugasbelajar extends Admin_Controller
                 }
 
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
- 
+                
 
                 $output['data'][] = $row;
 				$nomor_urut++;

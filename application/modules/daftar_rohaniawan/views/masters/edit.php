@@ -4,7 +4,7 @@
 <?php 
     $id = isset($detail_riwayat->ID) ? $detail_riwayat->ID : '';
 ?>
-<div class='box box-warning' id="form-riwayat-assesmen-add">
+<div class='box box-danger' id="form-riwayat-assesmen-add">
     <div class="box-body">
         <div class="messages">
         </div>

@@ -22,8 +22,6 @@ class Riwayatjabatan extends Admin_Controller
         $this->load->model('pegawai/pegawai_model');
         $this->load->model('pegawai/jenis_jabatan_model');
         $this->load->model('ref_jabatan/jabatan_model');
-        $jenis_jabatans = $this->jenis_jabatan_model->find_all();
-		Template::set('jenis_jabatans', $jenis_jabatans);
         $this->load->model('pegawai/update_mandiri_model');
 		$this->load->model('pegawai/kawasan_model');
         $this->load->model('pegawai/tusi_model');
@@ -103,7 +101,7 @@ class Riwayatjabatan extends Admin_Controller
                 $row []  = $nomor_urut;
                 $row []  = strtoupper($record->NAMA_JABATAN)."<br><i><b>NO SK :</b>".$record->NOMOR_SK."</i>";
                 if($record->NAMA_SATKER!="")
-                    $row []  = $record->UNOR."<br>".$record->NAMA_SATKER;
+                    $row []  = $record->UNOR != $record->NAMA_SATKER ? $record->UNOR."<br>".$record->NAMA_SATKER : $record->NAMA_SATKER;
                 else
                     $row []  = $record->NAMA_UNIT;
                 $row []  = $convert->fmtDate($record->TMT_JABATAN,"dd-mm-yyyy");
@@ -133,6 +131,8 @@ class Riwayatjabatan extends Admin_Controller
 		die();
     }
     public function show($PNS_ID,$record_id=''){
+        $jenis_jabatans = $this->jenis_jabatan_model->find_all();
+        Template::set('jenis_jabatans', $jenis_jabatans);
     	Template::set('recsatker', $this->unitkerja_model->find_satker());
         $kawasans = $this->kawasan_model->find_all();
         Template::set('kawasans', $kawasans);
@@ -357,27 +357,17 @@ class Riwayatjabatan extends Admin_Controller
 
         $rec_jabatan = $this->jabatan_model->find_by("KODE_JABATAN",$this->input->post("ID_JABATAN"));
         $data["ID_JABATAN_BKN"] = isset($rec_jabatan->KODE_BKN) ? $rec_jabatan->KODE_BKN : "";
+        $data["ID_JABATAN"]     = $this->input->post("ID_JABATAN");
+        $data["NAMA_JABATAN"]   = isset($rec_jabatan->NAMA_JABATAN) ? $rec_jabatan->NAMA_JABATAN : "";
 
         // struktur
         $rec_jabatan_struktural = $this->unitkerja_model->find_by("ID",$this->input->post("ID_UNOR")); // POST
-        $data["ID_UNOR_BKN"]    = isset($rec_jabatan_struktural->ID) ? $rec_jabatan_struktural->ID : "";
         $data["ID_UNOR_BKN"]    = isset($rec_jabatan_struktural->ID) ? $rec_jabatan_struktural->ID : "";
         $data["UNOR"]           = isset($rec_jabatan_struktural->NAMA_UNOR) ? $rec_jabatan_struktural->NAMA_UNOR : "";
         // jika jabatannya struktural
         if($this->input->post("ID_JENIS_JABATAN") == "1"){
             if($this->input->post("ID_UNOR") != ""){
-                $NAMA_JABATAN  = isset($rec_jabatan_struktural->NAMA_JABATAN) ? $rec_jabatan_struktural->NAMA_JABATAN : "";
-                $data["NAMA_JABATAN"] = $NAMA_JABATAN;
-                if($this->input->post("IS_ACTIVE") == "1"){
-                    $UNOR_ID           = isset($rec_jabatan_struktural->ID) ? $rec_jabatan_struktural->ID : "";
-                    // jika jabatan aktif set ke update tabel pejabat pada tabel unitkerja
-                    $dataupdate = array(
-                        'PEMIMPIN_PNS_ID'       => $this->input->post("PNS_ID"),
-                        'JABATAN_ID'            => $this->input->post("ID_JABATAN")
-                    );
-                    $this->unitkerja_model->skip_validation(true);
-                    $this->unitkerja_model->update($UNOR_ID, $dataupdate);
-                }
+                // $data["NAMA_JABATAN"] = $rec_jabatan_struktural->NAMA_JABATAN != "" ? $rec_jabatan_struktural->NAMA_JABATAN : "";
             }
         }else{
             if($this->input->post("ID_JABATAN") != ""){
@@ -415,9 +405,10 @@ class Riwayatjabatan extends Admin_Controller
              // add log
             log_activity_pegawai($NIP_BARU,$this->auth->user_id(),"Tambah data Riwayat Jabatan", 'rwt_jabatan');
          }
+        // update profile menjadi jabawan aktif dan penempatan terbaru
         $this->set_jabatan_aktif($NIP_BARU);
         $response ['success']= true;
-        $response ['msg']= "berhasil";
+        $response ['msg']= "Berhasil";
         echo json_encode($response);    
 
     }
@@ -426,18 +417,29 @@ class Riwayatjabatan extends Admin_Controller
         if($jabatan_aktifs[0]->ID_JABATAN != ""){
             $jabatan_aktifs = $jabatan_aktifs[0];
             $rec_jabatan    = $this->jabatan_model->find_by("KODE_JABATAN",$jabatan_aktifs->ID_JABATAN);
-            $rec_unitkerja  = $this->unitkerja_model->find_by("KODE_INTERNAL",$rec_jabatan->ID_UNOR); // POST
+            $rec_unitkerja  = $this->unitkerja_model->find_by("KODE_INTERNAL",$jabatan_aktifs->ID_UNOR); // POST
             $dataupdate = array();
             $dataupdate['JABATAN_INSTANSI_REAL_ID']     = $jabatan_aktifs->ID_JABATAN;
             $dataupdate['kawasan_id']                   = $jabatan_aktifs->kawasan_id;
             $dataupdate['tusi_id']                      = $jabatan_aktifs->tusi_id;
+            $dataupdate['JENIS_JABATAN_ID']             = $jabatan_aktifs->ID_JENIS_JABATAN ? $jabatan_aktifs->ID_JENIS_JABATAN : null;
             $dataupdate['JABATAN_NAMA']                 = $rec_jabatan->NAMA_JABATAN ? $rec_jabatan->NAMA_JABATAN : null;
             $dataupdate['JABATAN_INSTANSI_ID']          = $jabatan_aktifs->ID_JABATAN;
-            $dataupdate['UNOR_ID']                      = $rec_jabatan->ID_UNOR ? $rec_jabatan->ID_UNOR : null;
+            $dataupdate['UNOR_ID']                      = $jabatan_aktifs->ID_UNOR ? $jabatan_aktifs->ID_UNOR : null;
             $dataupdate['UNOR_INDUK_ID']                = $rec_unitkerja->UNOR_INDUK ? $rec_unitkerja->UNOR_INDUK : null;
-
             $this->pegawai_model->skip_validation(true);
             $this->pegawai_model->update_where("NIP_BARU",$nip, $dataupdate);
+            // jika jabatan strktural, ubah juga ke tabel unitkerja di kolom pejabat
+            if($jabatan_aktifs->ID_JENIS_JABATAN == '1'){
+                $data_pegawai   = $this->pegawai_model->find_by("NIP_BARU",$nip);
+                $data_unit      = array();
+                $data_unit['NAMA_PEJABAT']      = $data_pegawai->NAMA;
+                $data_unit['PEMIMPIN_PNS_ID']   = $data_pegawai->PNS_ID;
+                $data_unit['JABATAN_ID']        = $jabatan_aktifs->ID_JABATAN;
+                $this->unitkerja_model->skip_validation(true);
+                $this->unitkerja_model->update_where("ID",TRIM($jabatan_aktifs->ID_UNOR), $data_unit);
+                $this->cache->delete("aunor");
+            }
         }
     }
     public function savemandiri(){

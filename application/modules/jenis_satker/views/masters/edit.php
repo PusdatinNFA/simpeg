@@ -15,7 +15,7 @@ endif;
 $id = isset($jenis_satker->id_jenis) ? $jenis_satker->id_jenis : '';
 
 ?>
-<div class='admin-box box box-primary'>
+<div class='admin-box box box-danger'>
     <div class="box-header">
         <h3>Edit Jenis Satker</h3>
     </div>        
@@ -39,12 +39,6 @@ $id = isset($jenis_satker->id_jenis) ? $jenis_satker->id_jenis : '';
             <?php echo lang('bf_or'); ?>
             <?php echo anchor(SITE_AREA . '/masters/jenis_satker', lang('jenis_satker_cancel'), 'class="btn btn-warning"'); ?>
             
-            <?php if ($this->auth->has_permission('Jenis_Satker.Masters.Delete')) : ?>
-                <?php echo lang('bf_or'); ?>
-                <button type='submit' name='delete' formnovalidate class='btn btn-danger' id='delete-me' onclick="return confirm('<?php e(js_escape(lang('jenis_satker_delete_confirm'))); ?>');">
-                    <span class='icon-trash icon-white'></span>&nbsp;<?php echo lang('jenis_satker_delete_record'); ?>
-                </button>
-            <?php endif; ?>
         </fieldset>
     <?php echo form_close(); ?>
 </div>

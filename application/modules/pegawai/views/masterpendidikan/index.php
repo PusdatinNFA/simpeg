@@ -1,13 +1,9 @@
 <?php 
     $areaUrl = base_url() . '/pegawai/masterpendidikan';
 ?>  
-
-<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/components.min.css">
-<div id="manage_unitkerja_container" class="admin-box box box-primary">
+<div class="admin-box box box-danger">
 	<div class="box-header">
-        <div class="btn-group">
-            <a class="show-modal-custom btn btn-small btn-warning" href="<?php echo $areaUrl; ?>/create" tooltip="Tambah Pendidikan">Tambah Baru</a>
-        </div>
+            <a class="btn btn-small btn-warning margin pull-right" href="<?php echo $areaUrl; ?>/create" tooltip="Tambah Pendidikan">Tambah Baru</a>
     </div>
 	<div class="box-body">
             <table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-datatable table-hover">

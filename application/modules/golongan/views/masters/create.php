@@ -15,7 +15,7 @@ endif;
 $id = isset($golongan->ID) ? $golongan->ID : '';
 
 ?>
-<div class='admin-box box box-primary'>
+<div class='admin-box box box-danger'>
     <div class="box-header">
         <h3>Edit Pangkat golongan</h3>
     </div> 

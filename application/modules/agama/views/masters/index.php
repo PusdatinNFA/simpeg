@@ -9,12 +9,7 @@ if ($can_delete) {
     $num_columns++;
 }
 ?>
-<div class="admin-box box box-primary">
-	<div class="box-header">
-		<h3>
-			<?php echo lang('agama_area_title'); ?>
-		</h3>
-	</div>
+<div class="admin-box box box-danger">
 	<div class="box-body">	
 		<?php echo form_open($this->uri->uri_string()); ?>
 			<table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-datatable table-hover">

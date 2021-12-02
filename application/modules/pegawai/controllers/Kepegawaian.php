@@ -1166,12 +1166,13 @@ class Kepegawaian extends Admin_Controller
 			$recjenis_jabatan = $this->jenis_jabatan_model->find($jenis_jabatan);
 			Template::set('JENIS_JABATAN', $recjenis_jabatan->NAMA);
 		}
-		$unor = $this->unitkerja_model->find_by("ID",trim($pegawai->UNOR_ID));
-		$pemimpin_pns_id = isset($unor->PEMIMPIN_PNS_ID) ? $unor->PEMIMPIN_PNS_ID : "";
+		$unor 				= $this->unitkerja_model->find_by("ID",trim($pegawai->UNOR_ID));
+		$pemimpin_pns_id 	= isset($unor->PEMIMPIN_PNS_ID) ? $unor->PEMIMPIN_PNS_ID : "";
 		$nama_jabatan_struktural = isset($unor->NAMA_JABATAN) ? $unor->NAMA_JABATAN : "";
 		if($pemimpin_pns_id == $pegawai->PNS_ID or $pegawai->JENIS_JABATAN_ID == "1")
 		{
-			Template::set('NAMA_JABATAN_REAL', $nama_jabatan_struktural);
+			if($nama_jabatan_struktural != "")
+				Template::set('NAMA_JABATAN_REAL', $nama_jabatan_struktural);
 			Template::set('JENIS_JABATAN', "Struktural");
 			
 		}

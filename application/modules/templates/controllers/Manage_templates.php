@@ -54,8 +54,9 @@ class Manage_Templates extends Admin_Controller
                 $row []  = $record->name;
                 $row []  = $record->template_file;
                 $btn_actions = array();
+                $btn_actions  [] = "<a href='../assets/templates/".$record->template_file."' class='btn btn-sm btn-success' data-toggle='tooltip' data-placement='top' data-original-title='Download template' title='Download template' ><i class='glyphicon glyphicon-download'></i> </a>";
                 if($this->auth->has_permission($this->permissionEdit)){
-                    $btn_actions  [] = "<a href='".base_url()."templates/manage_templates/crud/".$record->id."' class='btn btn-sm btn-warning'><i class='glyphicon glyphicon-edit'></i> </a>";
+                    $btn_actions  [] = "<a href='".base_url()."templates/manage_templates/crud/".$record->id."' class='btn btn-sm btn-warning show-modal-custom'><i class='glyphicon glyphicon-edit'></i> </a>";
                 }
                 if($this->auth->has_permission($this->permissionDelete)){
                     $btn_actions  [] = "<a kode='$record->id' class='btn btn-sm btn-danger btn-hapus' data-toggle='tooltip' data-placement='top' data-original-title='Hapus data' title='Hapus data' tooltip='Hapus'><i class='glyphicon glyphicon-remove'></i> </a>";

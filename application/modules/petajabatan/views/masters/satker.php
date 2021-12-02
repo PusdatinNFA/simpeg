@@ -11,7 +11,7 @@ if ($can_delete) {
     $num_columns++;
 }
 ?>
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
     <div class="box-header box-tools">
             <center><h4><?php echo $data_unit->NAMA_UNOR; ?></h2></center>
             <div class="btn-group pull-right">

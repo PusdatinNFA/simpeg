@@ -17,7 +17,7 @@ $id = isset($peraturan_otk->id_peraturan) ? $peraturan_otk->id_peraturan : '';
 ?>
 <div class='admin-box box box-danger'>
     <div class="box-header">
-        <h3>Tambah Jenis Satker</h3>
+        <h3>Tambah Peraturan OTK</h3>
     </div>        
     <?php echo form_open($this->uri->uri_string(), ''); ?>
     <div class="box-body">

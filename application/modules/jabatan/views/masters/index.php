@@ -12,8 +12,6 @@ if ($can_delete) {
 <div class="admin-box box box-danger">
 	<div class="box-header">
 		<h3>
-			Jabatan
-			
 			 <?php if ($this->auth->has_permission('Ref_jabatan.Masters.Create')) : ?>
               <a href="<?php echo site_url($areaUrl . '/create'); ?>">
               	<button type="button" class="btn btn-default btn-warning margin pull-right "><i class="fa fa-plus"></i> Tambah</button>

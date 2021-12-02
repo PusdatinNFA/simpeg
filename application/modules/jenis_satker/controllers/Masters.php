@@ -207,25 +207,13 @@ class Masters extends Admin_Controller
                 $row []  = $nomor_urut;
                 $row []  = $record->nama_jenis_satker;
                 $btn_actions = array();
-                $btn_actions  [] = "
-                    <a href='".base_url()."admin/masters/jenis_satker/edit/".$record->id_jenis."'  data-toggle='tooltip' title='Ubah Data'><span class='fa-stack'>
-                        <i class='fa fa-square fa-stack-2x'></i>
-                        <i class='fa fa-pencil fa-stack-1x fa-inverse'></i>
-                        </span>
-                        </a>
-                ";
-
-                $btn_actions  [] = "
-                        <a href='#' kode='$record->id_jenis' class='btn-hapus' data-toggle='tooltip' title='Hapus data' >
-                        <span class='fa-stack'>
-                        <i class='fa fa-square fa-stack-2x'></i>
-                        <i class='fa fa-trash-o fa-stack-1x fa-inverse'></i>
-                        </span>
-                        </a>
-                ";
-                
-                $row[] = implode(" ",$btn_actions);
-                
+                if($this->auth->has_permission($this->permissionEdit)){
+                $btn_actions  [] = "<a href='".base_url()."admin/masters/jenis_satker/edit/".$record->id_jenis."' class='btn btn-sm btn-warning' title='Update data'><i class='glyphicon glyphicon-edit'></i> </a>";
+                }
+                if($this->auth->has_permission($this->permissionDelete)){
+                    $btn_actions  [] = "<a kode='$record->id_jenis' class='btn btn-sm btn-danger btn-hapus' data-toggle='tooltip' data-placement='top' data-original-title='Hapus data' title='Hapus data' tooltip='Hapus'><i class='glyphicon glyphicon-remove'></i> </a>";
+                }
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
 
                 $output['data'][] = $row;
                 $nomor_urut++;

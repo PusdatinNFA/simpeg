@@ -9,11 +9,10 @@ if ($can_delete) {
     $num_columns++;
 }
 ?>
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
 	<div class="box-header">
 		<h3>
-			Master Proses TTE
-			
+			Master Draft SK
 			 <?php if ($this->auth->has_permission('Tte.Masters.Create')) : ?>
               <a href="<?php echo site_url($areaUrl . '/create'); ?>">
               	<button type="button" class="btn btn-default btn-warning margin pull-right "><i class="fa fa-plus"></i> Tambah</button>

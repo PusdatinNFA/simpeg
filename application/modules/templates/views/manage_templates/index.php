@@ -6,9 +6,9 @@
 	}
 </style>
 <!--tab-pane-->
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
 	<div class="box-header">
-              <h3 class="box-title">Data Templates</h3>
+              <h3 class="box-title">Template SK</h3>
 	</div>
 	<div class="box-body">
 		<div class="tab-pane" id="<?php echo $TAB_ID;?>">
@@ -26,7 +26,7 @@
 								<th>No</th>
 								<th>Name</th>
 								<th>Document</th>
-								<th width='50px' align="center">#</th>
+								<th width='100px' align="center">#</th>
 							</tr>
 						</thead>
 						<tfoot>

@@ -5,7 +5,7 @@
     $id = isset($jenis_izin->ID) ? $jenis_izin->ID : '';
     $this->load->helper('aplikasi');
 ?>
-<div class='box box-warning' id="form-riwayat-assesmen-add">
+<div class='box box-danger' id="form-riwayat-assesmen-add">
     <div class="box-body">
         <div class="messages">
         </div>
