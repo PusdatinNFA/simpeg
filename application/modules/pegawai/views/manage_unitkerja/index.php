@@ -1,5 +1,5 @@
 <!--<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/components.min.css">-->
-<div id="manage_unitkerja_container" class="admin-box box box-primary">
+<div id="manage_unitkerja_container" class="admin-box box box-danger">
 	<div class="box-header">
         <div class="btn-group">
             <a class="show-modal-custom btn btn-small btn-success" title="Tambah Unit Kerja dibawah kementerian" href="<?php echo base_url(); ?>pegawai/manage_unitkerja/createNew" tooltip="Tambah Riwayat Diklat"><i class="fa fa-plus"> </i> Tambah Baru</a>

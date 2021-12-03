@@ -71,6 +71,8 @@ class Vw_kgb_model extends BF_Model
 				tmt_sk,
 				'$tanggal' tgl_estimasi,
 				mv_kgb.n_gapok as gaji_lama,
+				(select count(*) as total from rwt_hukdis where  \"ID_JENIS_HUKUMAN\" = '4' and trim(\"PNS_NIP\") = trim(pegawai.\"NIP_BARU\")
+				) as riwayat_hukdis, 
 				(select \"BASIC\" from wage where mv_kgb.golongan_id = wage.golongan_id and wage.working_period_month = (
 				EXTRACT (
 				YEAR 

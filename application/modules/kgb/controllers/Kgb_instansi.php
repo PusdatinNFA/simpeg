@@ -96,7 +96,7 @@ class Kgb_instansi extends Admin_Controller
 			foreach ($records as $record) {
 				$rec_golongan = $this->golongan_model->getGolongan($record->golongan_id);
 				$mk_tahun = $record->n_jml_bulan/12;
-				// print_r($rec_golongan);
+				// print_r($record);
 				$btn_actions_array = array();
 				if($record->riwayat_kgb_id){
 					$btn_actions_array  [] = "
@@ -109,8 +109,8 @@ class Kgb_instansi extends Admin_Controller
 					";	
 				}
 				$informasi_hukdis = "";
-				if($record->total>0){
-					$informasi_hukdis = "HUKDIS";
+				if($record->riwayat_hukdis>0){
+					$informasi_hukdis = "<small class='label text-center bg-red'>HUKDIS</small>";
 				}
 				else $informasi_hukdis = "-";
 				$row = array();
