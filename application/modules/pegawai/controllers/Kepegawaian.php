@@ -566,6 +566,7 @@ class Kepegawaian extends Admin_Controller
         	Template::set('selectedUnorid',$this->unitkerja_model->find_by("ID",TRIM($pegawaiData->UNOR_ID)));
         	Template::set('selectedUnorindukid',$this->unitkerja_model->find_by("ID",TRIM($pegawaiData->UNOR_INDUK_ID)));
         }
+        Template::set('satker_penempatan_ids',$this->unitkerja_model->find_by("ID",TRIM($pegawaiData->satker_penempatan_id)));
         //die($pegawaiData->JABATAN_INSTANSI_ID);
         Template::set('selectedPendidikanID',$this->pendidikan_model->find(trim($pegawaiData->PENDIDIKAN_ID)));
         $datajabatan = $this->jabatan_model->find_by("KODE_JABATAN",trim($pegawaiData->JABATAN_INSTANSI_ID));
@@ -1176,6 +1177,8 @@ class Kepegawaian extends Admin_Controller
 			Template::set('JENIS_JABATAN', "Struktural");
 			
 		}
+		// satker penempatan
+		Template::set('satker_penempatan_ids',$this->unitkerja_model->find_by("ID",TRIM($pegawai->satker_penempatan_id)));
 		Template::set('nama_unor',$unor->NAMA_UNOR);
 		$this->Riwayat_pns_cpns_model->order_by("ID","DESC");
 		$riwayat_pns_cpns = $this->Riwayat_pns_cpns_model->find_by("PNS_NIP",$pegawai->NIP_BARU);
@@ -3002,6 +3005,7 @@ class Kepegawaian extends Admin_Controller
 		// kawasan tusi
 		$data['kawasan_id']					= $this->input->post('kawasan_id') ? $this->input->post('kawasan_id') : null;
 		$data['tusi_id']					= $this->input->post('tusi_id') ? $this->input->post('tusi_id') : null;
+		$data['satker_penempatan_id']		= $this->input->post('satker_penempatan_id') ? $this->input->post('satker_penempatan_id') : null;
         $result = false;
         $msg = "";
         if ($id_data == "") {

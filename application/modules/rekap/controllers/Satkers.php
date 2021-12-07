@@ -15,40 +15,7 @@ class Satkers extends Admin_Controller
 		$this->load->model('pegawai/vwm_jml_pegawai_model');
 	}
 	public function index(){
-		
-		$list_es1 = $this->db->query('
-			SELECT
-				"ID",
-				"NAMA_UNOR" 
-			FROM
-				vw_list_eselon1
-		')->result();
-		$list_tk = $this->db->query('
-			select "ID","NAMA" from tkpendidikan
-		')->result();
-		
-		Template::set('list_es1',$list_es1);
-		Template::set('list_tk',$list_tk);
-		Template::set('list_usia',array(
-			array(
-				"ID"=>'21-25',
-				"NAMA"=>'21-25'
-			),
-			array(
-				"ID"=>'31-35',
-				"NAMA"=>'31-35'
-			)
-		));
-		Template::set('list_jf_type',array(
-			array(
-				"ID"=>'ja',
-				"NAMA"=>'Jabatan Administrator'
-			),
-			array(
-				"ID"=>'jft',
-				"NAMA"=>'Jabatan Fungsional Tertentu'
-			)
-		));
+		Template::set('toolbar_title', "Rekap Satker");
 		Template::set_view('rekap/satkers.php');
 		Template::render();
 	}
@@ -92,7 +59,7 @@ class Satkers extends Admin_Controller
 			if($filters['unit_id_key']){
 				$this->db->group_start();
 				$this->db->where('unitkerja."ID"',$filters['unit_id_key']);	
-				$this->db->or_where('unitkerja."DIATASAN_ID"',$filters['unit_id_key']);	
+				// $this->db->or_where('unitkerja."DIATASAN_ID"',$filters['unit_id_key']);	
 				$this->db->group_end();
 			}
 			if($filters['jenis_satker']){
@@ -127,7 +94,7 @@ class Satkers extends Admin_Controller
                 $row = array();
                 $row []  = $nomor_urut.".";
                 $row []  = $record->NAMA_UNOR;
-                $row []  = number_format($record->jumlah, 0, ',', '.');  
+                $row []  = number_format($record->jml_pegawai, 0, ',', '.');  
 
                 $output['data'][] = $row;
 				$nomor_urut++;
@@ -260,7 +227,7 @@ class Satkers extends Admin_Controller
                 $typenumber = PHPExcel_Cell_DataType::TYPE_NUMERIC;
                 $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(0, $row)->setValueExplicit($no, $type);
                 $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(1, $row)->setValueExplicit($record->NAMA_UNOR, $type);
-                $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(2, $row)->setValueExplicit($record->jumlah,$typenumber);
+                $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(2, $row)->setValueExplicit($record->jml_pegawai,$typenumber);
                 $row++;
                 $no++;
             }

@@ -79,7 +79,7 @@ endif;
           <div class="box box-danger">
             <div class="box-body box-profile">
               <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/uploadfoto/<?php echo $PNS_ID; ?>" tooltip="Upload Foto" class="show-modal">
-              <img src="<?php echo $foto_pegawai; ?>" class="img-responsive pic-bordered" id="photopegawai" alt="Photo" width="100%">
+              <img src="<?php echo $foto_pegawai; ?>" class="img-responsive pic-bordered img-rounded" id="photopegawai" alt="Photo" width="100%">
               </a>
                 <h3 class="profile-username text-center">
                     <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN : ''; ?>  <?php echo isset($pegawai->NAMA) ? $pegawai->NAMA : ''; ?> <?php echo isset($pegawai->GELAR_BELAKANG) ? $pegawai->GELAR_BELAKANG : ''; ?>
@@ -171,7 +171,7 @@ endif;
                     <?php echo isset($recpns_aktif->masa_kerja_bl) ? $recpns_aktif->masa_kerja_bl  : ""; ?> Bulan
               </p>
               <hr>
-              <strong><i class="fa fa-file-text-o margin-r-5"></i> Unit Organisasi</strong>
+              <strong><i class="fa fa-home margin-r-5"></i> Unit Organisasi</strong>
               <p> 
                 <ul>
                   <?php 
@@ -180,6 +180,11 @@ endif;
                       }
                   ?>
                 </ul>
+                </p>
+              <hr>
+              <strong><i class="fa fa-home margin-r-5"></i> Satker Penempatan</strong>
+              <p> 
+                  <?php echo isset($satker_penempatan_ids->NAMA_UNOR) ? $satker_penempatan_ids->NAMA_UNOR : ""; ?>
                 </p>
             </div>
             <!-- /.box-body -->

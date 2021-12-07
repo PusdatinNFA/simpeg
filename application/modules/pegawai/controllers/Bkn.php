@@ -5,8 +5,8 @@
  */
 class Bkn extends Admin_Controller
 {
-    protected $permissionCreate = 'Pegawai.Kepegawaian.Create';
-    protected $permissionViewPpnpn = 'Pegawai.Kepegawaian.CreatePpnpn';
+    protected $permissionCreate         = 'Pegawai.Kepegawaian.Create';
+    protected $permissionViewPpnpn      = 'Pegawai.Kepegawaian.CreatePpnpn';
     
     protected $permissionDelete = 'Pegawai.Kepegawaian.Delete';
     protected $permissionEdit   = 'Pegawai.Kepegawaian.Edit';
@@ -47,6 +47,7 @@ class Bkn extends Admin_Controller
 		$this->load->model('pegawai/riwayat_pindah_unit_kerja_model');
 		$this->load->model('pegawai/diklat_struktural_model');
         $this->load->model('pegawai/lokasi_model');
+        $this->load->model('pegawai/riwayat_cltn_model');
         $this->lang->load('pegawai');
         $this->load->model('pegawai/pendidikan_model');
         $this->load->model('pegawai/unitkerja_model');
@@ -278,6 +279,31 @@ class Bkn extends Admin_Controller
     	}
         echo json_encode($response);  
 	}
+    public function viewcltn(){
+        $kode   = $this->input->post('kode');
+        $pegawai_lokal = $this->pegawai_model->find_by("PNS_ID",$kode);
+        $this->load->library('Api_bkn');
+        $api_bkn = new Api_bkn;
+        $data_cltn = $this->getdata_riwayat_cltn(trim($pegawai_lokal->NIP_BARU));
+        $result = false;
+        $id = "";
+        if($data_cltn != null) {
+            $result = true;
+        } 
+        if($result){
+            $response ['success']= true;
+            $response ['nip']= trim($pegawai_lokal->NIP_BARU);
+            $response ['msg']= "Data ditemukan";
+            $output = $this->load->view('bkn/cltn',array('data_cltn'=>$data_cltn,"nipBaru"=>trim($pegawai_lokal->NIP_BARU)),true);   
+            $response ['konten']= $output;
+        }else{
+            $response ['success']= false;
+            $response ['nip']= trim($pegawai_lokal->NIP_BARU);
+            $response ['msg']= "Data tidak ada";
+            $response ['konten']= "";
+        }
+        echo json_encode($response);  
+    }
 	public function viewjabatan(){
         $kode 	= $this->input->post('kode');
 		$pegawai_lokal = $this->pegawai_model->find_by("PNS_ID",$kode);
@@ -359,6 +385,20 @@ class Bkn extends Admin_Controller
         }
         return $data_golongan;
 	}
+    private function getdata_riwayat_cltn($nip_baru){
+        $this->load->library('Api_bkn');
+        $api_bkn = new Api_bkn;
+        $data_golongan = $this->cache->get('cltn_'.$nip_baru);
+        if($data_golongan==null){
+            // data riwayat golongan
+            $jsonrwt_golongan   = $api_bkn->getData("rw-cltn",$nip_baru);
+            $jsonrwt_golongan = json_decode($jsonrwt_golongan);
+            $jsonrwt_golongan = json_decode($jsonrwt_golongan);
+            $data_golongan = $jsonrwt_golongan->data;
+            $this->cache->write($data_golongan,'cltn_'.$nip_baru,43200);
+        }
+        return $data_golongan;
+    }
 	private function getdata_riwayat_dp3($nip_baru){
 		$api_bkn = new Api_bkn;
 		$data_dp3 = $this->cache->get('data_dp3_'.$nip_baru);
@@ -759,6 +799,20 @@ class Bkn extends Admin_Controller
         echo json_encode($response); 
         
 	}
+    public function sinkron_cache_cltn(){
+        $nip_baru   = $this->input->post('kode');
+        $pegawai_lokal = $this->pegawai_model->find_by("NIP_BARU",$nip_baru);       
+        $result = $this->sinkron_cltn($pegawai_lokal);
+        if($result){
+            $response ['success']= true;
+            $response ['msg']= "Sukses sinkron data riwayat CLTN";
+        }else{
+            $response ['success']= false;
+            $response ['msg']= "Ada kesalahan";
+        }
+        echo json_encode($response); 
+        
+    }
 	public function sinkron_cache_jabatan(){
 		$nip_baru 	= $this->input->post('kode');
 		$pegawai_lokal = $this->pegawai_model->find_by("NIP_BARU",$nip_baru);		
@@ -854,6 +908,44 @@ class Bkn extends Admin_Controller
 		}
 		return $result;
 	}
+    private function sinkron_cltn($pegawai_lokal = null){
+        $nip_baru = trim($pegawai_lokal->NIP_BARU);
+        $data_cltn = $this->cache->get('cltn_'.$nip_baru);
+        $result = true;
+        // data riwayat pangkat golongan
+        if($data_cltn != null){
+            foreach($data_cltn as $row)
+            {
+                $data = array();
+                $data["cltn_id"]            = $row->cltnId;
+                $data["nomor_sk"]           = $row->skNomor;
+                $data["tanggal_sk"]         = $row->skTanggal;
+                $data["tanggal_awal"]       = $row->tanggalAwal;
+                $data["tanggal_akhir"]      = $row->tanggalAkhir;
+                $data["tanggal_aktif"]      = $row->tanggalAktif;
+                $data["nomor_letter_bkn"]   = $row->nomorLetterBkn;
+                $data["tanggal_letter_bkn"] = $row->tanggalLetterBkn;
+                $data["pns_id"]             = $row->pnsOrangId;
+                $data["pns_nip"]            = $nip_baru;
+                $data["id_bkn"]             = $row->id;
+
+                if(empty($data["tanggal_aktif"])){
+                    unset($data["tanggal_aktif"]);
+                }
+                if(empty($data["tanggal_awal"])){
+                    unset($data["tanggal_awal"]);
+                }
+                if(empty($data["tanggal_letter_bkn"])){
+                    unset($data["tanggal_letter_bkn"]);
+                }
+                if(!$this->riwayat_cltn_model->is_exist_cltn($row->id)){
+                    $result = $this->riwayat_cltn_model->insert($data);
+                    log_activity_pegawai($NIP_BARU,$this->auth->user_id(),"sinkron data riwayat_cltn dari BKN ".$row->skNomor, 'pegawai');
+                }
+            }   
+        }
+        return $result;
+    }
 	private function sinkron_skp($pegawai_lokal = null){
 		$nip_baru = trim($pegawai_lokal->NIP_BARU);
 		$data_skp = $this->cache->get('data_rwt_skp_'.$nip_baru);

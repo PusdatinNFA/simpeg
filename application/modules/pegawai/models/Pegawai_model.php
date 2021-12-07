@@ -947,7 +947,8 @@ class Pegawai_model extends BF_Model
 			ref,
 			username_intra,
 			kawasan_id,
-			tusi_id
+			tusi_id,
+			satker_penempatan_id
 			');
 		}
 		$this->db->join('jenis_pegawai', 'pegawai.JENIS_PEGAWAI_ID = jenis_pegawai.ID', 'left');

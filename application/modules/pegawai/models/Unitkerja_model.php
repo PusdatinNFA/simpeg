@@ -569,22 +569,19 @@ class Unitkerja_model extends BF_Model
 		//var_dump($sql);
 		return $data;
 	}
-	public function find_rekap_satker()
+	public function find_rekap_satker($ID = "")
 	{
 		if (empty($this->selects)) {
-			$this->select($this->table_name . '.ID,NAMA_UNOR,UNOR_INDUK,(select count(vw_pegawai_simple."ID") from vw_pegawai_simple where 
-				"VW_UNOR_INDUK" = unitkerja."ID"
-				or 
-				"VW_ESELON_1" = unitkerja."ID"
-				or 
-				"VW_ESELON_2" = unitkerja."ID"
-				or 
-				"VW_ESELON_3" = unitkerja."ID"
-				) as jumlah');
+			$this->select($this->table_name . '."UNOR_INDUK","NAMA_UNOR",count(p."NIP_BARU") as jml_pegawai');
 		}
-		$this->unitkerja_model->where("ID = UNOR_INDUK");
-		$this->unitkerja_model->where('EXPIRED_DATE IS NULL');
-		$this->order_by("NO","asc");
+		if($ID != ""){
+			$this->db->where("unitkerja.ID",$ID);	
+		}
+		$this->db->join("pegawai p", "unitkerja.ID=p.UNOR_INDUK_ID", "LEFT");
+		$this->db->where("IS_SATKER",1);
+		$this->db->where('EXPIRED_DATE IS NULL');
+		$this->db->group_by("UNOR_INDUK");
+		$this->db->group_by("NAMA_UNOR");
 		return parent::find_all();
 	}
 	public function count_rekap_satker()
@@ -592,8 +589,8 @@ class Unitkerja_model extends BF_Model
 		if (empty($this->selects)) {
 			$this->select($this->table_name . '.ID,NAMA_UNOR,UNOR_INDUK');
 		}
-
-		$this->unitkerja_model->where('"ID" in (select "UNOR_INDUK" from hris.unitkerja)');
+		// $this->unitkerja_model->where('"ID" in (select "UNOR_INDUK" from hris.unitkerja)');
+		$this->db->where("IS_SATKER",1);
 		return parent::count_all();
 	}
 	public function find_unitkerja($diatasan_id = "")

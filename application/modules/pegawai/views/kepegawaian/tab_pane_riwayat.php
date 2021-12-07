@@ -10,6 +10,7 @@
     $tab_pane_rwt_kgb = "tab_pane_rwt_kgb";
     $tab_pane_rwt_tb = "tab_pane_rwt_tb";
     $tab_pane_rwt_pns = "tab_pane_rwt_pns";
+    $tab_pane_cltn = "tab_pane_cltn";
 ?>
 <?php
 $id = isset($pegawai->ID) ? $pegawai->ID : '';
@@ -59,6 +60,11 @@ $NIP_BARU = isset($pegawai->NIP_BARU) ? $pegawai->NIP_BARU : '';
                 <a href="#<?php echo $tab_pane_rwt_pns;?>" data-toggle="tab" aria-expanded="false"> CPNS/PNS </a>
             </li>
             <?php } ?>
+            <?php if($this->auth->has_permission("Riwayatcltn.Kepegawaian.View")){ ?>
+            <li class="">
+                <a href="#<?php echo $tab_pane_cltn;?>" data-toggle="tab" aria-expanded="false"> CLTN </a>
+            </li>
+            <?php } ?>
         </ul>
         <div class="tab-content">
             <?php 
@@ -85,6 +91,9 @@ $NIP_BARU = isset($pegawai->NIP_BARU) ? $pegawai->NIP_BARU : '';
                 }
                 if($this->auth->has_permission("Riwayatpns.Kepegawaian.View")){
                     $this->load->view('kepegawaian/tab_pane_pnscpns',array('TAB_ID'=>$tab_pane_rwt_pns,'NIP_BARU'=>$NIP_BARU));
+                }
+                if($this->auth->has_permission("Riwayatcltn.Kepegawaian.View")){
+                    $this->load->view('kepegawaian/tab_pane_cltn',array('TAB_ID'=>$tab_pane_cltn,'NIP_BARU'=>$NIP_BARU));
                 }
             ?>
             

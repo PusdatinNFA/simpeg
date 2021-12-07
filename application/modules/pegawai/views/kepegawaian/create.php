@@ -21,7 +21,7 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
 
 ?>
 <div class='messages'></div>
-<div class='box box-primary'>
+<div class='box box-danger'>
 
 	<div class="box-body">
     <form role="form" action="#" id="frmprofile">

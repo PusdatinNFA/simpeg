@@ -7,7 +7,7 @@ $can_view		= $this->auth->has_permission('Rekap.Reports.Satker');
 ?>
 
 
-<div class="admin-box box box-primary expanded-box">
+<div class="admin-box box box-danger expanded-box">
 	<div class="box-header">
               <h3 class="box-title">Pencarian Lanjut</h3>
 			   <div class="box-tools pull-right">
@@ -44,6 +44,7 @@ $can_view		= $this->auth->has_permission('Rekap.Reports.Satker');
 				<tr>
 					<td colspan=4>
 						<button type="submit" class="btn btn-success pull-right "><i class="fa fa-search"></i> Cari</button>
+						&nbsp;<button class='btn btn-warning download_xls pull-right' target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</button>
 					</td>
 				</tr>
 			</table>
@@ -52,12 +53,8 @@ $can_view		= $this->auth->has_permission('Rekap.Reports.Satker');
 		?>
 	</div>
 </div>
-<div class="admin-box box box-primary">
-	<div class="box-header box-tools">
-		<div class="box-tools pull-right">
-			 &nbsp;<button class='btn btn-warning download_xls' target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</button>
- 		</div>
-	</div>
+<div class="admin-box box box-danger">
+	
 	<div class="box-body">
 		<table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-data table-hover">
 			<thead>
@@ -101,7 +98,7 @@ $table = $(".table-data").DataTable({
 	processing: true,
 	serverSide: true,
 	"columnDefs": [
-					{"className": "dt-center", "targets": [1]},
+					{"className": "text-center", "targets": [2]},
 					{ "targets": [0,2], "orderable": false }
 				],
 	ajax: {
