@@ -9,18 +9,15 @@
                 <table class="filter_pegawai" sborder=0 width='100%' cellpadding="10">
                      
                     <tr>
-                        <td width="20px"><input type="checkbox" name="nama_cb"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">NAMA</label></td>
                         <td colspan=2><input class="form-control" type="text" name="nama_key" value="" ></td>
                     </tr>
                     <tr>
-                        <td width="20px"><input type="checkbox" name="nip_cb"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">NIP</label></td>
                         <td colspan=2><input class="form-control" type="text" name="nip_key" value="" ></td>
                     </tr>
                       
                     <tr>
-                        <td width="20px"><input type="checkbox" name="kategori_cb"></td>
                         <td width="200px"><label for="example-text-input" class="col-form-label">Jenis Arsip</label></td>
                         <td colspan=2>
                             <select name="jenis_arsip" id="jenis_arsip" class="form-control">

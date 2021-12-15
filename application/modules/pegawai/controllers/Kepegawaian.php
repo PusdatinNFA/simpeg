@@ -1653,7 +1653,7 @@ class Kepegawaian extends Admin_Controller
                 $btn_actions = array();
                 $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>";
 
-				// $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/cetak_drh/".$record->PNS_ID."' class='btn btn-sm btn-success'><i class='glyphicon glyphicon-download'></i> </a>";
+				// $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/download_drh/".$record->PNS_ID."' class='btn btn-sm btn-success'><i class='glyphicon glyphicon-download'></i> </a>";
 
 
                 if($this->auth->has_permission("Pegawai.Kepegawaian.Edit")){
@@ -1820,7 +1820,7 @@ class Kepegawaian extends Admin_Controller
                 $row []  = $record->NAMA_UNOR_FULL;
                 $btn_actions = array();
                 $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>";
-				// $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/cetak_drh/".$record->PNS_ID."' class='btn btn-sm btn-success'><i class='glyphicon glyphicon-download'></i> </a>";
+				// $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/download_drh/".$record->PNS_ID."' class='btn btn-sm btn-success'><i class='glyphicon glyphicon-download'></i> </a>";
                 if($this->auth->has_permission("Pegawai.Kepegawaian.Edit")){
                 	$btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/edit/".$record->ID."' class='btn btn-sm btn-warning'><i class='glyphicon glyphicon-edit'></i> </a>";
                 }
@@ -1969,7 +1969,7 @@ class Kepegawaian extends Admin_Controller
                 $row []  = $record->NAMA_UNOR_FULL;
                 $btn_actions = array();
                 $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>";
-				// $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/cetak_drh/".$record->PNS_ID."' class='btn btn-sm btn-success'><i class='glyphicon glyphicon-download'></i> </a>";
+				// $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/download_drh/".$record->PNS_ID."' class='btn btn-sm btn-success'><i class='glyphicon glyphicon-download'></i> </a>";
                 if($this->auth->has_permission("Pegawai.Kepegawaian.Edit")){
                 	$btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/edit/".$record->ID."' class='btn btn-sm btn-warning'><i class='glyphicon glyphicon-edit'></i> </a>";
                 }
@@ -2386,7 +2386,7 @@ class Kepegawaian extends Admin_Controller
 					   	</a>
                 ";
 				$btn_actions  [] = "
-                    <a class='show-modal-custom' href='".base_url()."admin/kepegawaian/pegawai/cetak_drh/".$record->PNS_ID."'  data-toggle='tooltip' title='Cetak DRH'><span class='fa-stack'>
+                    <a class='show-modal-custom' href='".base_url()."admin/kepegawaian/pegawai/download_drh/".$record->PNS_ID."'  data-toggle='tooltip' title='Cetak DRH'><span class='fa-stack'>
 					   <i class='fa fa-square fa-stack-2x'></i>
 					   	<i class='fa fa-download fa-stack-1x fa-inverse'></i>
 					   	</span>
@@ -2421,7 +2421,7 @@ class Kepegawaian extends Admin_Controller
 		echo json_encode($output);
 		
 	}
-	public function cetak_drh($pns_id){
+	public function download_drh($pns_id){
 		$this->load->model('pegawai/orang_tua_model');
 		$this->load->model('pegawai/istri_model');
 		$this->load->model('pegawai/anak_model');

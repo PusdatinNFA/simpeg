@@ -10,7 +10,6 @@
         Keterangan
     </h4>
     Silahkan masukan NIP untuk import data dari BKN<br>
-    dengan syarat data NIP tersebut adalah pegawai dari kementerian Pendidikan dan Kebudayaan
 </div>
 <div class='box box-warning' id="form-riwayat-assesmen-add">
 	<div class="box-body">

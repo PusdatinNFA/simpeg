@@ -306,14 +306,14 @@ class Arsip extends Admin_Controller
                 $filters[$filter['name']] = $filter["value"];
             }
             
-            if($filters['nama_cb']){
+            if($filters['nama_key']){
                 $this->sk_ds_model->like('upper(pegawai."NAMA")',strtoupper($filters['nama_key']),"BOTH");    
             }
-            if($filters['nip_cb']){
+            if($filters['nip_key']){
                 $this->sk_ds_model->like('upper(pegawai."NIP_BARU")',strtoupper($filters['nip_key']),"BOTH"); 
             }
              
-            if($filters['golongan_cb']){
+            if($filters['golongan_key']){
                 $this->sk_ds_model->where('"GOL_ID"',strtoupper($filters['golongan_key']));   
             }
             
@@ -332,7 +332,7 @@ class Arsip extends Admin_Controller
             }else{
                 $this->sk_ds_model->where('tbl_file_ds.ds_ok',1);
             }
-            if($filters['kategori_cb']){
+            if($filters['kategori_sk']){
                 $this->sk_ds_model->where('tbl_file_ds.kategori',$filters['kategori_sk']); 
             }
             

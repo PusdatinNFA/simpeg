@@ -28,7 +28,7 @@ $id = isset($tte->id) ? $tte->id : '';
         Perhatian
     </h4>
     <p>Untuk mengupload file langsung ke penandatangan(Tidak membuat draft), silahkan pilih file pdf yang akan dikirimkan untuk ditandatangani</p>
-    <p>Jika pegawai diluar pegawai kementerian pendidikan dan kebudayaan, silahkan langsung diinputkan NIP dan Nama Pegawai pada kolom nip pemilik sk dan nama pemilik SK</p>
+    <p>Jika pegawai diluar pegawai BRIN, silahkan langsung diinputkan NIP dan Nama Pegawai pada kolom nip pemilik sk dan nama pemilik SK</p>
 </div>
 <div class='admin-box box box-primary'>
     <div class="box-header">

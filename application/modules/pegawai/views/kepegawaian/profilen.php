@@ -112,6 +112,9 @@ endif;
                     <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/profilen/<?php echo $pegawai->ref; ?>" class="btn btn-danger btn-block"><i class="fa fa-user"></i> Kembali Ke Profile </a>
                 <?php
                 } ?>
+                <?php if ($this->auth->has_permission('Pegawai.Downloaddrh.View')) : ?>
+                    <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/download_drh/<?php echo $pegawai->ref; ?>" class="btn btn-warning btn-block"><i class="fa fa-download"></i> Download DRH </a>
+                <?PHP endif; ?>
             </div>
             <!-- /.box-body -->
           </div>

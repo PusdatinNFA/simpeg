@@ -256,10 +256,10 @@ class Arsip extends Admin_Controller
             foreach($advanced_search_filters as  $filter){
                 $filters[$filter['name']] = $filter["value"];
             }
-            if($filters['nama_cb']){
+            if($filters['nama_key']){
                 $this->arsip_digital_model->like('upper(pegawai."NAMA")',strtoupper($filters['nama_key']),"BOTH");    
             }
-            if($filters['nip_cb']){
+            if($filters['nip_key']){
                 $this->arsip_digital_model->like('upper(pegawai."NIP_BARU")',strtoupper($filters['nip_key']),"BOTH"); 
             }
             if($filters['jenis_arsip']){

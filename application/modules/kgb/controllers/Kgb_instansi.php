@@ -116,7 +116,7 @@ class Kgb_instansi extends Admin_Controller
 				$row = array();
                 $row []  = $nomor_urut;
                 $row []  = $record->nama_pegawai."<br>".$record->pegawai_nip;
-                $row []  = $rec_golongan->NAMA_PANGKAT." - ".$rec_golongan->NAMA."<br><b><i>Sk Terakhir:</i></b> ".date("d-m-Y", strtotime($record->tmt_sk));
+                $row []  = $rec_golongan->NAMA_PANGKAT." - ".$rec_golongan->NAMA."<br><b><i>Sk Terakhir:</i></b> ".date("d-m-Y", strtotime($record->tmt_sk))."<br><small class='label text-center bg-yellow'>".$record->riwayat."</small>";
                 $row []  = "<b><i>Lama</i></b> ".$record->o_masa_kerja_thn."th ".$record->o_masa_kerja_bln."bln, <br><b><i>Baru </i></b>".($record->n_jml_bulan/12)."th 0bln";
                	$row []  = "<b><i>Lama</i></b> ".number_format($record->gaji_lama,0,",",".").",<br><b><i>Baru </i></b>".number_format($record->gaji_baru,0,",",".");
                	$row []  = $record->ABBREVIATION;

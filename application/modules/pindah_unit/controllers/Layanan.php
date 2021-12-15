@@ -551,7 +551,7 @@ class Layanan extends Admin_Controller
                 $datarwt["NAMA_UNOR_BARU"] = $unor_baru_data->NAMA_UNOR_FULL;
                 $datarwt["ID_SATUAN_KERJA"] = $unor_baru_data->ESELON_2;
                 $datarwt["NAMA_SATUAN_KERJA"] = $unor_baru_data->NAMA_UNOR_ESELON_2;
-                $datarwt["NAMA_INSTANSI"] = "KEMENTERIAN PENDIDIKAN dan KEBUDAYAAN";
+                $datarwt["NAMA_INSTANSI"] = "BRIN";
                 
                 $datarwt['SK_TANGGAL']     = $this->input->post('TANGGAL_SK_PINDAH') ? $this->input->post('TANGGAL_SK_PINDAH') : null;
                 $SK_NOMOR = $this->input->post('NO_SK_PINDAH') ? $this->input->post('NO_SK_PINDAH') : null;
