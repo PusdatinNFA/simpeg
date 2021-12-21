@@ -74,54 +74,54 @@ class Admin_Controller extends Authenticated_Controller
         $countnotifpindahunits = 0;
         $notifupdatemandiri = null;
         $notifpindahunits = null;
-        $this->load->model('pegawai/pegawai_model');
-        $this->load->model('pindah_unit/pindah_unit_model');
-        $PNS_NIP = trim($this->auth->username());
-        $notifpindahunits = $this->pindah_unit_model->find_notifpribadi($PNS_NIP);
-        Template::set('notifpindahunits', $notifpindahunits);
-        $countnotifpindahunits = $this->pindah_unit_model->count_notifpribadi($PNS_NIP);
+        // $this->load->model('pegawai/pegawai_model');
+        // $this->load->model('pindah_unit/pindah_unit_model');
+        // $PNS_NIP = trim($this->auth->username());
+        // $notifpindahunits = $this->pindah_unit_model->find_notifpribadi($PNS_NIP);
+        // Template::set('notifpindahunits', $notifpindahunits);
+        // $countnotifpindahunits = $this->pindah_unit_model->count_notifpribadi($PNS_NIP);
 
-        if($this->auth->has_permission("Pindah_unit.Layanan.Biro") or $this->auth->has_permission("Pindah_unit.Layanan.UnitAsal") or $this->auth->has_permission("Pindah_unit.Layanan.View")){
+        // if($this->auth->has_permission("Pindah_unit.Layanan.Biro") or $this->auth->has_permission("Pindah_unit.Layanan.UnitAsal") or $this->auth->has_permission("Pindah_unit.Layanan.View")){
             
-            $UNOR_ID = $this->pegawai_model->getunor_induk($this->auth->username());
-            $PNS_NIP = trim($this->auth->username());
-            $notifpindahunits = $this->pindah_unit_model->find_notif($UNOR_ID,$PNS_NIP);
-            Template::set('notifpindahunits', $notifpindahunits);
-            $countnotifpindahunits = $this->pindah_unit_model->count_notif($UNOR_ID,$PNS_NIP);
-            //Template::set('countnotifpindahunits', $countnotifpindahunits);
-        }
+        //     $UNOR_ID = $this->pegawai_model->getunor_induk($this->auth->username());
+        //     $PNS_NIP = trim($this->auth->username());
+        //     $notifpindahunits = $this->pindah_unit_model->find_notif($UNOR_ID,$PNS_NIP);
+        //     Template::set('notifpindahunits', $notifpindahunits);
+        //     $countnotifpindahunits = $this->pindah_unit_model->count_notif($UNOR_ID,$PNS_NIP);
+        //     //Template::set('countnotifpindahunits', $countnotifpindahunits);
+        // }
         if($this->auth->has_permission("Tte.Tte.Create")){
             $this->load->model('tte/tte_model');
             $rec_kategori_ds = $this->tte_model->find_all();
             Template::set('rec_kategori_ds', $rec_kategori_ds);
         }
-        if($this->auth->has_permission("Pegawai.Kepegawaian.VerifikasiUpdate")){
-            $this->load->model('pegawai/update_mandiri_model');
-            $UNOR_ID = $this->pegawai_model->getunor_induk($this->auth->username());
-            $PNS_NIP = trim($this->auth->username());
-            $notifupdatemandiri = $this->update_mandiri_model->limit(10)->find_notif1($UNOR_ID);
-            Template::set('notifupdatemandiri', $notifupdatemandiri);
+        // if($this->auth->has_permission("Pegawai.Kepegawaian.VerifikasiUpdate")){
+        //     $this->load->model('pegawai/update_mandiri_model');
+        //     $UNOR_ID = $this->pegawai_model->getunor_induk($this->auth->username());
+        //     $PNS_NIP = trim($this->auth->username());
+        //     $notifupdatemandiri = $this->update_mandiri_model->limit(10)->find_notif1($UNOR_ID);
+        //     Template::set('notifupdatemandiri', $notifupdatemandiri);
 
-            $count_notif_update = $this->update_mandiri_model->count_notif1($UNOR_ID);
-            //Template::set('count_notif_update', $count_notif_update);
-        }
-        if($this->auth->has_permission("Pegawai.Kepegawaian.VerifikasiUpdate3")){
-            $this->load->model('pegawai/update_mandiri_model');
-            $PNS_NIP = trim($this->auth->username());
-            $notifupdatemandiri = $this->update_mandiri_model->limit(10)->find_notif();
-            Template::set('notifupdatemandiri', $notifupdatemandiri);
+        //     $count_notif_update = $this->update_mandiri_model->count_notif1($UNOR_ID);
+        //     //Template::set('count_notif_update', $count_notif_update);
+        // }
+        // if($this->auth->has_permission("Pegawai.Kepegawaian.VerifikasiUpdate3")){
+        //     $this->load->model('pegawai/update_mandiri_model');
+        //     $PNS_NIP = trim($this->auth->username());
+        //     $notifupdatemandiri = $this->update_mandiri_model->limit(10)->find_notif();
+        //     Template::set('notifupdatemandiri', $notifupdatemandiri);
 
-            $count_notif_update = $this->update_mandiri_model->count_notif();
-            //Template::set('count_notif_update', $count_notif_update);
-        }
-        Template::set('count_notif_update', $count_notif_update);
-        Template::set('countnotifpindahunits', $countnotifpindahunits);
-        Template::set('notifpindahunits', $notifpindahunits);
-        Template::set('notifupdatemandiri', $notifupdatemandiri);
+        //     $count_notif_update = $this->update_mandiri_model->count_notif();
+        //     //Template::set('count_notif_update', $count_notif_update);
+        // }
+        // Template::set('count_notif_update', $count_notif_update);
+        // Template::set('countnotifpindahunits', $countnotifpindahunits);
+        // Template::set('notifpindahunits', $notifpindahunits);
+        // Template::set('notifupdatemandiri', $notifupdatemandiri);
         // cek pejabat cuti
-        $this->load->model('izin_pegawai/vw_pejabat_cuti_model');
-        $is_pejabat_cuti = $this->vw_pejabat_cuti_model->count_me(trim($this->auth->username()));
-        Template::set('is_pejabat_cuti', $is_pejabat_cuti);
+        // $this->load->model('izin_pegawai/vw_pejabat_cuti_model');
+        // $is_pejabat_cuti = $this->vw_pejabat_cuti_model->count_me(trim($this->auth->username()));
+        // Template::set('is_pejabat_cuti', $is_pejabat_cuti);
         // hidden log di bawah
         $this->output->enable_profiler(FALSE);
         // Basic setup

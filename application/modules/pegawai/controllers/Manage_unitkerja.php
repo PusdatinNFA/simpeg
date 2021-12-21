@@ -43,7 +43,7 @@ class Manage_unitkerja extends Admin_Controller {
     public function get_children($parent=null){
         if($parent==null){
             return $this->db->query('
-            select parent."ID",parent."NAMA_UNOR","IS_SATKER",(select count(*) from unitkerja children where children."DIATASAN_ID" = parent."ID" and children."EXPIRED_DATE" is null )as num_child
+            select parent."ID",parent."NAMA_UNOR","IS_SATKER",(select count(*) from unitkerja children where children."DIATASAN_ID" = parent."KODE_INTERNAL" and children."EXPIRED_DATE" is null )as num_child
             from unitkerja parent
             where 
             deleted is null 
@@ -54,7 +54,7 @@ class Manage_unitkerja extends Admin_Controller {
         }
         else {
             return $this->db->query('
-                        select parent."ID",parent."NAMA_UNOR","IS_SATKER",(select count(*) from unitkerja children where children."DIATASAN_ID" = parent."ID" and children."EXPIRED_DATE" is null)as num_child
+                        select parent."ID",parent."NAMA_UNOR","IS_SATKER",(select count(*) from unitkerja children where children."DIATASAN_ID" = parent."KODE_INTERNAL" and children."EXPIRED_DATE" is null)as num_child
                         from unitkerja parent
                         where 
                         deleted is null 
@@ -67,7 +67,7 @@ class Manage_unitkerja extends Admin_Controller {
         // $this->create_cache_unor_tree();
         if($parent==null){
             return $this->db->query('
-            select parent."ID",parent."NAMA_UNOR","IS_SATKER",(select count(*) from unitkerja children where children."DIATASAN_ID" = parent."ID" and children."EXPIRED_DATE" is null )as num_child
+            select parent."ID",parent."NAMA_UNOR","IS_SATKER",(select count(*) from unitkerja children where children."DIATASAN_ID" = parent."KODE_INTERNAL" and children."EXPIRED_DATE" is null )as num_child
             from unitkerja parent
             where 
             deleted is null 
@@ -81,7 +81,7 @@ class Manage_unitkerja extends Admin_Controller {
             // print_r($aunitkerja);
             if($aunitkerja==null){
                 return $this->db->query('
-                        select parent."ID",parent."NAMA_UNOR","IS_SATKER",(select count(*) from unitkerja children where children."DIATASAN_ID" = parent."ID" and children."EXPIRED_DATE" is null)as num_child
+                        select parent."ID",parent."NAMA_UNOR","IS_SATKER",(select count(*) from unitkerja children where children."DIATASAN_ID" = parent."KODE_INTERNAL" and children."EXPIRED_DATE" is null)as num_child
                         from unitkerja parent
                         where 
                         deleted is null 

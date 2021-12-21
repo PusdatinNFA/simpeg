@@ -430,7 +430,7 @@ class Riwayatjabatan extends Admin_Controller
             $this->pegawai_model->skip_validation(true);
             $this->pegawai_model->update_where("NIP_BARU",$nip, $dataupdate);
             // jika jabatan strktural, ubah juga ke tabel unitkerja di kolom pejabat
-            if($jabatan_aktifs->ID_JENIS_JABATAN == '1'){
+            if($jabatan_aktifs->ID_JENIS_JABATAN == '1' or $jabatan_aktifs->ID_JENIS_JABATAN == '7'){
                 $data_pegawai   = $this->pegawai_model->find_by("NIP_BARU",$nip);
                 $data_unit      = array();
                 $data_unit['NAMA_PEJABAT']      = $data_pegawai->NAMA;

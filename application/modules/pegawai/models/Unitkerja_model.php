@@ -140,7 +140,7 @@ class Unitkerja_model extends BF_Model
 				select unor.* from (
 					select uk."ID",uk."NO",uk."NAMA_UNOR",uk."NAMA_JABATAN",uk."NAMA_PEJABAT",uk."DIATASAN_ID",count(children."ID")as "TOTAL_CHILD",uk."PEMIMPIN_PNS_ID" 
 					from hris.unitkerja uk
-					left join  hris.unitkerja children on uk."ID" = children."DIATASAN_ID"
+					left join  hris.unitkerja children on uk."KODE_INTERNAL" = children."DIATASAN_ID"
 					group by uk."ID",uk."NO",uk."NAMA_UNOR",uk."DIATASAN_ID",uk."PEMIMPIN_PNS_ID",uk."NAMA_JABATAN",uk."NAMA_PEJABAT"
 				) as unor 
 				left join hris.pegawai pejabat on pejabat."PNS_ID" = unor."PEMIMPIN_PNS_ID"	
@@ -163,7 +163,7 @@ class Unitkerja_model extends BF_Model
 					select uk."ID",uk."NO",uk."NAMA_UNOR",uk."NAMA_JABATAN",uk."NAMA_PEJABAT",uk."DIATASAN_ID",
 					count(children."ID")as "TOTAL_CHILD",uk."PEMIMPIN_PNS_ID" 
 					from hris.unitkerja uk
-					left join  hris.unitkerja children on uk."ID" = children."DIATASAN_ID"
+					left join  hris.unitkerja children on uk."KODE_INTERNAL" = children."DIATASAN_ID"
 					group by uk."ID",uk."NO",
 					uk."NAMA_UNOR",
 					uk."DIATASAN_ID",
@@ -636,7 +636,7 @@ class Unitkerja_model extends BF_Model
 	{
 		$sql = 'with RECURSIVE r as (select "ID"::text as "ID" from hris.unitkerja WHERE "ID"=?
 			union all
-			select  a."ID" from hris.unitkerja a join r on a."DIATASAN_ID" = r."ID")
+			select  a."ID" from hris.unitkerja a join r on a."DIATASAN_ID" = r."KODE_INTERNAL")
 			select string_agg(r."ID", \',\') as array_unor_id from r';
 		$query =  $this->db->query($sql, array($unor_id));
 		$row = $query->first_row();
