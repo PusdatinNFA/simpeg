@@ -101,9 +101,9 @@ class Riwayatjabatan extends Admin_Controller
                 $row []  = $nomor_urut;
                 $row []  = strtoupper($record->NAMA_JABATAN)."<br><i><b>NO SK :</b>".$record->NOMOR_SK."</i>";
                 if($record->NAMA_SATKER!="")
-                    $row []  = $record->UNOR != $record->NAMA_SATKER ? $record->UNOR."<br>".$record->NAMA_SATKER : $record->NAMA_SATKER;
+                    $row []  = ($record->UNOR != $record->NAMA_SATKER) ? $record->UNOR."<br>".$record->NAMA_SATKER : $record->NAMA_SATKER;
                 else
-                    $row []  = $record->NAMA_UNIT;
+                    $row []  = $record->NAMA_UNIT.$record->UNOR;
                 $row []  = $convert->fmtDate($record->TMT_JABATAN,"dd-mm-yyyy");
 
                 $btn_actions = array();

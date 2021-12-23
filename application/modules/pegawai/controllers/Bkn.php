@@ -1022,6 +1022,7 @@ class Bkn extends Admin_Controller
 			{
 				$this->riwayat_jabatan_model->where("TANGGAL_SK",date('Y-m-d', strtotime($row->tanggalSk)));
 				$data_riwayat = $this->riwayat_jabatan_model->find_by("PNS_ID",trim($pegawai_lokal->PNS_ID));
+                $unor_local = $this->unitkerja_model->find_by("bkn_id",$row->unorId);
 				$idPns 		= $row->idPns;
 	        	if(!isset($data_riwayat->ID))
 	        	{
@@ -1037,30 +1038,30 @@ class Bkn extends Admin_Controller
                     }
                     if($row->jenisJabatan == "FUNGSIONAL_UMUM"){
                         $recjabatan = $this->jabatan_model->find_by("KODE_BKN",TRIM($row->jabatanFungsionalUmumId));
-                        $data["ID_JENIS_JABATAN"]      = 4;
+                        $data["ID_JENIS_JABATAN"]   = 4;
                         $data["JENIS_JABATAN"]      = "Jabatan Fungsional Umum";
                         $data["ID_JABATAN_BKN"]     = $row->jabatanFungsionalUmumId;
-                        $data["NAMA_JABATAN"]   = $row->jabatanFungsionalUmumNama;
-                        $data["ID_JABATAN"]   = isset($recjabatan->KODE_JABATAN) ? $recjabatan->KODE_JABATAN : "";
+                        $data["NAMA_JABATAN"]       = $row->jabatanFungsionalUmumNama;
+                        $data["ID_JABATAN"]         = isset($recjabatan->KODE_JABATAN) ? $recjabatan->KODE_JABATAN : "";
                     }
                     if($row->jenisJabatan == "STRUKTURAL"){
                         $recjabatan = $this->jabatan_model->find_by("KODE_BKN",TRIM($row->unorId));
                         $data["ID_JENIS_JABATAN"]      = 1;
                         $data["JENIS_JABATAN"]      = "Struktural";
-                        $data["ID_JABATAN_BKN"]     = $row->unorId;   
+                        $data["ID_JABATAN_BKN"]     = "221";   
                         $data["NAMA_JABATAN"]   = $row->namaJabatan;
                         $data["ID_JABATAN"]   = isset($recjabatan->KODE_JABATAN) ? $recjabatan->KODE_JABATAN : "";
                     }
                     
-                    $data["PNS_NIP"]    = $pegawai_lokal->NIP_BARU;
-                    $data["PNS_ID"]     = trim($pegawai_lokal->PNS_ID);
-                    $data["PNS_NAMA"]   = trim($pegawai_lokal->NAMA);
-                    $data["TANGGAL_SK"] = date('Y-m-d', strtotime($row->tanggalSk));
-                    $data["TMT_JABATAN"] = date('Y-m-d', strtotime($row->tmtJabatan));
-                    $data["NOMOR_SK"]      = $row->nomorSk;
+                    $data["PNS_NIP"]        = $pegawai_lokal->NIP_BARU;
+                    $data["PNS_ID"]         = trim($pegawai_lokal->PNS_ID);
+                    $data["PNS_NAMA"]       = trim($pegawai_lokal->NAMA);
+                    $data["TANGGAL_SK"]     = date('Y-m-d', strtotime($row->tanggalSk));
+                    $data["TMT_JABATAN"]    = date('Y-m-d', strtotime($row->tmtJabatan));
+                    $data["NOMOR_SK"]       = $row->nomorSk;
                     // struktur
                     $data["ID_UNOR_BKN"]    = $row->unorId;
-                    $data["ID_UNOR"]    = $row->unorId;
+                    $data["ID_UNOR"]        = isset($unor_local->ID) ? $unor_local->ID : $row->unorId;
                     $data["UNOR"]           = $row->unorNama;
                     
                     $data["ID_SATUAN_KERJA"]    = $row->satuanKerjaId;
@@ -1105,15 +1106,15 @@ class Bkn extends Admin_Controller
                         $data["ID_JABATAN"]   = isset($recjabatan->KODE_JABATAN) ? $recjabatan->KODE_JABATAN : "";
                     }
                     
-                    $data["PNS_NIP"]    = $pegawai_lokal->NIP_BARU;
-                    $data["PNS_ID"]     = trim($pegawai_lokal->PNS_ID);
-                    $data["PNS_NAMA"]   = trim($pegawai_lokal->NAMA);
-                    $data["TANGGAL_SK"] = date('Y-m-d', strtotime($row->tanggalSk));
-                    $data["TMT_JABATAN"] = date('Y-m-d', strtotime($row->tmtJabatan));
-                    $data["NOMOR_SK"]      = $row->nomorSk;
+                    $data["PNS_NIP"]        = $pegawai_lokal->NIP_BARU;
+                    $data["PNS_ID"]         = trim($pegawai_lokal->PNS_ID);
+                    $data["PNS_NAMA"]       = trim($pegawai_lokal->NAMA);
+                    $data["TANGGAL_SK"]     = date('Y-m-d', strtotime($row->tanggalSk));
+                    $data["TMT_JABATAN"]    = date('Y-m-d', strtotime($row->tmtJabatan));
+                    $data["NOMOR_SK"]       = $row->nomorSk;
                     // struktur
                     $data["ID_UNOR_BKN"]    = $row->unorId;
-                    $data["ID_UNOR"]    = $row->unorId;
+                    $data["ID_UNOR"]        = isset($unor_local->ID) ? $unor_local->ID : $row->unorId;
                     $data["UNOR"]           = $row->unorNama;
                     
                     $data["ID_SATUAN_KERJA"]    = $row->satuanKerjaId;
