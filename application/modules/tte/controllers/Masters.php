@@ -128,7 +128,7 @@ class Masters extends Admin_Controller
                 $row []  = $nomor_urut;
                 $row []  = $record->nama_proses;
                 $row []  = $record->NAMA;
-                $row []  = $record->keterangan_proses;
+                $row []  = $record->keterangan_proses."<br><b>Format Nomor</b>: ".$record->format_nomor_sk."<br><b>Nomor Terakhir :</b> ".$record->nomor_terakhir;
                 
                 $btn_actions = array();
                  
@@ -253,13 +253,13 @@ class Masters extends Admin_Controller
                 $status = FALSE;
                 $msg = "silahkan isi penandatangan SK";
             }
-            $data["nama_proses"]      = $this->input->post('nama_proses');
+            $data["nama_proses"]          = $this->input->post('nama_proses');
             if($template_sk != "")
                 $data["template_sk"]      = $template_sk;    
-            //$data['id_file']           = md5($nama_sk);
-            //$data['waktu_buat']                  = date("Y-m-d");
-            $data['penandatangan_sk']             = $penandatangan_sk;
-            $data['keterangan_proses']             = $keterangan_proses;
+            $data['nomor_terakhir']       = $this->input->post('nomor_terakhir');
+            $data['format_nomor_sk']      = $this->input->post('format_nomor_sk');
+            $data['penandatangan_sk']     = $penandatangan_sk;
+            $data['keterangan_proses']    = $keterangan_proses;
             if($kode != ""){
                 $id = $this->tte_model->update($kode,$data);
             }else{

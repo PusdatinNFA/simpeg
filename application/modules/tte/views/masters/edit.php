@@ -21,14 +21,11 @@ $id = isset($tte->id) ? $tte->id : '';
 ?>
 <div class='admin-box box box-primary'>
     <div class="box-header">
-        <h3>Tambah Master Proses TTE</h3>
+        <h3>Edit Master Proses</h3>
     </div>        
-           
     <div class="box-body">
     <?php echo form_open($this->uri->uri_string(),"id=submit_form","form"); ?>
         <fieldset>
-            
-
             <div class="control-group<?php echo form_error('nama_proses') ? ' error' : ''; ?> col-sm-12">
                 <?php echo form_label(lang('tte_field_nama_proses') . lang('bf_form_label_required'), 'nama_proses', array('class' => 'control-label')); ?>
                 <div class='controls'>
@@ -56,6 +53,20 @@ $id = isset($tte->id) ? $tte->id : '';
                 <div class='controls'>
                     <textarea name='keterangan_proses' class="form-control"><?php echo set_value('keterangan_proses', isset($tte->keterangan_proses) ? $tte->keterangan_proses : ''); ?></textarea> 
                     <span class='help-inline'><?php echo form_error('keterangan_proses'); ?></span>
+                </div>
+            </div>
+            <div class="control-group<?php echo form_error('format_nomor_sk') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label("Format Nomor" . lang('format_nomor_sk'), 'format_nomor_sk', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <input id='format_nomor_sk' type='text' class="form-control" name='format_nomor_sk' maxlength='100' value="<?php echo set_value('format_nomor_sk', isset($tte->format_nomor_sk) ? $tte->format_nomor_sk : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('format_nomor_sk'); ?></span>
+                </div>
+            </div>
+            <div class="control-group<?php echo form_error('nomor_terakhir') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label("Nomor Terakhir", 'nomor_terakhir', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <input id='nomor_terakhir' type='text' class="form-control" name='nomor_terakhir' maxlength='100' value="<?php echo set_value('nomor_terakhir', isset($tte->nomor_terakhir) ? $tte->nomor_terakhir : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('nomor_terakhir'); ?></span>
                 </div>
             </div>
             <div class="control-group<?php echo form_error('template_sk') ? ' error' : ''; ?> col-sm-10">

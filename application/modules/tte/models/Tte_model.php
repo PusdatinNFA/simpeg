@@ -42,7 +42,7 @@ class Tte_model extends BF_Model
 		array(
 			'field' => 'nama_proses',
 			'label' => 'lang:tte_field_nama_proses',
-			'rules' => 'required|max_length[100]',
+			'rules' => 'max_length[100]',
 		),
 		array(
 			'field' => 'template_sk',
@@ -75,7 +75,7 @@ class Tte_model extends BF_Model
     public function find_all()
 	{
 
-		$this->db->select('id,pegawai."NIP_BARU",pegawai."NAMA",nama_proses,penandatangan_sk,keterangan_proses');
+		$this->db->select('id,pegawai."NIP_BARU",pegawai."NAMA",nama_proses,penandatangan_sk,keterangan_proses,nomor_terakhir,format_nomor_sk');
 		$this->db->join('pegawai', 'pegawai.PNS_ID = tte_master_proses.penandatangan_sk', 'left');
 		$this->db->order_by("tte_master_proses.id", "ASC");
 		return parent::find_all();
