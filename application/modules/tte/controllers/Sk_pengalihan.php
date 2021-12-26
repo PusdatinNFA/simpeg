@@ -560,8 +560,8 @@ class Sk_pengalihan extends Admin_Controller
             $aData['nama'] = $aData['nama_lengkap'] != "" ? $aData['nama_lengkap'] : $aData['nama'];
             $vardefault = array(
                 'nomor'=>$this->create_nomor($tte),
-                'rp_terbilang'=>Terbilang($aData['tunjangan_rp']),
-                'tunjangan_format'=>rupiah($aData['tunjangan_rp']),
+                'rpTerbilang'=>Terbilang($aData['tunjangan_rp']),
+                'tunjanganFormat'=>rupiah($aData['tunjangan_rp']),
                 'tmt_pangkat'=>getIndonesiaFormat($aData['tmt_pangkat'])
             );
             $array_variable = array_merge($aData,$vardefault);
