@@ -179,8 +179,11 @@ class Sk_pengalihan extends Admin_Controller
                 $row []  = $record->nama."<br>".$record->nip;
                 $row []  = "<b>".$record->nomor_sk."</b><br>".$record->nomor."<br>".$record->id_file;
                 $btn_sk = array(); 
-                $btn_sk  [] = "<a dherf='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_BAP.pdf' data-toggle='tooltip' title='SK BAP' class='btn btn-sm btn-success popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
-                $btn_sk  [] = "<a dherf='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_JF.pdf' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
+                $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_BAP.pdf' data-toggle='tooltip' title='SK BAP' class='btn btn-sm btn-success popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
+                $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_JF.pdf' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
+                $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPMJP.pdf' data-toggle='tooltip' title='SK SPMJ' class='btn btn-sm btn-danger popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
+                $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPMT.pdf' data-toggle='tooltip' title='SK SPMT ' class='btn btn-sm btn-info popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
+                $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPPP.pdf' data-toggle='tooltip' title='SK SPP ' class='btn btn-sm btn-success popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_sk)."</div>";
 
                 $btn_actions = array(); 
@@ -534,7 +537,7 @@ class Sk_pengalihan extends Admin_Controller
             $array_variable = array_merge($aData,$vardefault);
             $TBS->MergeField('o',$array_variable);
 
-            $output_file_name = $draftsk->nip.'_'.$draftsk->id.'_bap.docx';
+            $output_file_name = $draftsk->nip.'_'.$draftsk->id.'_BAP.docx';
             $direktori = trim($this->settings_lib->item('site.pathsk'))."template/";
             $docx_location = $direktori.$output_file_name;
             
