@@ -93,7 +93,7 @@ class Sk_pengalihan extends Admin_Controller
     public function generate_sk()
     {
         // generate all
-        $records=$this->trx_pengalihan_model->limit(100)->find_all();
+        $records=$this->trx_pengalihan_model->limit(1)->find_all();
         if(isset($records) && is_array($records) && count($records)):
             foreach ($records as $record) {
                 $this->create_ba($record);
