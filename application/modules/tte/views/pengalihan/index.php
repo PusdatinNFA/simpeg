@@ -40,10 +40,11 @@
             <thead>
             <tr>
                 <th style="width:10px">No</th>
-                <th width="30%">Pegawai</th>
-                <th>No SK / Tgl SK</th>
+                <th>Pegawai</th>
                 <th width="200px">SK</th>
-                <th width="60px" align="center">#</th></tr>
+                <th width="200px">Draft SK</th>
+                <th>#</th>
+            </tr>
             </thead>
         </table>
     </div>
@@ -57,7 +58,7 @@ $table = $(".table-data").DataTable({
     processing: true,
     serverSide: true,
     "columnDefs": [
-                    {"className": "text-center", "targets": [0,3,4]},
+                    {"className": "text-center", "targets": [0,2,3,4]},
                     { "targets": [0], "orderable": false }
                 ],
     ajax: {
