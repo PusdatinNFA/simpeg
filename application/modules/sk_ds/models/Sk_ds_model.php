@@ -1178,5 +1178,10 @@ class Sk_ds_model extends BF_Model
 		$this->db->where('tbl_file_ds."id_file" is not null '. $where_clause);
 		return parent::count_all();
 	}
+	public function is_exist($id_file)
+	{
+		$this->db->where("id_file",$id_file);
+		return parent::count_all()>0;
+	}
 
 }

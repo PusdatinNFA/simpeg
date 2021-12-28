@@ -17,16 +17,16 @@ $this->load->library('convert');
           <!-- About Me Box -->
           <div class="box box-danger">
             <div class="box-header with-border">
-              <h3 class="box-title">Keterangan SK</h3>
+              <h3 class="box-title">Keterangan Dokumen</h3>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
-              <strong><i class="fa fa-user margin-r-5"></i> Pemilik SK </strong>
+              <strong><i class="fa fa-user margin-r-5"></i> Pemilik Dokumen </strong>
               <p class="text-muted">
                   <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN : ''; ?>  <?php echo isset($pegawai->NAMA) ? $pegawai->NAMA : ''; ?> <?php echo isset($pegawai->GELAR_BELAKANG) ? $pegawai->GELAR_BELAKANG : $data->nama_pemilik_sk; ?>
               </p>
               <hr>
-              <strong><i class="fa fa-user margin-r-5"></i> Penandatangan SK</strong>
+              <strong><i class="fa fa-user margin-r-5"></i> Penandatangan Dokumen</strong>
               <p class="text-muted">
                   <?php echo isset($pejabat->GELAR_DEPAN) ? $pejabat->GELAR_DEPAN : "-"; ?>
                   <?php echo isset($pejabat->NAMA) ? $pejabat->NAMA : "-"; ?>
@@ -85,10 +85,10 @@ $this->load->library('convert');
               <?php if($data->is_signed != "1" and $data->is_signed != "3"){ ?>
                 
                 <a class="btn btn-block btn-social btn-flickr" id="btn_sign">
-                <i class="fa fa-edit"></i> Tanda Tangan SK
+                <i class="fa fa-edit"></i> Tanda Tangan Dokumen
               </a>
                <a class="btn btn-block btn-social btn-github" target="_blank" href="<?php echo base_url() ?>admin/sk/sk_ds/downloadsk/<?php echo $data->id_file; ?>">
-                <i class="fa fa-download"></i> Download draft SK
+                <i class="fa fa-download"></i> Download draft dokumen
               </a>
                
               <br>
@@ -99,7 +99,7 @@ $this->load->library('convert');
                     </a>
             <?php }else if($data->is_signed != "3" and $data->is_signed == "1"){ ?>
               <button class="btn btn-block btn-social btn-google" id="btn_notsign">
-                <i class="fa fa-edit"></i> SK sudah ditanda Tangan
+                <i class="fa fa-edit"></i> sudah ditanda Tangan
               </button>
             <?php } ?>
             </div>

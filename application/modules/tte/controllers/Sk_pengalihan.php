@@ -5,12 +5,10 @@
  */
 class Sk_pengalihan extends Admin_Controller
 {
-    protected $permissionCreate = 'Tte.Tte.Create';
-    protected $permissionDelete = 'Tte.Tte.Delete';
-    protected $permissionEdit   = 'Tte.Tte.Edit';
-    protected $permissionView   = 'Tte.Tte.View';
     protected $permissionViewSk_Pengalihan   = 'Tte.Sk_pengalihan.View';
-
+    protected $permissionGenerate   = 'Sk_pengalihan.Admin.Generate';
+    protected $permissionUploadRevisi   = 'Sk_pengalihan.Admin.RevisiSk';
+    protected $permissionUploadDs   = 'Sk_pengalihan.Admin.KirimDs';
     /**
      * Constructor
      *
@@ -19,7 +17,7 @@ class Sk_pengalihan extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
-        
+        date_default_timezone_set("Asia/Jakarta");
         $this->auth->restrict($this->permissionView);
         $this->load->model('tte/tte_model');
         $this->load->model('tte/variable_model');
@@ -33,6 +31,7 @@ class Sk_pengalihan extends Admin_Controller
         $this->load->model('sk_ds/sk_ds_model');
         $this->load->model('sk_ds/sk_ds_korektor_model');
         $this->load->model('tte/trx_pengalihan_model');
+        $this->load->model('tte/Nomor_surat_model');
         $this->lang->load('tte');
         $this->form_validation->set_error_delimiters("<span class='error'>", "</span>");
     }
@@ -61,56 +60,155 @@ class Sk_pengalihan extends Admin_Controller
      *
      * @return void
      */
-    public function create()
+    public function kirimds()
     {
-        $this->auth->restrict($this->permissionCreate);
-        $id = $this->uri->segment(5);
-        $tte = $this->tte_model->find($id);        
-        $judul_ttd = $tte->nama_proses;
-        $penandatangan_sk = $tte->penandatangan_sk;
-        $apenandatangan_sk = $this->pegawai_model->find_by("PNS_ID",$penandatangan_sk);
-        Template::set('apenandatangan_sk', $apenandatangan_sk);
+        $id = $this->input->get('kode');
+        $this->auth->restrict($this->permissionUploadDs);
+        $this->trx_pengalihan_model->where("id",$id);
+        $records = $this->trx_pengalihan_model->find_all();
+        $number = 0;
+        if(isset($records) && is_array($records) && count($records)):
+            foreach ($records as $record) {
+                if($record->flag_jf == "1"){
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_BAP.pdf")){
+                        $id_file                        = md5($record->nomor_ba);
+                        $is_exist  = $this->sk_ds_model->is_exist($id_file);
+                        if(!$is_exist){
+                           $this->saveDs($record,"BAP",$record->nomor_ba,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_BAP.pdf");
+                        }
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JF.pdf")){
+                        
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JFU.pdf")){
+                        
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMJP.pdf")){
+                        
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMT.pdf")){
+                        
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPPP.pdf")){
+                        
+                    } 
+                }
+                if($record->flag_jf == "2"){
+                    $nomor_jf = $this->create_sk($record,"JFU",$record->nomor_sk_jf,$record->nomor_sk_jf);
+                }
+                $number++;
+                // update flag
+                $this->updateStatusGenerate($record->id);
+            }
+        endif;
+        $output = array();
+        $output['success'] = true;
+        $output['msg'] = "Kirim ke DS selesai";
+        $output['jumlah'] = $number;
+        echo json_encode($output);
+        die();
+    }
+    private function saveDs($record_pengalihan,$kategori,$nomor_sk,$file_pdf){
+        $id_file                        = md5($nomor_sk);
+        $tte                            = $this->tte_model->find_by("kode_proses",$kategori);        
+        $judul_ttd                      = $tte->nama_proses;
+        $averifikator       = json_decode($tte->korektors);
+        $data_ds = array();
+        $data_ds['id_file']             = $id_file;
+        $data_ds['waktu_buat']          = date("Y-m-d H:i:s");
+        $data_ds['id_pegawai_ttd']      = $tte->penandatangan_sk;
+        $data_ds['nip_sk']              = $record_pengalihan->nip;
+        $data_ds['nama_pemilik_sk']     = $record_pengalihan->nama_lengkap;
+        $data_ds['kategori']            = $kategori;
+        $data_ds['nomor_sk']            = $nomor_sk;
+        $data_ds['show_qrcode']         = 1;
+        $data_ds['letak_ttd']           = 1;
+        $data_ds['halaman_ttd']         = 1;
+        if(count($averifikator) > 0){
+            $data_ds['is_signed']            = 0;
+            $data_ds['is_corrected']         = 0;
+        }else{
+            $data_ds['is_corrected']         = 1;// dibuat langsung bisa tandatangan jika ga ada korektor        
+            $data_ds['is_signed']            = 0;
+        }    
+        $data_ds['ds_ok']               = 1; // merupakan ttd digital
+        $data_ds['teks_base64']         = $this->conversiFileToBase64($file_pdf);
+        $this->sk_ds_model->skip_validation(true);
+        $return_ds = $this->sk_ds_model->insert($data_ds);    
+        log_activity($this->auth->user_id(),"Kirim dokumen BAP ke DS " . ': ' . $return_ds . ' : ' . $this->input->ip_address(), 'sk_pengalihan');
 
-        $this->proses_variable_model->where("id_proses",$id);
-        $proses_variable = $this->proses_variable_model->find_detil();
-        Template::set('proses_variable', $proses_variable);
-
-        $this->tte_master_korektor_model->where("id_tte_master_proses",$id);
-        $verifikators = $this->tte_master_korektor_model->find_all();
-        Template::set('verifikators', $verifikators);
-        Template::set('tte', $tte);
-        Template::set('judul_ttd', $judul_ttd);
-        Template::set('id_master_proses', $id);
-        Template::set('toolbar_title', "Buat Dokumen ".$judul_ttd);
-        Template::set_view("tte/tte/create");
-        Template::render();
+        $datadel_korektor   = array('id_file '=>$id_file);
+        $this->sk_ds_korektor_model->delete_where($datadel_korektor);
+        $korektor_ke = 1;
+        if(count($averifikator) > 0)
+        {
+            for ($i=0;$i<count($averifikator);$i++) 
+            {
+                $data_korektor = array();
+                $data_korektor['id_file']               = $id_file;
+                $data_korektor["id_pegawai_korektor"]   = $averifikator[$i];
+                $data_korektor['korektor_ke']           = $korektor_ke;
+                $data_korektor['is_corrected']          = $korektor_ke == 1 ? 2 : null;
+                $this->sk_ds_korektor_model->skip_validation(true);
+                $id_ds_korektor = $this->sk_ds_korektor_model->insert($data_korektor);
+                if($id_ds_korektor){
+                    log_activity($this->auth->user_id(),"Save Korektor ds dari " . ': ' . $id_ds_korektor . ' : ' . $this->input->ip_address(), 'pengalihan');
+                }
+                $korektor_ke++;
+            }
+        }
+    }
+    private function conversiFileToBase64($fileFullDirektory){
+        $data_file = file_get_contents($fileFullDirektory);
+        $FILE_BASE64 = base64_encode($data_file);
+        return $FILE_BASE64;
     }
     /**
      * Allows editing of tte data.
      *
      * @return void
      */
-    public function generate_sk($id = "")
+    public function generate_sk()
     {
         // generate all
-        if($id != "")
+        $id = $this->input->get('kode');
+        if($id != ""){
             $this->trx_pengalihan_model->where("id",$id);
-        $records = $this->trx_pengalihan_model->limit(1)->find_all();
+        }else{
+            $this->trx_pengalihan_model->where("flag_generate is null");
+        }
+        $this->trx_pengalihan_model->where("flag_jf",1);
+        $records = $this->trx_pengalihan_model->limit(50)->find_all();
         $number = 0;
         if(isset($records) && is_array($records) && count($records)):
             foreach ($records as $record) {
-                $this->create_ba($record);
-                $this->create_sk($record,"JF");
-                $this->create_sk($record,"SPMJP");
-                $this->create_sk($record,"SPMT");
-                $this->create_sk($record,"SPPP");   
+                if($record->flag_jf == "1"){
+                    $nomor_jf = $this->create_sk($record,"JF",$record->nomor_sk_jf,$record->nomor_sk_jf);
+                    $this->create_ba($record,$nomor_jf,$record->nomor_ba);
+                    $this->create_sk($record,"SPPP",$nomor_jf,$record->nomor_spp);
+                    $this->create_sk($record,"SPMJP",$nomor_jf,$record->nomor_spmj);
+                    $this->create_sk($record,"SPMT",$nomor_jf,$record->nomor_spmt);   
+                }
+                if($record->flag_jf == "2"){
+                    $nomor_jf = $this->create_sk($record,"JFU",$record->nomor_sk_jf,$record->nomor_sk_jf);
+                }
                 $number++;
+                // update flag
+                $this->updateStatusGenerate($record->id);
             }
         endif;
         $output = array();
+        $output['success'] = true;
+        $output['msg'] = "Generate Selesai";
         $output['jumlah'] = $number;
         echo json_encode($output);
         die();
+    }
+    private function updateStatusGenerate($id){
+        $dataupdate = array();
+        $dataupdate['flag_generate'] = 1;
+        $this->trx_pengalihan_model->skip_validation(true);
+        $this->trx_pengalihan_model->update($id, $dataupdate);
     }
     public function ajax_data(){
         $this->auth->restrict($this->permissionView);
@@ -153,11 +251,18 @@ class Sk_pengalihan extends Admin_Controller
             }
              
             if($filters['nama_key']){
-                $this->trx_pengalihan_model->like('upper(pegawai."NAMA")',strtoupper($filters['nama_key']),"BOTH");    
+                $this->trx_pengalihan_model->like('upper("nama")',strtoupper($filters['nama_key']),"BOTH");    
             }
             if($filters['nip_key']){
-                $this->trx_pengalihan_model->like('upper(pegawai."NIP_BARU")',strtoupper($filters['nip_key']),"BOTH"); 
+                $this->trx_pengalihan_model->like('upper("nip")',strtoupper($filters['nip_key']),"BOTH"); 
             }
+            if($filters['is_jf_key']){
+                $this->trx_pengalihan_model->where('flag_jf',$filters['is_jf_key']);    
+            }
+            if($filters['agama_key']){
+                $this->trx_pengalihan_model->where('agama',$filters['agama_key']);    
+            }
+    
         }
         
         $this->db->stop_cache();
@@ -185,25 +290,58 @@ class Sk_pengalihan extends Admin_Controller
                 $class_delete = "";
                 $row = array();
                 $row []  = $nomor_urut;
-                $row []  = $record->nama."<br>".$record->nip."<br><b>Asal : </b><i>".$record->asal_instansi."</i>";
+                $row []  = $record->nama."<br>".$record->nip."<br><b>Asal : </b><i>".$record->asal_instansi."</i>"."<br><b>Agama : </b><i>".$record->agama."</i>"."<br><b>NO SK : </b><i>".$record->nomor_sk_jf."</i>";
                 $btn_sk = array(); 
-                $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_BAP.pdf' data-toggle='tooltip' title='SK BAP' class='btn btn-sm btn-success popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
-                $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_JF.pdf' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
-                $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPMJP.pdf' data-toggle='tooltip' title='SK SPMJ' class='btn btn-sm btn-danger popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
-                $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPMT.pdf' data-toggle='tooltip' title='SK SPMT ' class='btn btn-sm btn-info popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
-                $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPPP.pdf' data-toggle='tooltip' title='SK SPP ' class='btn btn-sm btn-success popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_BAP.pdf")){
+                        $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_BAP.pdf' data-toggle='tooltip' title='BAP' class='btn btn-sm btn-success popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
+                        }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JF.pdf")){
+                        $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_JF.pdf' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning popupurl'><i class='fa fa-eye'></i> </a>";
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JFU.pdf")){
+                        $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_JFU.pdf' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning popupurl'><i class='fa fa-eye'></i> </a>";
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMJP.pdf")){
+                        $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPMJP.pdf' data-toggle='tooltip' title='SPMJ' class='btn btn-sm btn-danger popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMT.pdf")){
+                        $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPMT.pdf' data-toggle='tooltip' title='SPMT ' class='btn btn-sm btn-info popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPPP.pdf")){
+                        $btn_sk  [] = "<a href='#' url='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPPP.pdf' data-toggle='tooltip' title='SPP ' class='btn btn-sm btn-success popupurl ".$class_delete."'><i class='fa fa-eye'></i> </a>";
+                    }
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_sk)."</div>";
 
                 $btn_actions = array(); 
-                $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_BAP.docx' data-toggle='tooltip' title='SK BAP' class='btn btn-sm btn-success ".$class_delete."'><i class='fa fa-download'></i> </a>";
-                $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_JF.pdf' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning ".$class_delete."'><i class='fa fa-download'></i> </a>";
-                $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPMJP.docx' data-toggle='tooltip' title='SK SPMJ' class='btn btn-sm btn-danger ".$class_delete."'><i class='fa fa-download'></i> </a>";
-                $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPMT.docx' data-toggle='tooltip' title='SK SPMT ' class='btn btn-sm btn-info ".$class_delete."'><i class='fa fa-download'></i> </a>";
-                $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPPP.docx' data-toggle='tooltip' title='SK SPP ' class='btn btn-sm btn-success ".$class_delete."'><i class='fa fa-download'></i> </a>";
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_BAP.docx")){
+                        $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_BAP.docx' data-toggle='tooltip' title='SK BAP' class='btn btn-sm btn-success'><i class='fa fa-download'></i> </a>";
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JF.docx")){
+                        $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_JF.docx' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning'><i class='fa fa-download'></i> </a>";
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JFU.docx")){
+                        $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_JFU.docx' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning'><i class='fa fa-download'></i> </a>";
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMJP.docx")){
+                        $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPMJP.docx' data-toggle='tooltip' title='SK SPMJ' class='btn btn-sm btn-danger ".$class_delete."'><i class='fa fa-download'></i> </a>";
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMT.docx")){
+                    $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPMT.docx' data-toggle='tooltip' title='SK SPMT ' class='btn btn-sm btn-info ".$class_delete."'><i class='fa fa-download'></i> </a>";
+                    }
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPPP.docx")){
+                        $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPPP.docx' data-toggle='tooltip' title='SK SPP ' class='btn btn-sm btn-success ".$class_delete."'><i class='fa fa-download'></i> </a>";
+                    }
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
                 $btn_aksi = array();
-                $btn_aksi  [] = "<a href='".base_url()."tte/sk_pengalihan/upload_revisi/{$record->id}' data-toggle='tooltip' title='Upload SK perubahan ' class='btn btn-sm btn-success show-modal'><i class='fa fa-upload'></i> </a>";
-                $btn_aksi  [] = "<a href='".base_url()."tte/sk_pengalihan/generate_sk/{$record->id}' data-toggle='tooltip' title='Generate SK' class='btn btn-sm btn-danger'><i class='fa fa-forward'></i> </a>";
+                if($this->auth->has_permission($this->permissionUploadRevisi)){
+                    $btn_aksi  [] = "<a href='".base_url()."tte/sk_pengalihan/upload_revisi/{$record->id}' data-toggle='tooltip' title='Upload SK perubahan ' class='btn btn-sm btn-success show-modal'><i class='fa fa-upload'></i> </a>";
+                }
+                if($this->auth->has_permission($this->permissionUploadDs)){
+                    $btn_aksi  [] = "<button  data-toggle='tooltip' title='Kirim Ke DS' class='btn btn-sm btn-warning sendDs' kode='{$record->id}'><i class='fa fa-key'></i> </button>";
+                }
+                if($this->auth->has_permission($this->permissionGenerate)){
+                    $btn_aksi  [] = "<button  data-toggle='tooltip' title='Generate SK' class='btn btn-sm btn-danger generateSk' kode='{$record->id}'><i class='fa fa-forward'></i> </button>";
+                }
                 
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_aksi)."</div>";
                 $output['data'][] = $row;
@@ -224,7 +362,7 @@ class Sk_pengalihan extends Admin_Controller
         file_put_contents($direktori.$file_name, $bin);
     }
     function save_draft(){
-        $this->auth->restrict($this->permissionCreate);
+        // $this->auth->restrict($this->permissionCreate);
         if (!$this->input->is_ajax_request()) {
             die("Only ajax request");
         }
@@ -232,19 +370,6 @@ class Sk_pengalihan extends Admin_Controller
             'success'=>false,
             'msg'=>'Unknown error'
         );
-        if ($this->form_validation->run() === false) {
-            $response['msg'] = "
-            <div class='alert alert-block alert-error fade in'>
-                <a class='close' data-dismiss='alert'>&times;</a>
-                <h4 class='alert-heading'>
-                    Error
-                </h4>
-                ".validation_errors()."
-            </div>
-            ";
-            echo json_encode($response);
-            exit();
-        }
         $this->load->helper('handle_upload');
         $status = false;
         $msg    = "";  
@@ -255,19 +380,33 @@ class Sk_pengalihan extends Admin_Controller
         $base64data = "";
         $save_file_ds = false;
         $data_ds = array();
-        if (isset($_FILES['nama_sk']) && $_FILES['nama_sk']['name']) {
+        if (isset($_FILES['userfile']) && $_FILES['userfile']['name']) {
             $errors=array();
             $allowed_ext= array('docx');
-            $file_name =$_FILES['nama_sk']['name'];
-         //   $file_name =$_FILES['image']['tmp_name'];
+            $file_name =$_FILES['userfile']['name'];
+            // $file_name =$_FILES['image']['tmp_name'];
             $file_ext  = explode('.',$file_name);
-            $file_size =$_FILES['nama_sk']['size'];
-            $file_tmp  = $_FILES['nama_sk']['tmp_name'];
-            $type= $_FILES['nama_sk']['type'];
+            $file_size =$_FILES['userfile']['size'];
+            $file_tmp  = $_FILES['userfile']['tmp_name'];
+            $type= $_FILES['userfile']['type'];
             //echo $file_ext[1];echo "<br>";
-            if (isset($_FILES['nama_sk']) && is_array($_FILES['nama_sk']) && $_FILES['nama_sk']['error'] != 4)
+            if (isset($_FILES['userfile']) && is_array($_FILES['userfile']) && $_FILES['userfile']['error'] != 4)
              {
-                
+                unlink(trim($this->settings_lib->item('site.pathsk'))."template/".$file_name);
+                $tmp_name   = pathinfo($_FILES['userfile']['name'], PATHINFO_FILENAME);
+                $uploadData = handle_upload('userfile',trim($this->settings_lib->item('site.pathsk'))."template/");
+                 if (isset($uploadData['error']) && !empty($uploadData['error']))
+                 {
+                    $tipefile=$_FILES['userfile']['type'];
+                    //$tipefile = $_FILES['userfile']['name'];
+                     $upload = false;
+                     log_activity($this->auth->user_id(), 'Gagal : '.$uploadData['error'].trim($this->settings_lib->item('site.pathsk')).$tipefile.$this->input->ip_address(), 'pegawai');
+                 }else{
+                    $status = true;
+                    $docx_location = $uploadData['data']['full_path'];
+                    $this->generate_pdf_from_word($docx_location);
+                    log_activity($this->auth->user_id(), 'Update draft SK : ' . $file_name . ' : ' . $this->input->ip_address(), 'tte');
+                 }
              }
             if(in_array(end($file_ext),$allowed_ext) === false)
             {
@@ -301,52 +440,8 @@ class Sk_pengalihan extends Admin_Controller
 
             }
         }
-         
-        if($penandatangan_sk ==""){
-            $status = FALSE;
-            $msg = "silahkan isi penandatangan SK";
-        }
-        $id_file = "";
-        $nomor_sk = $this->input->post('nomor_sk') ? trim($this->input->post('nomor_sk')) : null;
-        $tgl_sk = $this->input->post('tgl_sk') ? trim($this->input->post('tgl_sk')) : null;
-        $tmt_sk = $this->input->post('tmt_sk') ? trim($this->input->post('tmt_sk')) : null;
-        if($nomor_sk != "" and $kode == ""){
-            $id_file = md5($nomor_sk.date("ymdhis"));
-            $data['id_file']            = $id_file;
-        }
-        $data['nip_sk']             = $nip_sk;
-        $data['nama_pemilik_sk']             = $nama_pemilik_sk;
-        
-        $data['penandatangan_sk']             = $penandatangan_sk;
-        $data['id_master_proses']             = $id_master_proses ? $id_master_proses : null;
-        $data['tgl_sk']             = $tgl_sk;
-        $data['tmt_sk']             = $tmt_sk;
-        $data['nomor_sk']           = $nomor_sk;
-
-        $data['show_qrcode']           = $show_qrcode;
-        $data['letak_ttd']           = $letak_ttd;
-        $data['halaman_ttd']           = $halaman_ttd;
-        
-        if($kode != ""){
-            $data['updated_by']         = $this->auth->user_id();
-            $data['updated_date']        = date("Y-m-d");
-            $id = $this->tte_trx_draft_sk_model->update($kode,$data);
-        }else{
-            $data['created_by']         = $this->auth->user_id();
-            $data['created_date']            = date("Y-m-d");
-
-            $id = $this->tte_trx_draft_sk_model->insert($data);   
-            $kode = $id; 
-        }
-        if($id){
-            $status = true;
-            $msg = "Berhasil";   
-        }else{
-            $status = false;
-            $msg = "Gagal";   
-        }
         $data_json = array(
-            'status' => $status,
+            'success' => $status,
             'msg' => $msg
 
         );
@@ -357,7 +452,7 @@ class Sk_pengalihan extends Admin_Controller
     private function generate_pdf_from_word($file_word = ""){
         $output = shell_exec('unoconv -f pdf '.$file_word.' 2>&1');
     }
-    private function create_ba($draftsk){
+    private function create_ba($draftsk,$nomor_jf,$nomor_sk = ""){
         $this->load->helper('aplikasi');
         // berita acara
         $kode           = 'BAP';
@@ -373,9 +468,12 @@ class Sk_pengalihan extends Admin_Controller
                 $template_name = trim($this->settings_lib->item('site.pathsk'))."template/".$template_sk."Islam.docx";
             $TBS = $this->libopentbs->TBS;
             $TBS->LoadTemplate($template_name, OPENTBS_ALREADY_UTF8); // Also merge some [onload] automatic fields (depends of the type of document).
+            $nomor_sk = $nomor_sk!= "" ? $nomor_sk : $this->create_nomor($tte);
             $aData['nama'] = $aData['nama_lengkap'] != "" ? $aData['nama_lengkap'] : $aData['nama'];
             $vardefault = array(
-                'nomor'=>$this->create_nomor($tte)
+                'nomor'=>$nomor_sk,
+                'nomor_bap'=>$nomor_sk,
+                'nomor_sk_jf'=>$nomor_jf,
             );
             $array_variable = array_merge($aData,$vardefault);
             $TBS->MergeField('o',$array_variable);
@@ -384,10 +482,11 @@ class Sk_pengalihan extends Admin_Controller
             $docx_location = $direktori.$output_file_name;
             $TBS->Show(OPENTBS_FILE, $docx_location); // Also merges all [onshow] automatic fields.
             $this->generate_pdf_from_word($docx_location);
+            $this->updateNomorSk($draftsk->id,$nomor_sk,$kode);
         }
         
     }
-    private function create_sk($draftsk,$kode){
+    private function create_sk($draftsk,$kode,$nomor_sk_jf = "",$nomor_sk = ""){
         $this->load->helper('aplikasi');
         $tte            = $this->tte_model->find_by("kode_proses",$kode);        
         $judul_ttd      = $tte->nama_proses;
@@ -399,12 +498,17 @@ class Sk_pengalihan extends Admin_Controller
             $TBS = $this->libopentbs->TBS;
             $TBS->LoadTemplate($template_name, OPENTBS_ALREADY_UTF8); // Also merge some [onload] automatic fields (depends of the type of document).
             $aData['nama'] = $aData['nama_lengkap'] != "" ? $aData['nama_lengkap'] : $aData['nama'];
+            $nomor_sk = $nomor_sk ? $nomor_sk : $this->create_nomor($tte);
             $vardefault = array(
-                'nomor'=>$this->create_nomor($tte),
+                'nomor'=>$nomor_sk,
                 'rpTerbilang'=>Terbilang($aData['tunjangan_rp']),
                 'tunjanganFormat'=>rupiah($aData['tunjangan_rp']),
-                'jabatanUwords'=>ucwords($aData['jenis_jabatan']),
-                'tmt_pangkat'=>getIndonesiaFormat($aData['tmt_pangkat'])
+                'jabatanUwords'=>ucwords(strtolower($aData['jenis_jabatan'])),
+                'jabatan_baruUpper'=>strtoupper($aData['jenis_jabatan']),
+                'tmt_pangkat'=>getIndonesiaFormat($aData['tmt_pangkat']),
+                'tanggal_lahirFormat'=>getIndonesiaFormat($aData['tanggal_lahir']),
+                'tmt_jabatan'=>isset($aData['tanggal_lahir']) ? $aData['tmt_jabatan'] : '3 Januari 2022',
+                'nomor_sk_jf'=>$nomor_sk_jf
             );
             $array_variable = array_merge($aData,$vardefault);
             $TBS->MergeField('o',$array_variable);
@@ -413,24 +517,53 @@ class Sk_pengalihan extends Admin_Controller
             $docx_location = $direktori.$output_file_name;
             $TBS->Show(OPENTBS_FILE, $docx_location); // Also merges all [onshow] automatic fields.
             $this->generate_pdf_from_word($docx_location);
+            $this->updateNomorSk($draftsk->id,$nomor_sk,$kode);
         }
+        return $nomor_sk;
         
     }
     private function create_nomor($tte){
         $this->load->helper('aplikasi');
+        $nomor    = $this->Nomor_surat_model->getNomor($tte->format_nomor_sk);
         $format_nomor   = $tte->format_nomor_sk;
-        $nomor          = (int)$tte->nomor_terakhir+1;
         $tahun          = date("Y");
         $bulan          = (int)date("m");
-        $param = array($nomor, $bulan,$tahun);
-        $this->update_nomor($tte,$nomor);
+        $param          = array($nomor, $bulan,$tahun);
+        $this->updateNomorTerakhir($tte->format_nomor_sk,$nomor);
         return sprintf($format_nomor,$nomor,$bulan,$tahun);
     }
-    private function update_nomor($tte,$nomor_terakhir){
+    private function updateNomorTerakhir($format,$nomor_terakhir){
         $dataupdate = array();
         $dataupdate["nomor_terakhir"] = $nomor_terakhir;
-        $this->tte_model->skip_validation(true);
-        $this->tte_model->update($tte->id, $dataupdate);
+        $this->Nomor_surat_model->skip_validation(true);
+        $this->Nomor_surat_model->update_where("format_nomor",$format, $dataupdate);
+    }
+    private function updateNomorSk($id,$nomor_sk,$kolom){
+        switch ($kolom) {
+          case "BAP":
+            $kolom = "nomor_ba";
+            break;
+          case "JF":
+            $kolom = "nomor_sk_jf";
+            break;
+          case "SPMJP":
+            $kolom = "nomor_spmj";
+            break;
+          case "SPPP":
+            $kolom = "nomor_spp";
+            break;
+        case "SPMT":
+            $kolom = "nomor_spmt";
+            break;
+            
+          default:
+            $kolom = "";
+        }
+        $dataupdate = array();
+        $dataupdate[$kolom] = $nomor_sk;
+        $this->trx_pengalihan_model->skip_validation(true);
+        if($kolom != "")
+            $this->trx_pengalihan_model->update($id, $dataupdate);
     }
     private function initial_data($record_data){
         $a_data = array();

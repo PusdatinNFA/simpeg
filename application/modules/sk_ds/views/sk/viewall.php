@@ -1,4 +1,4 @@
-<div class="admin-box box box-primary expanded-box">
+<div class="admin-box box box-danger expanded-box">
         <div class="box-header">
         <?php echo form_open($this->uri->uri_string(),"id=form_search_pegawai","form"); ?>
                 <style>
