@@ -33,7 +33,7 @@ $this->load->library('convert');
                   <?php echo isset($pejabat->GELAR_BELAKANG) ? $pejabat->GELAR_BELAKANG : "-"; ?>
               </p>
               <hr>
-              <strong><i class="fa fa-user margin-r-5"></i> Status Koreksi </strong>
+              <strong><i class="fa fa-user margin-r-5"></i> Status Paraf </strong>
               <p class="text-muted">
                   <?php echo $data->is_corrected == "1" ? "<span class='label label-success'>Sudah Koreksi</span>" : ""; ?>
                   <?php echo $data->is_corrected == "2" ? "<span class='label label-warning'>Proses Koreksi</span>" : ""; ?>
@@ -54,7 +54,7 @@ $this->load->library('convert');
               </p>
               <?php if(isset($korektor) && is_array($korektor) && count($korektor)){ ?>
               <hr>
-              <strong><i class="fa fa-user margin-r-5"></i> Korektor </strong>
+              <strong><i class="fa fa-user margin-r-5"></i> Paraf </strong>
               <p class="text-muted">
                   <?php 
                     if(isset($korektor) && is_array($korektor) && count($korektor)):
@@ -63,10 +63,10 @@ $this->load->library('convert');
                         echo $record->korektor_ke.". ";
                         echo $record->NAMA;
                     ?>
-                      <?php echo $record->is_corrected == "1" ? "<span class='label label-success'>Sudah Koreksi</span>" : ""; ?>
-                      <?php echo $record->is_corrected == "2" ? "<span class='label label-warning'>Sedang Koreksi</span>" : ""; ?>
-                      <?php echo $record->is_corrected == "" ? "<span class='label label-danger'>Belum Koreksi</span>" : ""; ?>
-                      <?php echo $record->is_corrected == "3" ? "<span class='label label-danger'>Sudah koreksi (Dikembalikan)</span>" : ""; ?>
+                      <?php echo $record->is_corrected == "1" ? "<span class='label label-success'>Sudah Paraf</span>" : ""; ?>
+                      <?php echo $record->is_corrected == "2" ? "<span class='label label-warning'>Siap Paraf</span>" : ""; ?>
+                      <?php echo $record->is_corrected == "" ? "<span class='label label-danger'>Belum Paraf</span>" : ""; ?>
+                      <?php echo $record->is_corrected == "3" ? "<span class='label label-danger'>Sudah Paraf (Dikembalikan)</span>" : ""; ?>
                     <?php
                         echo "<br>";
                         $no++;

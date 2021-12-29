@@ -78,19 +78,40 @@ class Sk_pengalihan extends Admin_Controller
                         }
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JF.pdf")){
+                        $id_file                        = md5($record->nomor_sk_jf);
+                        $is_exist  = $this->sk_ds_model->is_exist($id_file);
+                        if(!$is_exist){
+                           $this->saveDs($record,"JF",$record->nomor_sk_jf,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JF.pdf");
+                        }
                         
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JFU.pdf")){
-                        
+                        $id_file                        = md5($record->nomor_sk_jf);
+                        $is_exist  = $this->sk_ds_model->is_exist($id_file);
+                        if(!$is_exist){
+                           $this->saveDs($record,"JFU",$record->nomor_sk_jf,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JFU.pdf");
+                        }
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMJP.pdf")){
-                        
+                        $id_file                        = md5($record->nomor_spmj);
+                        $is_exist  = $this->sk_ds_model->is_exist($id_file);
+                        if(!$is_exist){
+                           $this->saveDs($record,"SPMJP",$record->nomor_spmj,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMJP.pdf");
+                        }
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMT.pdf")){
-                        
+                        $id_file                        = md5($record->nomor_spmt);
+                        $is_exist  = $this->sk_ds_model->is_exist($id_file);
+                        if(!$is_exist){
+                           $this->saveDs($record,"SPMT",$record->nomor_spmt,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMT.pdf");
+                        }
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPPP.pdf")){
-                        
+                        $id_file                        = md5($record->nomor_spp);
+                        $is_exist  = $this->sk_ds_model->is_exist($id_file);
+                        if(!$is_exist){
+                           $this->saveDs($record,"SPPp",$record->nomor_spp,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPPP.pdf");
+                        }
                     } 
                 }
                 if($record->flag_jf == "2"){
@@ -112,7 +133,7 @@ class Sk_pengalihan extends Admin_Controller
         $id_file                        = md5($nomor_sk);
         $tte                            = $this->tte_model->find_by("kode_proses",$kategori);        
         $judul_ttd                      = $tte->nama_proses;
-        $averifikator       = json_decode($tte->korektors);
+        $averifikator                   = $this->getKorektors($tte->id);
         $data_ds = array();
         $data_ds['id_file']             = $id_file;
         $data_ds['waktu_buat']          = date("Y-m-d H:i:s");
@@ -135,18 +156,17 @@ class Sk_pengalihan extends Admin_Controller
         $data_ds['teks_base64']         = $this->conversiFileToBase64($file_pdf);
         $this->sk_ds_model->skip_validation(true);
         $return_ds = $this->sk_ds_model->insert($data_ds);    
-        log_activity($this->auth->user_id(),"Kirim dokumen BAP ke DS " . ': ' . $return_ds . ' : ' . $this->input->ip_address(), 'sk_pengalihan');
+        log_activity($this->auth->user_id(),"Kirim dokumen {$kategori} ke DS " . ': ' . $return_ds . ' : ' . $this->input->ip_address(), 'sk_pengalihan');
 
         $datadel_korektor   = array('id_file '=>$id_file);
         $this->sk_ds_korektor_model->delete_where($datadel_korektor);
         $korektor_ke = 1;
-        if(count($averifikator) > 0)
+        if(isset($averifikator) && is_array($averifikator) && count($averifikator))
         {
-            for ($i=0;$i<count($averifikator);$i++) 
-            {
+            foreach ($averifikator as $record) {
                 $data_korektor = array();
                 $data_korektor['id_file']               = $id_file;
-                $data_korektor["id_pegawai_korektor"]   = $averifikator[$i];
+                $data_korektor["id_pegawai_korektor"]   = $record->id_pegawai_korektor;
                 $data_korektor['korektor_ke']           = $korektor_ke;
                 $data_korektor['is_corrected']          = $korektor_ke == 1 ? 2 : null;
                 $this->sk_ds_korektor_model->skip_validation(true);
@@ -157,6 +177,11 @@ class Sk_pengalihan extends Admin_Controller
                 $korektor_ke++;
             }
         }
+    }
+    private function getKorektors($id){
+        $this->tte_master_korektor_model->where("id_tte_master_proses",$id);
+        $verifikators = $this->tte_master_korektor_model->find_all();
+        return $verifikators;
     }
     private function conversiFileToBase64($fileFullDirektory){
         $data_file = file_get_contents($fileFullDirektory);
@@ -261,6 +286,9 @@ class Sk_pengalihan extends Admin_Controller
             }
             if($filters['agama_key']){
                 $this->trx_pengalihan_model->where('agama',$filters['agama_key']);    
+            }
+            if($filters['instansi_key']){
+                $this->trx_pengalihan_model->like('upper("asal_instansi")',strtoupper($filters['instansi_key']),"BOTH");       
             }
     
         }

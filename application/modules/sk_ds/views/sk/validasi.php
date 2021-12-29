@@ -1,13 +1,13 @@
 <div class="nav-tabs-custom">
         <ul id="tab-insides-here" class="nav nav-tabs">
             <li class="active">
-                <a href="#belumttd" data-toggle="tab" aria-expanded="true"> Belum Koreksi </a>
+                <a href="#belumttd" data-toggle="tab" aria-expanded="true"> Belum Paraf </a>
             </li>
             <li class="">
-                <a href="#sudahttd" data-toggle="tab" aria-expanded="false"> Sudah Koreksi </a>
+                <a href="#sudahttd" data-toggle="tab" aria-expanded="false"> Sudah Paraf </a>
             </li> 
             <li class="">
-                <a href="#antriankoreksi" data-toggle="tab" aria-expanded="false"> Antrian Koreksi </a>
+                <a href="#antriankoreksi" data-toggle="tab" aria-expanded="false"> Antrian Paraf </a>
             </li> 
         </ul>
         <div class="tab-content">

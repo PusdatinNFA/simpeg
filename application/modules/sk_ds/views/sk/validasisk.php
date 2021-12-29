@@ -57,16 +57,16 @@ $this->load->library('convert');
                   <?php echo isset($pejabat->GELAR_BELAKANG) ? $pejabat->GELAR_BELAKANG : "-"; ?>
               </p>
               <hr>
-              <strong><i class="fa fa-user margin-r-5"></i> Korektor Ke </strong>
+              <strong><i class="fa fa-user margin-r-5"></i> Paraf Ke </strong>
               <p class="text-muted">
                   <?php echo $data[0]->korektor_ke; ?>
                   
               </p>
                <hr>
-               <strong><i class="fa fa-user margin-r-5"></i> Status Koreksi </strong>
+               <strong><i class="fa fa-user margin-r-5"></i> Status Paraf </strong>
               <p class="text-muted">
-                  <?php echo $data[0]->status_koreksi == "1" ? "<span class='label label-success'>Sudah Koreksi</span>" : ""; ?>
-                  <?php echo $data[0]->status_koreksi == "2" ? "<span class='label label-warning'>Sedang Koreksi</span>" : ""; ?>
+                  <?php echo $data[0]->status_koreksi == "1" ? "<span class='label label-success'>Sudah Paraf</span>" : ""; ?>
+                  <?php echo $data[0]->status_koreksi == "2" ? "<span class='label label-warning'>Sedang Paraf</span>" : ""; ?>
                   <?php echo ($data[0]->status_koreksi == "" or $data[0]->status_koreksi == "0") ? "<span class='label label-danger'>Belum Koreksi</span>" : ""; ?>
                   
               </p>
@@ -94,8 +94,11 @@ $this->load->library('convert');
                       ?>
                       <br>
                       
-                    <a class="btn btn-block btn-social btn-dropbox" id="btn_koreksi_ok">
+                    <!-- <a class="btn btn-block btn-social btn-dropbox" id="btn_koreksi_ok">
                       <i class="fa fa-edit"></i> Teruskan
+                     </a>-->
+                    <a class="btn btn-block btn-social btn-flickr" id="btn_paraf">
+                      <i class="fa fa-edit"></i> Paraf Dokumen
                     </a>
                     <a class="btn btn-block btn-social btn-google" id="btn_koreksi_batal">
                       <i class="fa fa-arrow-left"></i> Koreksi/Kembalikan Ke Pemroses
@@ -114,7 +117,50 @@ $this->load->library('convert');
         <!-- /.col -->
 </div>
 <script>
-  
+  $( "#btn_paraf" ).click(function() {
+        swal({
+        title: "Paraf SK",
+        //text: "Silahkan Masukan Pasphrase anda dengan NIK <?php echo isset($pegawai_login->NIK) ? $pegawai_login->NIK : ""; ?>",
+        text: "Silahkan Masukan Pasphrase anda",
+        inputType: "password",
+        type: "input",
+        showCancelButton: true,
+        closeOnConfirm: false,
+        animation: "slide-from-top",
+        inputPlaceholder: "Pasphrase"
+      },
+      function(inputValue){
+        if (inputValue === false) return false;
+
+        if (inputValue === "") {
+          swal.showInputError("Silahkan masukan Pasphrase!");
+          return false
+        }
+        swal("Perhatian", "Tunggu sebentar, tandatangan digital sedang proses....", "info");
+        submitParaf(inputValue);
+      });
+
+    });
+  function submitParaf(pass){
+    var valid_file = "<?php echo $data->id_file; ?>";
+    var datas = "id_file="+valid_file+"&passphrase="+pass+"&username=<?php echo isset($pegawai_login->NIK) ? trim($pegawai_login->NIK) : ""; ?>&NIP=<?php echo isset($pegawai_login->NIP_BARU) ? trim($pegawai_login->NIP_BARU) : ""; ?>";
+    var json_url = "<?php echo base_url() ?>admin/sk/sk_ds/tandatangansk";
+     $.ajax({    
+      type: "POST",
+      url: json_url,
+      data: datas,
+            dataType: "json",
+            success: function(data){ 
+                if(data.success){
+                    swal("Pemberitahuan!", data.msg, "success");
+                    location.reload();
+                }
+                else {
+                  swal("Pemberitahuan!", data.msg, "error");    
+                }
+      }});
+    return false; 
+  }
   function submitdata(status){
     
     var json_url = "<?php echo base_url() ?>admin/sk/sk_ds/prosesvalidasi/"+status;

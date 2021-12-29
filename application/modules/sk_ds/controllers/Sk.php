@@ -448,7 +448,7 @@ class Sk extends Admin_Controller
         $pejabat = $this->pegawai_model->find_by("PNS_ID",trim($id_penandatangan));
         Template::set("pejabat",$pejabat);
 
-        # Decode the Base64 string, making sure that it contains only valid characters
+        # Decode the Base64 string, mang sure that it contains only valid characters
         $bin = base64_decode($b64, true);
         # Perform a basic validation to make sure that the result is a valid PDF file
         # Be aware! The magic number (file signature) is not 100% reliable solution to validate PDF files
@@ -2059,56 +2059,6 @@ echo $file;
      * @return boolean|integer An ID for successful inserts, true for successful
      * updates, else false.
      */
-    public function tandatangansk_old()
-    {
-        $this->auth->restrict($this->permissionttd);
-        $direktori = trim($this->settings_lib->item('site.pathsk'));
-        $id_file = $this->input->post('id_file');
-        $data = $this->sk_ds_model->find($id_file);
-        $text_base64 = $data->teks_base64;
-        $this->load->library('Api_digital');
-        $ClassApidigital = new Api_digital();
-        $retuanbase64  = $ClassApidigital->signsk($direktori.$id_file);
-        // update data
-        $status = false;
-        $msg = "";
-        if($retuanbase64->status){
-            //die($retuanbase64->base_64);
-            $data = array();
-            $data["teks_base64"]     = $retuanbase64->base_64;
-            $data["is_signed"]      = "1";
-            $this->sk_ds_model->update($id_file,$data);
-
-            // generate file
-            //echo $retuanbase64;
-            $new_file_name = $id_file.".pdf";
-            $bin = base64_decode($retuanbase64, true);
-            # Perform a basic validation to make sure that the result is a valid PDF file
-            # Be aware! The magic number (file signature) is not 100% reliable solution to validate PDF files
-            # Moreover, if you get Base64 from an untrusted source, you must sanitize the PDF contents
-            if (strpos($bin, '%PDF') !== 0) {
-              throw new Exception('Missing the PDF file signature');
-            }
-            $direktori = trim($this->settings_lib->item('site.pathsk'));
-            $url_sk = trim($this->settings_lib->item('site.urlsk'));
-            
-            if (file_exists($direktori.$new_file_name)) {
-               unlink($direktori.$new_file_name);
-            }
-            file_put_contents(trim($direktori).$new_file_name, $bin);  
-            // end 
-            $status = true;
-            $msg = "SK telah Berhasil ditanda Tangan digital";
-        }else{
-            $status = false;
-            $msg = "Ada kesalahan";
-        }
-        $response ['success']= $status;
-        $response ['msg']= $msg;
-        echo json_encode($response);    
-
-        exit();
-    }
     public function tandatangansk_bppt()
     {
         $this->auth->restrict($this->permissionttd);
@@ -2185,14 +2135,14 @@ echo $file;
         $status = false;
         $msg = "";
 
-        $this->load->library('signature/esign');
-        $esign = new Esign();
+        $this->load->library('signature/Dsignclient');
+        $esign = new Dsignclient();
         if($usercert != "" && $passphrase != ""){
             $spesimen = "default.png";
             if (file_exists($direktorispesimen.$NIP.'.png')) {
                 $spesimen = $NIP.'.png';
             }
-            $return = $esign->sign($usercert,$passphrase,$direktori.$id_file.'.pdf',$direktorispesimen.$spesimen,$halaman_ttd,$show_qrcode,$letak_ttd);
+            $return = $esign->sign($usercert,$passphrase,$direktori.$id_file.'.pdf','','visible',$halaman_ttd);
             if($return == 1){
 
                 // cek file signed
@@ -2220,12 +2170,12 @@ echo $file;
             }else{
                 // save log
                 log_activity($this->auth->user_id(),"Gagal Tandatangan" . ': ' . $id_file ."-".$return. ' : ' . $this->input->ip_address(), 'sk_ds');
-                $this->save_log($id_file,$usercert,$return,1);
+                $this->save_log($id_file,$usercert,$return['error'],1);
                 // add log riwayat
                 $ses_nip = trim($this->auth->username());
                 $this->save_riwayat_ds($id_file,$ses_nip,"Gagal tandatangan SK","");
                 // end log riwayat
-                $msg = $return;
+                $msg = $return['error'];
             }
         }else{
             $msg = "Silahkan Lengkapi NIK dan Passphrase ";
@@ -2248,8 +2198,8 @@ echo $file;
 
         $direktori = trim($this->settings_lib->item('site.pathsk'));
         $direktorispesimen = trim($this->settings_lib->item('site.pathspesimen'));
-        $this->load->library('signature/esign');
-        $esign = new Esign();
+        $this->load->library('signature/Dsignclient');
+        $esign = new Dsignclient();
         $jmldok = 0;
         if($usercert != "" && $passphrase != ""){
             foreach($aid_file as $value) {
@@ -2261,51 +2211,37 @@ echo $file;
                 $status = false;
                 $msg = "";
                 // create pdf jika belum ada
-                $file_name = $value.".pdf";
-                $b64 = $data->teks_base64;
-                $bin = base64_decode($b64, true);
-                if (strpos($bin, '%PDF') !== 0) {
-                  throw new Exception('Missing the PDF file signature');
-                }
-                if (!file_exists($direktori.$file_name)) {
-                   file_put_contents($direktori.$file_name, $bin);    
+                $file_name = $direktori.$value.".pdf";
+                $filesigned = $direktori.$value."_signed.pdf";
+                if (file_exists($filesigned)) {
+                   $file_name = $filesigned;
                 }
                 // end create pdf
-
-                $spesimen = "default.png";
-                if (file_exists($direktorispesimen.$NIP.'.png')) {
-                    $spesimen = $NIP.'.png';
-                }
-
-                $return = $esign->sign($usercert,$passphrase,$direktori.$value.'.pdf',$direktorispesimen.$spesimen,$halaman_ttd,$show_qrcode,$letak_ttd);
+                $return = $esign->sign($usercert,$passphrase,$file_name,'','visible',$halaman_ttd);
+                // print_r($return);
                 if($return == 1){
-
                     // cek file signed
-                    $filesigned = $direktori.$value."_signed.pdf";
                     $base64signed = "";
                     if (file_exists($filesigned)) {
                         $base64signed = chunk_split(base64_encode(file_get_contents($filesigned)));
                     }
-
                     $status = true;
-                    
                     $data = array();
                     if($base64signed != ""){
-                        $data["teks_base64_sign"]      = $base64signed;    
+                        $data["teks_base64_sign"]   = $base64signed;    
                     }
-                    $data["is_signed"]      = "1";
-                    $data["tgl_tandatangan"]      = date("Y-m-d H:i:s");
+                    $data["is_signed"]              = "1";
+                    $data["tgl_tandatangan"]        = date("Y-m-d H:i:s");
                     $this->sk_ds_model->update($value,$data);
                     $jmldok++;
                     $msg = $jmldok." Dokumen sudah ditandatangan";
-
                     $this->save_log($value,$usercert,"Berhasil Tandatangan",2);
                     // add log riwayat
                     $ses_nip = trim($this->auth->username());
                     $this->save_riwayat_ds($value,$ses_nip,"Berhasil Tandatangan dari ttd all","");
                     // end log riwayat
                 }else{
-                    $this->save_log($value,$usercert,$return,1);
+                    $this->save_log($value,$usercert,$return['error'],1);
                     // add log riwayat
                     $ses_nip = trim($this->auth->username());
                     $this->save_riwayat_ds($value,$ses_nip,"Gagal tandatangan SK dari ttd all","");
@@ -2313,7 +2249,7 @@ echo $file;
                     if($return == "Proses signing gagal : null 0"){
                         $return = "Ada masalah pada server DS, ".$return;
                     }
-                    $msg = $return;
+                    $msg = $return['error'];
                 }
             }
         }else{
@@ -2497,7 +2433,8 @@ echo $file;
         $this->auth->restrict($this->permissionValidasi);
         $NIP = $this->input->post('NIP');
         $aid_file = $this->input->post('id_file');
-        $komentar = $this->input->post('komentar');
+        $usercert = $this->input->post('username');
+        $passphrase = $this->input->post('passphrase');
         $ses_nip = trim($this->auth->username());
         $status = $this->uri->segment(5);
         
@@ -2506,50 +2443,44 @@ echo $file;
             $datadetil = $this->sk_ds_korektor_model->find($id_file);
             // jika statusnya lanjutkan, maka ubah status koreksi pengoreksi selanjutnya jadi 2 (siap koreksi)
             if($status=="1"){
-                $korektor_ke = $datadetil->korektor_ke;
-                $file_id = $datadetil->id_file;
-                $korektor_selanjutnya = $korektor_ke + 1;
-                // cek apakah ada korektor selanjutnya, jika sudah korektor terakhir maka update ketabel file_ds supaya siap tanda tangan
-                $data = array();
-                $this->sk_ds_korektor_model->where("korektor_ke",$korektor_selanjutnya);
-                $nextkorektor = $this->sk_ds_korektor_model->find_by("id_file",$file_id);
-
-                // cek file
-                $datads = $this->sk_ds_model->find($file_id);
-                $file_name = $file_id.".pdf";
-                $b64 = $datads->teks_base64;
-                $bin = base64_decode($b64, true);
-                $direktori = trim($this->settings_lib->item('site.pathsk'));
-                if (strpos($bin, '%PDF') !== 0) {
-                  throw new Exception('Missing the PDF file signature');
-                }
-                if (file_exists($direktori.$file_name)) {
-                   unlink($direktori.$file_name);
-                }
-                // end cek file
-                if(isset($nextkorektor->id)){
-                    // jika ada korektor selanjutnya
-                    $data_updates = array(
-                        'is_corrected'     => 2
-                    );
-                    $this->sk_ds_korektor_model->where("id_file",$file_id);
-                    $this->sk_ds_korektor_model->update_where('korektor_ke', $korektor_selanjutnya, $data_updates);
-                    log_activity($this->auth->user_id(),"Koreksi OK -> korektor selanjutnya" . ': ' . $file_id . ' : ' . $this->input->ip_address(), 'sk_ds');
-                    // add log riwayat
-                    $this->save_riwayat_ds($file_id,$ses_nip,"Koreksi SK (Teruskan ke korektor ".$korektor_selanjutnya.")","");
-                    // end log riwayat
+                // kirim file DS untuk paraf
+                $resultDs = $this->parafDs($usercert,$passphrase,$id_file);
+                if($resultDs){
+                    $korektor_ke = $datadetil->korektor_ke;
+                    $file_id = $datadetil->id_file;
+                    $korektor_selanjutnya = $korektor_ke + 1;
+                    // cek apakah ada korektor selanjutnya, jika sudah korektor terakhir maka update ketabel file_ds supaya siap tanda tangan
+                    $data = array();
+                    $this->sk_ds_korektor_model->where("korektor_ke",$korektor_selanjutnya);
+                    $nextkorektor = $this->sk_ds_korektor_model->find_by("id_file",$file_id);
+                    // end cek file
+                    if(isset($nextkorektor->id)){
+                        // jika ada korektor selanjutnya
+                        $data_updates = array(
+                            'is_corrected'     => 2
+                        );
+                        $this->sk_ds_korektor_model->where("id_file",$file_id);
+                        $this->sk_ds_korektor_model->update_where('korektor_ke', $korektor_selanjutnya, $data_updates);
+                        log_activity($this->auth->user_id(),"Paraf OK -> korektor selanjutnya" . ': ' . $file_id . ' : ' . $this->input->ip_address(), 'sk_ds');
+                        // add log riwayat
+                        $this->save_riwayat_ds($file_id,$ses_nip,"Paraf SK (Teruskan ke korektor ".$korektor_selanjutnya.")","");
+                        // end log riwayat
+                    }else{
+                        // jika tidak ada korektor selanjutnya
+                        $data_updates = array(
+                            'is_corrected'     => 1
+                        );
+                        $this->sk_ds_model->update($file_id,$data_updates);
+                        log_activity($this->auth->user_id(),"Paraf OK langsung ke penandatangan " . ': ' . $file_id . ' : ' . $this->input->ip_address(), 'sk_ds');
+                        // add log riwayat
+                        $this->save_riwayat_ds($file_id,$ses_nip,"Paraf SK (Teruskan ke penandatangan) dari Paraf all","");
+                        // end log riwayat
+                    }
+                    file_put_contents($direktori.$file_name, $bin);
                 }else{
-                    // jika tidak ada korektor selanjutnya
-                    $data_updates = array(
-                        'is_corrected'     => 1
-                    );
-                    $this->sk_ds_model->update($file_id,$data_updates);
-                    log_activity($this->auth->user_id(),"Koreksi OK langsung ke penandatangan " . ': ' . $file_id . ' : ' . $this->input->ip_address(), 'sk_ds');
-                    // add log riwayat
-                    $this->save_riwayat_ds($file_id,$ses_nip,"Koreksi SK (Teruskan ke penandatangan) dari koreksi all","");
-                    // end log riwayat
+                    $status = false;
+                    $msg = "Tandatangan gagal";
                 }
-                file_put_contents($direktori.$file_name, $bin);
             }
             // jika statusnya dikembalikan
             if($status=="3"){
@@ -2567,30 +2498,67 @@ echo $file;
                 $this->sk_ds_model->update($file_id,$data_updates);
 
                 $data["is_returned"]     = 1;
-                log_activity($this->auth->user_id(),"Koreksi SK " . ': ' . $file_id . ' Catatan : '.$catatan. $this->input->ip_address(), 'sk_ds');
+                log_activity($this->auth->user_id(),"Paraf SK " . ': ' . $file_id . ' Catatan : '.$catatan. $this->input->ip_address(), 'sk_ds');
                 // add log riwayat
-                $this->save_riwayat_ds($file_id,$ses_nip,"Koreksi SK (SK dikembalikan)",$catatan);
+                $this->save_riwayat_ds($file_id,$ses_nip,"Paraf SK (SK dikembalikan)",$catatan);
                 // end log riwayat
             }
 
-            // update data
-            
-            $data["is_corrected"]     = $status;
-            $data["catatan_koreksi"]     = $catatan;
-            
-            $return = false;
-            $msg = "";
-            if($this->sk_ds_korektor_model->update($id_file,$data)){
-                $return = true;
-                $msg = "Koreksi Selesai";
-            }else{
-                $msg = "Koreksi error ".$this->sk_ds_korektor_model->error;
-            }      
         }
         $response ['success']= $status;
         $response ['msg']= $msg;
         echo json_encode($response);   
         exit();
+    }
+    private function parafDs($usercert,$passphrase,$value){
+        $direktori = trim($this->settings_lib->item('site.pathsk'));
+        $this->load->library('signature/Dsignclient');
+        $esign = new Dsignclient();
+        $data = $this->sk_ds_model->find($value);
+        $halaman_ttd = $data->halaman_ttd;
+        $show_qrcode = $data->show_qrcode;
+        $letak_ttd = $data->letak_ttd;
+
+        $status = false;
+        $msg = "";
+        // create pdf jika belum ada
+        $file_name = $direktori.$value.".pdf";
+        $filesigned = $direktori.$value."_signed.pdf";
+        if (file_exists($filesigned)) {
+           $file_name = $filesigned;
+        }
+        // end create pdf
+        $return = $esign->sign($usercert,$passphrase,$file_name,'','visible',$halaman_ttd);
+        if($return == 1){
+            // cek file signed
+            $base64signed = "";
+            if (file_exists($filesigned)) {
+                $base64signed = chunk_split(base64_encode(file_get_contents($filesigned)));
+            }
+            $status = true;
+            $data = array();
+            if($base64signed != ""){
+                $data["teks_base64"]   = $base64signed;    
+            }
+            // $data["is_signed"]              = "1";
+            // $data["tgl_tandatangan"]        = date("Y-m-d H:i:s");
+            $this->sk_ds_model->update($value,$data);
+            $jmldok++;
+            $msg = $jmldok." Dokumen sudah diparaf";
+            $this->save_log($value,$usercert,"Berhasil Tandatangan",2);
+            // add log riwayat
+            $ses_nip = trim($this->auth->username());
+            $this->save_riwayat_ds($value,$ses_nip,"Berhasil Tandatangan dari ttd all","");
+            // end log riwayat
+            return true;
+        }else{
+            $this->save_log($value,$usercert,$return['error'],1);
+            // add log riwayat
+            $ses_nip = trim($this->auth->username());
+            $this->save_riwayat_ds($value,$ses_nip,"Gagal paraf SK dari ttd all","");
+            // end log riwayat
+            return false;
+        }
     }
     public function kembalikan_kepemroses()
     {

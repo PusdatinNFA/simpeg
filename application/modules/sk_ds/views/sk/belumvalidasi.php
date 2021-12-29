@@ -93,23 +93,15 @@ if ($can_delete) {
                             </select>
                         </td>
                     </tr>
-				<!-- <tr>
-                        <td width="20px"><input type="checkbox" class="chkqr" name="chkqr"></td>
-                        <td width="200px"><label for="example-text-input" class="col-form-label">Qr</label></td>
-                        <td colspan=2>
-                            <a href="<?php echo base_url(); ?>admin/sk/sk_ds/scanqr" id="linkqr" data-toggle="tooltip" title="" class="btn btn-sm btn-info show-modal" data-original-title="Scan QR"><i class="glyphicon glyphicon-eye-open"></i> Scan Qrcode </a>
-                            <input type="text" id="textqrcode" name="textqrcode" class="form-control">
-                            
-                        </select>
-                        </td>
-                    </tr> -->
-
 				<tr>
 					<td colspan=4>
-						<a class="btn btn-social btn-google" id="btn_koreksi_ok">
+						<!-- <a class="btn btn-social btn-google" id="btn_koreksi_ok">
 	                      <i class="fa fa-edit"></i> <span id="textteruskan">Teruskan SK</span>
 	                    </a>
-	                    
+	                     -->
+	                     <a class="btn btn-social btn-google pull-left" id="btn_koreksi_ok">
+			                <i class="fa fa-edit"></i> <span id="textteruskan">Tanda Tangan SK</span>
+			            </a>
 			            &nbsp; &nbsp;
 						<button type="submit" class="btn btn-success pull-right "><i class="fa fa-search"></i> Cari</button>
 					</td>
@@ -228,11 +220,11 @@ $('.group-checkable').change(function() {
     //$.uniform.update(set);
     var jumlahselected = $('.mycxk').filter(':checked').length;
     if(jumlahselected > 0){
-    	$('#textteruskan').html("Teruskan "+jumlahselected+" SK");
+    	$('#textteruskan').html("Paraf "+jumlahselected+" SK");
     	$('#btn_koreksi_ok').show();
 		$('#btn_koreksi_batal').show();
    	}else{
-   		$('#textteruskan').html("Teruskan SK");
+   		$('#textteruskan').html("Paraf SK");
    		$('#btn_koreksi_ok').hide();
 		$('#btn_koreksi_batal').hide();
    	}
@@ -240,35 +232,82 @@ $('.group-checkable').change(function() {
 $('body').on('change','.mycxk',function () { 
   var jumlahselected = $('.mycxk').filter(':checked').length;
     if(jumlahselected > 0){
-    	$('#textteruskan').html("Teruskan "+jumlahselected+" SK");
+    	$('#textteruskan').html("Paraf "+jumlahselected+" SK");
     	$('#btn_koreksi_ok').show();
 		$('#btn_koreksi_batal').show();
    	}else{
-   		$('#textteruskan').html("Teruskan SK");
+   		$('#textteruskan').html("Paraf SK");
    		$('#btn_koreksi_ok').hide();
 		$('#btn_koreksi_batal').hide();
    	}
 });
 
-$('body').on('click','#btn_koreksi_ok',function () { 
-  swal({
-    title: "Anda Yakin?",
-    text: "Lanjutkan Proses ke Korektor selanjutnya/Ke Penandatangan!",
-    type: "warning",
-    showCancelButton: true,
-    confirmButtonClass: 'btn-danger',
-    confirmButtonText: 'Ya!',
-    cancelButtonText: "Tidak, Batalkan!",
-    closeOnConfirm: false,
-    closeOnCancel: false
-  },
-  function (isConfirm) {
-    if (isConfirm) {
-      submitdata(1);
-    } else {
-      swal("Batal", "", "error");
-    }
-  });
+function submitdata(pass){
+	var the_data = $( "#frm-sign" ).serialize();
+    var json_url = "<?php echo base_url() ?>admin/sk/sk_ds/tandatangansk_all/";
+     $.ajax({    
+      type: "POST",
+      url: json_url,
+      timeout:0,
+      data: the_data+ '&passphrase=' + pass,
+            dataType: "json",
+            success: function(data){ 
+            	//swal("Pemberitahuan!", JSON.stringify(data), "success");
+                if(data.success){
+                    swal("Pemberitahuan!", data.msg, "success");
+                    location.reload();
+                }
+                else {
+                	swal({
+                        title: "Pemberitahuan!",
+                        text: data.msg,
+                        type: "error",
+                        timer: 5000,
+                        showConfirmButton: true
+                    }, function () {
+                        // location.reload();
+                    });
+                  // swal("Pemberitahuan!", data.msg, "error");    
+                }
+                
+      		},
+      error: function (xhr, ajaxOptions, thrownError) {
+        //alert(thrownError);
+        swal("Pemberitahuan!", thrownError, "error");
+        //location.reload();
+      }
+  	});
+    return false; 
+  }
+   
+$( "#btn_koreksi_ok" ).click(function() {
+	var jumlahselected = $('.mycxk').filter(':checked').length;
+	if(jumlahselected <= 0){
+		swal("Perhatian", "Silahkan checklist dokumen yang akan ditanda tangan", "error");
+		return false;
+	}
+	    swal({
+	    title: "Paraf " +jumlahselected+ " SK",
+	    //text: "Silahkan Masukan Pasphrase anda dengan NIK <?php echo isset($pegawai_login->NIK) ? $pegawai_login->NIK : ""; ?>",
+	    text: "Silahkan Masukan Pasphrase anda",
+	    type: "input",
+	    inputType: "password",
+	    showCancelButton: true,
+	    closeOnConfirm: false,
+	    animation: "slide-from-top",
+	    inputPlaceholder: "Pasphrase"
+	  },
+	  function(inputValue){
+	    if (inputValue === false) return false;
+
+	    if (inputValue === "") {
+	      swal.showInputError("Silahkan masukan Pasphrase!");
+	      return false
+	    }
+	    swal("Perhatian", "Tunggu sebentar, tandatangan digital sedang proses....", "info");
+	    submitParaf(1);
+	  });
+
 });
 $('body').on('click','#btn_koreksi_batal',function () { 
   swal({
@@ -288,10 +327,10 @@ $('body').on('click','#btn_koreksi_batal',function () {
           return false
         }
         swal("Perhatian", "Tunggu sebentar, sedang proses....", "info");
-        submitdata(3,inputValue);
+        submitParaf(3,inputValue);
       });
 });
-function submitdata(status,alasan = ""){
+function submitParaf(status,alasan = ""){
     
     var json_url = "<?php echo base_url() ?>admin/sk/sk_ds/prosesvalidasi_all/"+status;
      $.ajax({    
@@ -302,7 +341,7 @@ function submitdata(status,alasan = ""){
             success: function(data){ 
                 if(data.success){
                     swal("Pemberitahuan!", data.msg, "success");
-                    window.location.href = "<?php echo base_url('admin/sk/sk_ds/validasi'); ?>";
+                    // window.location.href = "<?php echo base_url('admin/sk/sk_ds/validasi'); ?>";
                 }
                 else {
                   swal("Pemberitahuan!", data.msg, "error");    

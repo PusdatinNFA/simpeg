@@ -23,6 +23,11 @@
                     <td width="200px"><label for="example-text-input" class="col-form-label">NIP</label></td>
                     <td colspan=2><input class="form-control" type="text" name="nip_key" value="" ></td>
                 </tr>
+
+                <tr>
+                    <td width="200px"><label for="example-text-input" class="col-form-label">INSTANSI</label></td>
+                    <td colspan=2><input class="form-control" type="text" name="instansi_key" value="" ></td>
+                </tr>
                 <tr>
                     <td width="200px"><label for="example-text-input" class="col-form-label">Jabatan</label></td>
                     <td colspan=2>
