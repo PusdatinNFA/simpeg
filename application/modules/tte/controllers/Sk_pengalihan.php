@@ -70,11 +70,13 @@ class Sk_pengalihan extends Admin_Controller
         if(isset($records) && is_array($records) && count($records)):
             foreach ($records as $record) {
                 if($record->flag_jf == "1"){
+                    // khusus BA, masukan pemilik sk untuk tandatangan
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_BAP.pdf")){
                         $id_file                        = md5($record->nomor_ba);
                         $is_exist  = $this->sk_ds_model->is_exist($id_file);
                         if(!$is_exist){
-                           $this->saveDs($record,"BAP",$record->nomor_ba,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_BAP.pdf");
+                            $this->saveDs($record,"BAP",$record->nomor_ba,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_BAP.pdf");
+                            $number++;
                         }
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JF.pdf")){
@@ -82,14 +84,15 @@ class Sk_pengalihan extends Admin_Controller
                         $is_exist  = $this->sk_ds_model->is_exist($id_file);
                         if(!$is_exist){
                            $this->saveDs($record,"JF",$record->nomor_sk_jf,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JF.pdf");
+                           $number++;
                         }
-                        
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JFU.pdf")){
                         $id_file                        = md5($record->nomor_sk_jf);
                         $is_exist  = $this->sk_ds_model->is_exist($id_file);
                         if(!$is_exist){
                            $this->saveDs($record,"JFU",$record->nomor_sk_jf,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JFU.pdf");
+                           $number++;
                         }
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMJP.pdf")){
@@ -97,6 +100,7 @@ class Sk_pengalihan extends Admin_Controller
                         $is_exist  = $this->sk_ds_model->is_exist($id_file);
                         if(!$is_exist){
                            $this->saveDs($record,"SPMJP",$record->nomor_spmj,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMJP.pdf");
+                           $number++;
                         }
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMT.pdf")){
@@ -104,27 +108,35 @@ class Sk_pengalihan extends Admin_Controller
                         $is_exist  = $this->sk_ds_model->is_exist($id_file);
                         if(!$is_exist){
                            $this->saveDs($record,"SPMT",$record->nomor_spmt,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMT.pdf");
+                           $number++;
                         }
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPPP.pdf")){
                         $id_file                        = md5($record->nomor_spp);
                         $is_exist  = $this->sk_ds_model->is_exist($id_file);
                         if(!$is_exist){
-                           $this->saveDs($record,"SPPp",$record->nomor_spp,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPPP.pdf");
+                           $this->saveDs($record,"SPPP",$record->nomor_spp,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPPP.pdf");
+                           $number++;
                         }
                     } 
                 }
                 if($record->flag_jf == "2"){
-                    $nomor_jf = $this->create_sk($record,"JFU",$record->nomor_sk_jf,$record->nomor_sk_jf);
+                    if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JFU.pdf")){
+                        $id_file                        = md5($record->nomor_sk_jf);
+                        $is_exist  = $this->sk_ds_model->is_exist($id_file);
+                        if(!$is_exist){
+                           $this->saveDs($record,"JFU",$record->nomor_sk_jf,trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JFU.pdf");
+                           $number++;
+                        }
+                    }
                 }
-                $number++;
-                // update flag
-                $this->updateStatusGenerate($record->id);
+                // update flag menjadi sudah generate ke DS
+                $this->updateStatusGenerateDs($record->id);
             }
         endif;
         $output = array();
         $output['success'] = true;
-        $output['msg'] = "Kirim ke DS selesai";
+        $output['msg'] = $number." Dokumen telah dikirim ke DS";
         $output['jumlah'] = $number;
         echo json_encode($output);
         die();
@@ -146,21 +158,48 @@ class Sk_pengalihan extends Admin_Controller
         $data_ds['letak_ttd']           = 1;
         $data_ds['halaman_ttd']         = 1;
         if(count($averifikator) > 0){
-            $data_ds['is_signed']            = 0;
-            $data_ds['is_corrected']         = 0;
+            $data_ds['is_signed']       = 0;
+            $data_ds['is_corrected']    = 0;
         }else{
-            $data_ds['is_corrected']         = 1;// dibuat langsung bisa tandatangan jika ga ada korektor        
-            $data_ds['is_signed']            = 0;
+            $data_ds['is_corrected']    = 1;// dibuat langsung bisa tandatangan jika ga ada korektor        
+            $data_ds['is_signed']       = 0;
         }    
         $data_ds['ds_ok']               = 1; // merupakan ttd digital
         $data_ds['teks_base64']         = $this->conversiFileToBase64($file_pdf);
         $this->sk_ds_model->skip_validation(true);
         $return_ds = $this->sk_ds_model->insert($data_ds);    
         log_activity($this->auth->user_id(),"Kirim dokumen {$kategori} ke DS " . ': ' . $return_ds . ' : ' . $this->input->ip_address(), 'sk_pengalihan');
-
+        // pindah file
+        $this->copyFile($file_pdf,$id_file);
         $datadel_korektor   = array('id_file '=>$id_file);
         $this->sk_ds_korektor_model->delete_where($datadel_korektor);
         $korektor_ke = 1;
+        if($kategori != "BAP"){
+            $data_korektor = array();
+            $data_korektor['id_file']               = $id_file;
+            $data_korektor["id_pegawai_korektor"]   = $record_pengalihan->pegawai_paraf;
+            $data_korektor['korektor_ke']           = $korektor_ke;
+            $data_korektor['is_corrected']          = 2; // siap koreksi
+            $this->sk_ds_korektor_model->skip_validation(true);
+            $id_ds_korektor = $this->sk_ds_korektor_model->insert($data_korektor);
+            if($id_ds_korektor){
+                log_activity($this->auth->user_id(),"Save Paraf koordinator ds dari " . ': ' . $id_ds_korektor . ' : ' . $this->input->ip_address(), 'pengalihan');
+            }
+            $korektor_ke++;
+        }else{
+            //jika BA msukan pemilik SK menjadi penandatangan juga
+            $pemilik_sk = $this->pegawai_model->find_by("NIP_BARU",$record_pengalihan->nip);
+            $data_korektor = array();
+            $data_korektor['id_file']               = $id_file;
+            $data_korektor["id_pegawai_korektor"]   = isset($pemilik_sk->PNS_ID) ? $pemilik_sk->PNS_ID : null;
+            $data_korektor['korektor_ke']           = $korektor_ke;
+            $data_korektor['is_corrected']          = 2; // siap koreksi
+            $this->sk_ds_korektor_model->skip_validation(true);
+            $id_ds_korektor = $this->sk_ds_korektor_model->insert($data_korektor);
+            if($id_ds_korektor){
+                log_activity($this->auth->user_id(),"Save paraf pemilik SK ds dari " . ': ' . $id_ds_korektor . ' : ' . $this->input->ip_address(), 'pengalihan');
+            }
+        }
         if(isset($averifikator) && is_array($averifikator) && count($averifikator))
         {
             foreach ($averifikator as $record) {
@@ -168,14 +207,23 @@ class Sk_pengalihan extends Admin_Controller
                 $data_korektor['id_file']               = $id_file;
                 $data_korektor["id_pegawai_korektor"]   = $record->id_pegawai_korektor;
                 $data_korektor['korektor_ke']           = $korektor_ke;
-                $data_korektor['is_corrected']          = $korektor_ke == 1 ? 2 : null;
+                $data_korektor['is_corrected']          = 2;
                 $this->sk_ds_korektor_model->skip_validation(true);
                 $id_ds_korektor = $this->sk_ds_korektor_model->insert($data_korektor);
                 if($id_ds_korektor){
-                    log_activity($this->auth->user_id(),"Save Korektor ds dari " . ': ' . $id_ds_korektor . ' : ' . $this->input->ip_address(), 'pengalihan');
+                    log_activity($this->auth->user_id(),"Save paraf Korektor ds dari " . ': ' . $id_ds_korektor . ' : ' . $this->input->ip_address(), 'pengalihan');
                 }
                 $korektor_ke++;
             }
+        }
+    }
+    private function copyFile($file_name,$id_file){
+        $newfile    = trim($this->settings_lib->item('site.pathsk')).$id_file.".pdf";
+        if(!copy($file_name,$newfile)){
+            return false;
+        }
+        else{
+            return true;
         }
     }
     private function getKorektors($id){
@@ -235,6 +283,13 @@ class Sk_pengalihan extends Admin_Controller
         $this->trx_pengalihan_model->skip_validation(true);
         $this->trx_pengalihan_model->update($id, $dataupdate);
     }
+    private function updateStatusGenerateDs($id){
+        $dataupdate = array();
+        $dataupdate['flag_generate_ds'] = 1;
+        $this->trx_pengalihan_model->skip_validation(true);
+        $this->trx_pengalihan_model->update($id, $dataupdate);
+    }
+    
     public function ajax_data(){
         $this->auth->restrict($this->permissionView);
         if (!$this->input->is_ajax_request()) {
@@ -365,8 +420,11 @@ class Sk_pengalihan extends Admin_Controller
                     $btn_aksi  [] = "<a href='".base_url()."tte/sk_pengalihan/upload_revisi/{$record->id}' data-toggle='tooltip' title='Upload SK perubahan ' class='btn btn-sm btn-success show-modal'><i class='fa fa-upload'></i> </a>";
                 }
                 if($this->auth->has_permission($this->permissionUploadDs)){
-                    $btn_aksi  [] = "<button  data-toggle='tooltip' title='Kirim Ke DS' class='btn btn-sm btn-warning sendDs' kode='{$record->id}'><i class='fa fa-key'></i> </button>";
-                }
+                    if($record->flag_generate_ds != 1)    {
+                        $btn_aksi  [] = "<button  data-toggle='tooltip' title='Kirim Ke DS' class='btn btn-sm btn-warning sendDs' kode='{$record->id}'><i class='fa fa-key'></i> </button>";
+                    }else{
+                        $btn_aksi  [] = "<button  data-toggle='tooltip' title='Kirim Ke DS (Sudah Pernah)' class='btn btn-sm btn-info sendDs' kode='{$record->id}'><i class='fa fa-key'></i> </button>";
+                    }                }
                 if($this->auth->has_permission($this->permissionGenerate)){
                     $btn_aksi  [] = "<button  data-toggle='tooltip' title='Generate SK' class='btn btn-sm btn-danger generateSk' kode='{$record->id}'><i class='fa fa-forward'></i> </button>";
                 }

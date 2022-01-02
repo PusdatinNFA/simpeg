@@ -14,7 +14,7 @@ $this->load->library('convert');
         <div class="col-md-3">
 
           <!-- Profile Image -->
-          <div class="box box-warning">
+          <div class="box box-danger">
             <div class="box-body box-profile">
             <center>
               <img src="<?php echo base_url(); ?><?php echo $foto_pegawai; ?>" class="img-responsive pic-bordered" id="photopegawai" alt="Photo" width="50%">
@@ -44,7 +44,7 @@ $this->load->library('convert');
           <!-- /.box -->
 
           <!-- About Me Box -->
-          <div class="box box-primary">
+          <div class="box box-danger">
             <div class="box-header with-border">
               <h3 class="box-title">Keterangan SK</h3>
             </div>
@@ -106,7 +106,7 @@ $this->load->library('convert');
               </form>
             <?php }else{ ?>
                 <button class="btn btn-block btn-social btn-google" id="btn_notsign">
-                  <i class="fa fa-key"></i> SK Sudak dikoreksi
+                  <i class="fa fa-key"></i> SK Sudak diparaf
                 </button>
             <?php } ?>
             </div>

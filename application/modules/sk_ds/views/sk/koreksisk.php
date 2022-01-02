@@ -13,7 +13,7 @@ if ($can_delete) {
 ?>
 
 
-<div class="admin-box box box-primary expanded-box">
+<div class="admin-box box box-danger expanded-box">
 	<div class="box-header">
               <h3 class="box-title">Pencarian Lanjut</h3>
 			   <div class="box-tools pull-right">
@@ -33,23 +33,19 @@ if ($can_delete) {
 			</style>
 			<table class="filter_pegawai" sborder=0 width='100%' cellpadding="10">
 				<tr>
-					<td width="20px"><input type="checkbox" name="unit_id_cb"></td>
 					<td width="200px"><label for="example-text-input" class="col-form-label">Satuan Kerja</label></td>
 					<td colspan=2><select id="unit_id_key" name="unit_id_key" width="100%" class=" col-md-10 format-control"></select></td>
 				</tr>
 				<tr>
-					<td width="20px"><input type="checkbox" name="nama_cb"></td>
 					<td width="200px"><label for="example-text-input" class="col-form-label">NAMA</label></td>
 					<td colspan=2><input class="form-control" type="text" name="nama_key" value="" ></td>
 				</tr>
 				<tr>
-					<td width="20px"><input type="checkbox" name="nip_cb"></td>
 					<td width="200px"><label for="example-text-input" class="col-form-label">NIP</label></td>
 					<td colspan=2><input class="form-control" type="text" name="nip_key" value="" ></td>
 				</tr>
 				 
 				<tr>
-					<td width="20px"><input type="checkbox" name="golongan_cb"></td>
 					<td width="200px"><label for="example-text-input" class="col-form-label">Golongan</label></td>
 					<td colspan=2>
 						<select name="golongan_key" class="form-control">
@@ -61,9 +57,7 @@ if ($can_delete) {
 						</select>
 					</td>
 				</tr>
-				
 				<tr>
-					<td width="20px"><input type="checkbox" name="kategori_cb"></td>
 					<td width="200px"><label for="example-text-input" class="col-form-label">Jabatan</label></td>
 					<td colspan=2>
 						<select name="kategori_jabatan" id="kategori_jabatan" class="form-control select2">
@@ -80,7 +74,7 @@ if ($can_delete) {
 					</td>
 				</tr>
 				<tr>
-					<td colspan=4>
+					<td colspan=3>
 						<button type="submit" class="btn btn-success pull-right "><i class="fa fa-search"></i> Cari</button>
 					</td>
 				</tr>
@@ -90,18 +84,18 @@ if ($can_delete) {
 		?>
 	</div>
 </div>
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
 	
 	<div class="box-body">
 		<table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-data table-hover">
 			<thead>
 			<tr>
 				<th style="width:10px">No</th>
-				<th width="15%">Pegawai</th>
-				<th width="10%">Kategori SK</th>
-				<th>No SK / Tgl SK</th>
+				<th>Pegawai</th>
+				<th>Kategori</th>
+				<th>No SK / TglK</th>
 				<th>Unit Kerja</th>
-				<th width="70px" align="center">#</th></tr>
+				<th width="100px" align="center">#</th></tr>
 			</thead>
 		</table>
 	</div>
@@ -134,7 +128,7 @@ $table = $(".table-data").DataTable({
 	processing: true,
 	serverSide: true,
 	"columnDefs": [
-					{"className": "dt-center", "targets": [4]},
+					{"className": "text-center", "targets": [5]},
 					{ "targets": [0,5], "orderable": false }
 				],
 	ajax: {

@@ -95,12 +95,12 @@ if ($can_delete) {
                     </tr>
 				<tr>
 					<td colspan=4>
-						<!-- <a class="btn btn-social btn-google" id="btn_koreksi_ok">
-	                      <i class="fa fa-edit"></i> <span id="textteruskan">Teruskan SK</span>
-	                    </a>
-	                     -->
-	                     <a class="btn btn-social btn-google pull-left" id="btn_koreksi_ok">
-			                <i class="fa fa-edit"></i> <span id="textteruskan">Tanda Tangan SK</span>
+	                    <a class="btn btn-social btn-google pull-right" id="btn_koreksi_ok">
+			                <i class="fa fa-edit"></i> <span id="textteruskan">Paraf SK</span>
+			            </a>
+			            &nbsp; &nbsp;
+			            <a class="btn btn-social btn-facebook pull-right" id="btn_koreksi_view">
+			                <i class="fa fa-edit"></i> <span id="textparaf">Paraf SK</span>
 			            </a>
 			            &nbsp; &nbsp;
 						<button type="submit" class="btn btn-success pull-right "><i class="fa fa-search"></i> Cari</button>
@@ -120,18 +120,18 @@ if ($can_delete) {
 			<thead>
 				<tr>
 					<th style="width:10px"><input type="checkbox" class="group-checkable"></th>
-					<th width="15%">Pemilik SK</th>
-					<th width="10%">Kategori SK</th>
-					<th>No SK / Tgl SK</th>
+					<th>Pemilik Dok</th>
+					<th>Kategori Dok</th>
+					<th>No / Tgl Dok</th>
 					<th>Unit Kerja</th>
-					<th width="70px" align="center">#</th>
+					<th width="100px" align="center">#</th>
 				</tr>
 			</thead>
 		</table>
 		<?php
 		echo form_close();    
 		?>
-		<div id="infokosong">adsada</div>
+		<div id="infokosong"></div>
 	</div>
 </div>
 
@@ -173,37 +173,16 @@ $table = $(".table-data").DataTable({
 			d.search['advanced_search_filters']=  $("#form_search_pegawai").serializeArray();
 		},
 		"complete": function(response) {
-			var valtextqrcode = $("#textqrcode").val();
-			if(valtextqrcode != ""){
-			 	if(response.responseJSON.recordsTotal==0){
-	            	var json_url = "<?php echo base_url() ?>admin/sk/sk_ds/showinfo/";
-				     $.ajax({    
-				      type: "POST",
-				      url: json_url,
-				      data: "valtextqrcode="+valtextqrcode,
-				      dataType: "html",
-				      success: function(data){ 
-				      	$("#infokosong").show();
-				      	$("#infokosong").html(data);
-				      },
-				      error: function(){
-				      	alert("error");
-				      }
-				  });
-				    return false; 
-	            }     		
-			}else{
-				$("#infokosong").show();
-				$("#infokosong").empty();
-			}
+			 
        }
 	}
 });
 $("#infokosong").hide();
 $("#linkqr").click(function(){
-        $( ".chkqr" ).prop( "checked", true );
-    });
+    $( ".chkqr" ).prop( "checked", true );
+});
 $("#form_search_pegawai").submit(function(){
+	cekJumlah();
 	$table.ajax.reload(null,true);
 	return false;
 });
@@ -218,68 +197,24 @@ $('.group-checkable').change(function() {
         $(this).prop("checked", checked);
     });
     //$.uniform.update(set);
-    var jumlahselected = $('.mycxk').filter(':checked').length;
-    if(jumlahselected > 0){
-    	$('#textteruskan').html("Paraf "+jumlahselected+" SK");
-    	$('#btn_koreksi_ok').show();
-		$('#btn_koreksi_batal').show();
-   	}else{
-   		$('#textteruskan').html("Paraf SK");
-   		$('#btn_koreksi_ok').hide();
-		$('#btn_koreksi_batal').hide();
-   	}
+    cekJumlah();
 });
 $('body').on('change','.mycxk',function () { 
-  var jumlahselected = $('.mycxk').filter(':checked').length;
+	cekJumlah();
+});
+function cekJumlah(){
+	var jumlahselected = $('.mycxk').filter(':checked').length;
     if(jumlahselected > 0){
-    	$('#textteruskan').html("Paraf "+jumlahselected+" SK");
+    	$('#textteruskan').html("Paraf ("+jumlahselected+") Dok");
+    	$('#textparaf').html("Lihat & Paraf ("+jumlahselected+") Dok");
     	$('#btn_koreksi_ok').show();
-		$('#btn_koreksi_batal').show();
+    	$('#btn_koreksi_view').show();
    	}else{
    		$('#textteruskan').html("Paraf SK");
    		$('#btn_koreksi_ok').hide();
-		$('#btn_koreksi_batal').hide();
+   		$('#btn_koreksi_view').hide();
    	}
-});
-
-function submitdata(pass){
-	var the_data = $( "#frm-sign" ).serialize();
-    var json_url = "<?php echo base_url() ?>admin/sk/sk_ds/tandatangansk_all/";
-     $.ajax({    
-      type: "POST",
-      url: json_url,
-      timeout:0,
-      data: the_data+ '&passphrase=' + pass,
-            dataType: "json",
-            success: function(data){ 
-            	//swal("Pemberitahuan!", JSON.stringify(data), "success");
-                if(data.success){
-                    swal("Pemberitahuan!", data.msg, "success");
-                    location.reload();
-                }
-                else {
-                	swal({
-                        title: "Pemberitahuan!",
-                        text: data.msg,
-                        type: "error",
-                        timer: 5000,
-                        showConfirmButton: true
-                    }, function () {
-                        // location.reload();
-                    });
-                  // swal("Pemberitahuan!", data.msg, "error");    
-                }
-                
-      		},
-      error: function (xhr, ajaxOptions, thrownError) {
-        //alert(thrownError);
-        swal("Pemberitahuan!", thrownError, "error");
-        //location.reload();
-      }
-  	});
-    return false; 
-  }
-   
+}
 $( "#btn_koreksi_ok" ).click(function() {
 	var jumlahselected = $('.mycxk').filter(':checked').length;
 	if(jumlahselected <= 0){
@@ -305,43 +240,26 @@ $( "#btn_koreksi_ok" ).click(function() {
 	      return false
 	    }
 	    swal("Perhatian", "Tunggu sebentar, tandatangan digital sedang proses....", "info");
-	    submitParaf(1);
+	    submitParaf(inputValue,1);
 	  });
 
 });
-$('body').on('click','#btn_koreksi_batal',function () { 
-  swal({
-        title: "Koreksi SK",
-        text: "Silahkan Masukan komentar anda",
-        input: "textarea",
-      	inputPlaceholder: "Komentar",
-        showCancelButton: true,
-        closeOnConfirm: false,
-        animation: "slide-from-top",
-      },
-      function(inputValue){
-        if (inputValue === false) return false;
-
-        if (inputValue === "") {
-          swal.showInputError("Silahkan masukan koreksi anda!");
-          return false
-        }
-        swal("Perhatian", "Tunggu sebentar, sedang proses....", "info");
-        submitParaf(3,inputValue);
-      });
+$( "#btn_koreksi_view" ).click(function() {
+	var xyz = $("#frm-koreksi").serialize();
+	window.open("<?php echo base_url('admin/sk/sk_ds/vskreview/');?>?"+xyz);
 });
-function submitParaf(status,alasan = ""){
+function submitParaf(pass,status){
     
     var json_url = "<?php echo base_url() ?>admin/sk/sk_ds/prosesvalidasi_all/"+status;
      $.ajax({    
       type: "POST",
       url: json_url,
-      data: $("#frm-koreksi").serialize()+"&komentar="+alasan,
+      data: $("#frm-koreksi").serialize()+"&passphrase="+pass,
             dataType: "json",
             success: function(data){ 
                 if(data.success){
                     swal("Pemberitahuan!", data.msg, "success");
-                    // window.location.href = "<?php echo base_url('admin/sk/sk_ds/validasi'); ?>";
+                    window.location.href = "<?php echo base_url('admin/sk/sk_ds/validasi'); ?>";
                 }
                 else {
                   swal("Pemberitahuan!", data.msg, "error");    
@@ -350,6 +268,6 @@ function submitParaf(status,alasan = ""){
     return false; 
   }
 $('#btn_koreksi_ok').hide();
-$('#btn_koreksi_batal').hide();
+$('#btn_koreksi_view').hide();
 </script>
 </div>

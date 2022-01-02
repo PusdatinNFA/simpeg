@@ -85,7 +85,7 @@ class Sk_ds_korektor_model extends BF_Model
 		$this->db->join('pegawai P', 'P.PNS_ID = tbl_file_ds_corrector.id_pegawai_korektor', 'inner');
 		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
 		$this->db->join('golongan', 'pegawai.GOL_ID = golongan.ID', 'left');
-		$this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_ID = jabatan.KODE_JABATAN', 'left');
+		$this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_REAL_ID = jabatan.KODE_JABATAN', 'left');
 		 
 		if($NIP != ""){
 			$this->db->where("P.NIP_BARU",$NIP);
@@ -93,6 +93,27 @@ class Sk_ds_korektor_model extends BF_Model
 		//if($id_file != ""){
 			$this->db->where("tbl_file_ds.id_file",$id_file);
 		//}
+		return parent::find_all();
+	}
+	public function find_all_file_nip_id($NIP = "",$id)
+	{
+
+		$this->db->select('tbl_file_ds.*,tbl_file_ds_corrector.id as id_table,
+			tbl_file_ds_corrector.is_corrected as status_koreksi,
+			tbl_file_ds_corrector.korektor_ke,
+			tbl_file_ds_corrector.is_returned as status_kembali');
+		
+		$this->db->join('tbl_file_ds', 'tbl_file_ds_corrector.id_file = tbl_file_ds.id_file', 'inner');
+		$this->db->join('pegawai', 'pegawai.NIP_BARU = tbl_file_ds.nip_sk', 'left');
+		$this->db->join('pegawai P', 'P.PNS_ID = tbl_file_ds_corrector.id_pegawai_korektor', 'inner');
+		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
+		$this->db->join('golongan', 'pegawai.GOL_ID = golongan.ID', 'left');
+		$this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_REAL_ID = jabatan.KODE_JABATAN', 'left');
+		 
+		if($NIP != ""){
+			$this->db->where("P.NIP_BARU",$NIP);
+		}
+		$this->db->where("tbl_file_ds_corrector.id",$id);
 		return parent::find_all();
 	}
 	public function find_all_korektor($id_file = "")
@@ -106,5 +127,21 @@ class Sk_ds_korektor_model extends BF_Model
 		//}
 			$this->db->order_by("korektor_ke","asc");
 		return parent::find_all();
+	}
+	public function find_by_id_tabelkorektor($id_tabel = "")
+	{
+
+		$this->db->select('tbl_file_ds.*');
+		$this->db->join('tbl_file_ds', 'tbl_file_ds_corrector.id_file = tbl_file_ds.id_file', 'inner');
+		$this->db->where("tbl_file_ds_corrector",$id);
+		return parent::find_all();
+	}
+	public function findCountStatusSiap($id_file = "")
+	{
+
+		$this->db->select('tbl_file_ds.*');
+		$this->db->where("tbl_file_ds_corrector.id_file",$id_file);
+		$this->db->where("is_corrected",2);
+		return parent::count_all();
 	}
 }

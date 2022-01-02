@@ -110,12 +110,12 @@ if ($can_delete) {
 		<table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-hover table-datasudah">
 			<thead>
 			<tr>
-				<th style="width:10px">No</th>
-				<th>Pemilik SK</th>
-				<th>Kategori SK</th>
-				<th>No SK / Tgl SK</th>
+				<th style="width:2px">No</th>
+				<th>Pemilik Dok</th>
+				<th>Kategori Dok</th>
+				<th>No/ Tgl Dok</th>
 				<th width="50%">Unit Kerja</th>
-				<th width="10%" align="center">#</th></tr>
+				<th width="20px" align="center">#</th></tr>
 			</thead>
 		</table>
 	</div>
@@ -149,7 +149,7 @@ $tablesudah = $(".table-datasudah").DataTable({
 	serverSide: true,
 	stateSave: true,
 	"columnDefs": [
-					{"className": "dt-center", "targets": [4]},
+					{"className": "text-center", "targets": [0,5]},
 					{ "targets": [0,5], "orderable": false }
 				],
 	ajax: {

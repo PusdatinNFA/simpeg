@@ -161,6 +161,7 @@ class Sk_ds_model extends BF_Model
 			pegawai."NIP_BARU",
 			pegawai."NAMA",vw."NAMA_UNOR_FULL",
 			waktu_buat,
+		 	tbl_file_ds.is_corrected,
 			tgl_tandatangan,
 			golongan."NAMA" AS "NAMA_GOLONGAN","NAMA_PANGKAT","NAMA_UNOR_ESELON_4","NAMA_UNOR_ESELON_3","NAMA_UNOR_ESELON_2","NAMA_UNOR_ESELON_1","KATEGORI_JABATAN","is_signed"', false);
 		$this->db->join('pegawai', 'pegawai.NIP_BARU = tbl_file_ds.nip_sk', 'left');
@@ -527,7 +528,6 @@ class Sk_ds_model extends BF_Model
 			"KATEGORI_JABATAN"', false);
 		$this->db->join('pegawai', 'pegawai.NIP_BARU = tbl_file_ds.nip_sk', 'left');
 		$this->db->join('tbl_file_ds_corrector t', 'tbl_file_ds.id_file = t.id_file', 'inner');
-		//$this->db->join('pegawai P', 'P.PNS_ID = t.id_pegawai_korektor', 'inner');
 		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
 		$this->db->join('golongan', 'pegawai.GOL_ID = golongan.ID', 'left');
 		$this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_ID = jabatan.KODE_JABATAN', 'left');
@@ -1183,5 +1183,33 @@ class Sk_ds_model extends BF_Model
 		$this->db->where("id_file",$id_file);
 		return parent::count_all()>0;
 	}
+	public function count_antrian_koreksi($id_pns = '')
+	{
+		$sql = "SELECT 
+				k.id_pegawai_korektor,
+					count(*) AS jumlah
+				FROM hris.tbl_file_ds d
+					JOIN hris.vw_ds_korektor k ON d.id_file::text = k.id_file::text
+				WHERE d.is_signed <> 1::smallint AND d.ds_ok = 1 AND d.kategori::text <> '< Semua >'::text and k.is_corrected = 2";
+				// if ($id_pns)
+					$sql.=" and k.id_pegawai_korektor = '$id_pns'";
 
+				$sql.="GROUP BY k.id_pegawai_korektor";
+		return $this->db->query($sql)->result();
+	}
+	public function count_antrian_ttd($id_pns = '')
+	{
+		$sql = "SELECT 
+				d.id_pegawai_ttd,
+				d.is_signed,
+				count(*) AS jumlah
+			FROM hris.tbl_file_ds d
+				JOIN hris.vw_ds_jml_korektor k ON d.id_file::text = k.id_file::text
+			WHERE d.is_signed <> 1::smallint AND d.ds_ok = 1 AND d.kategori::text <> '< Semua >'::text";
+				// if ($id_pns)
+					$sql.=" and d.id_pegawai_ttd = '$id_pns' and d.is_corrected = 1 and d.is_signed = 0";
+
+				$sql.=" GROUP BY d.is_signed, d.id_pegawai_ttd";
+		return $this->db->query($sql)->result();
+	}
 }

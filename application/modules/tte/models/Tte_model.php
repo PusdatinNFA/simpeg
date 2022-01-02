@@ -80,4 +80,16 @@ class Tte_model extends BF_Model
 		$this->db->order_by("tte_master_proses.id", "ASC");
 		return parent::find_all();
 	}
+	public function getKategory($kode="")
+	{
+		$data = $this->cache->get('jenisDokumen');
+		if ($data == null) {
+			$rows =  $this->db->query('select id,nama_proses,kode_proses from tte_master_proses')->result();
+			foreach ($rows as $row) {
+				$data[$row->kode_proses] = $row;
+			}
+			$this->cache->write($data, 'jenisDokumen');
+		}
+		return isset($data[$kode]) ? $data[$kode] : null;
+	}
 }

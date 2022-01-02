@@ -9,7 +9,7 @@ $this->load->library('convert');
         
         <div class="col-md-9">     
              <!--<embed src="<?php echo $url_sk; ?>" width="100%" height="700" alt="pdf"> -->
-              <embed src="data:application/pdf;base64,<?php echo $b64; ?>" width="100%" height="700" alt="pdf">
+              <embed src="data:application/pdf;base64,<?php echo $b64; ?>" width="100%" height="900" alt="pdf">
               
         </div>
         <!-- /.col -->
@@ -33,10 +33,17 @@ $this->load->library('convert');
                   <?php echo isset($pejabat->GELAR_BELAKANG) ? $pejabat->GELAR_BELAKANG : "-"; ?>
               </p>
               <hr>
+              <strong><i class="fa fa-user margin-r-5"></i> Status Tandatangan </strong>
+              <p class="text-muted">
+                  <?php echo $data->is_signed == "1" ? "<span class='label label-success'>Sudah Tandatangan</span>" : ""; ?>
+                  <?php echo $data->is_signed == "0" ? "<span class='label label-danger'>Belum Tandatangan</span>" : ""; ?>
+                  <?php echo $data->is_signed == "3" ? "<span class='label label-danger'>Dikoreksi</span>" : ""; ?>
+              </p>
+              <hr>
               <strong><i class="fa fa-user margin-r-5"></i> Status Paraf </strong>
               <p class="text-muted">
-                  <?php echo $data->is_corrected == "1" ? "<span class='label label-success'>Sudah Koreksi</span>" : ""; ?>
-                  <?php echo $data->is_corrected == "2" ? "<span class='label label-warning'>Proses Koreksi</span>" : ""; ?>
+                  <?php echo $data->is_corrected == "1" ? "<span class='label label-success'>Sudah Paraf</span>" : ""; ?>
+                  <?php echo $data->is_corrected == "2" ? "<span class='label label-warning'>Proses Paraf</span>" : ""; ?>
                   <?php echo $data->is_corrected == "3" ? "<span class='label label-danger'>Di Kembalikan</span>" : ""; ?>
 
                   <?php 
@@ -45,13 +52,7 @@ $this->load->library('convert');
                   }
                   ?>
               </p>
-              <hr>
-              <strong><i class="fa fa-user margin-r-5"></i> Status Tandatangan </strong>
-              <p class="text-muted">
-                  <?php echo $data->is_signed == "1" ? "<span class='label label-success'>Sudah Tandatangan</span>" : ""; ?>
-                  <?php echo $data->is_signed == "0" ? "<span class='label label-danger'>Belum Tandatangan</span>" : ""; ?>
-                  <?php echo $data->is_signed == "3" ? "<span class='label label-danger'>Dikoreksi</span>" : ""; ?>
-              </p>
+              
               <?php if(isset($korektor) && is_array($korektor) && count($korektor)){ ?>
               <hr>
               <strong><i class="fa fa-user margin-r-5"></i> Paraf </strong>
@@ -66,7 +67,7 @@ $this->load->library('convert');
                       <?php echo $record->is_corrected == "1" ? "<span class='label label-success'>Sudah Paraf</span>" : ""; ?>
                       <?php echo $record->is_corrected == "2" ? "<span class='label label-warning'>Siap Paraf</span>" : ""; ?>
                       <?php echo $record->is_corrected == "" ? "<span class='label label-danger'>Belum Paraf</span>" : ""; ?>
-                      <?php echo $record->is_corrected == "3" ? "<span class='label label-danger'>Sudah Paraf (Dikembalikan)</span>" : ""; ?>
+                      <?php echo $record->is_corrected == "3" ? "<span class='label label-danger'>Dokumen Dikembalikan</span>" : ""; ?>
                     <?php
                         echo "<br>";
                         $no++;
@@ -87,10 +88,6 @@ $this->load->library('convert');
                 <a class="btn btn-block btn-social btn-flickr" id="btn_sign">
                 <i class="fa fa-edit"></i> Tanda Tangan Dokumen
               </a>
-               <a class="btn btn-block btn-social btn-github" target="_blank" href="<?php echo base_url() ?>admin/sk/sk_ds/downloadsk/<?php echo $data->id_file; ?>">
-                <i class="fa fa-download"></i> Download draft dokumen
-              </a>
-               
               <br>
               <textarea name="catatan" id="catatan" class="form-control" width="100%" placeholder="Masukan Catatan Koreksi"><?php echo $data->catatan; ?></textarea>
               
@@ -98,10 +95,13 @@ $this->load->library('convert');
                       <i class="fa fa-arrow-left"></i> Koreksi/Kembalikan Ke Pemroses
                     </a>
             <?php }else if($data->is_signed != "3" and $data->is_signed == "1"){ ?>
-              <button class="btn btn-block btn-social btn-google" id="btn_notsign">
-                <i class="fa fa-edit"></i> sudah ditanda Tangan
-              </button>
+              <a class="btn btn-block btn-social btn-google" id="btn_notsign">
+                <i class="fa fa-key disabled"></i> sudah ditanda Tangan
+              </a>
             <?php } ?>
+            <a class="btn btn-block btn-social btn-github" target="_blank" href="<?php echo base_url() ?>admin/sk/sk_ds/downloadsk/<?php echo $data->id_file; ?>">
+                <i class="fa fa-download"></i> Download dokumen
+              </a>
             </div>
             <!-- /.box-body -->
           </div>
@@ -112,10 +112,7 @@ $this->load->library('convert');
 </div>
 
 <script>
-  
-   
   function kembalikan(){
-    
     var json_url = "<?php echo base_url() ?>admin/sk/sk_ds/kembalikan_kepemroses";
      $.ajax({    
       type: "POST",
@@ -137,8 +134,8 @@ $this->load->library('convert');
 
   function submitdata(pass){
     var valid_file = "<?php echo $data->id_file; ?>";
-    var datas = "id_file="+valid_file+"&passphrase="+pass+"&username=<?php echo isset($pegawai_login->NIK) ? trim($pegawai_login->NIK) : ""; ?>&NIP=<?php echo isset($pegawai_login->NIP_BARU) ? trim($pegawai_login->NIP_BARU) : ""; ?>";
-    var json_url = "<?php echo base_url() ?>admin/sk/sk_ds/tandatangansk";
+    var datas = "id_file="+valid_file+"&passphrase="+pass+"&username=<?php echo isset($pegawai_login->NIK) ? trim($pegawai_login->NIK) : ""; ?>";
+    var json_url = "<?php echo base_url() ?>admin/sk/sk_ds/tandatangan/1";
      $.ajax({    
       type: "POST",
       url: json_url,
@@ -147,7 +144,7 @@ $this->load->library('convert');
             success: function(data){ 
                 if(data.success){
                     swal("Pemberitahuan!", data.msg, "success");
-                    location.reload();
+                    window.location = "<?php echo base_url(); ?>admin/sk/sk_ds/";
                 }
                 else {
                   swal("Pemberitahuan!", data.msg, "error");    
@@ -158,7 +155,7 @@ $this->load->library('convert');
    
 $( "#btn_sign" ).click(function() {
         swal({
-        title: "Tandatangani SK",
+        title: "Tandatangani Dokumen",
         //text: "Silahkan Masukan Pasphrase anda dengan NIK <?php echo isset($pegawai_login->NIK) ? $pegawai_login->NIK : ""; ?>",
         text: "Silahkan Masukan Pasphrase anda",
         inputType: "password",

@@ -128,9 +128,9 @@
                 <thead>
                 <tr>
                     <th style="width:10px">No</th>
-                    <th width="15%">Pemilik SK</th>
-                    <th width="10%">Kategori SK</th>
-                    <th>No SK / Tgl SK</th>
+                    <th>Pemilik</th>
+                    <th>Kategori</th>
+                    <th>No SK / Tgl</th>
                     <th>Unit Kerja</th>
                     <th>TTD</th>
                     <th width="120px" align="center">#</th></tr>
@@ -183,41 +183,6 @@
     });
     $("#linkqr").click(function(){
         $( ".chkqr" ).prop( "checked", true );
-    });
-    $('body').on('click','.generatedatabkn',function () { 
-        var kode =$(this).attr("kode");
-        swal({
-            title: "Anda Yakin?",
-            text: "Sinkronisasi data Pegawai!",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonClass: 'btn-danger',
-            confirmButtonText: 'Ya!',
-            cancelButtonText: "Tidak, Batalkan!",
-            closeOnConfirm: false,
-            closeOnCancel: false
-        },
-        function (isConfirm) {
-            if (isConfirm) {
-                var post_data = "kode="+kode;
-                $.ajax({
-                        url: "<?php echo base_url() ?>admin/kepegawaian/pegawai/getpegawaibkn",
-                        type:"POST",
-                        data: post_data,
-                        dataType: "html",
-                        timeout:180000,
-                        success: function (result) {
-                             swal("Perhatian!", result, "success");
-                    },
-                    error : function(error) {
-                        alert(error);
-                    } 
-                });        
-                
-            } else {
-                swal("Batal", "", "error");
-            }
-        });
     });
      
     $( "#textqrcode" ).focus(function() {

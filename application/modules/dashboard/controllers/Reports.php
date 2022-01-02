@@ -477,8 +477,13 @@ class reports extends Admin_Controller
 	{
 		$this->auth->restrict($this->permissionViewPribadi);
 		$this->load->model('izin_pegawai/izin_pegawai_model');
+		$this->load->model('pegawai/pegawai_model');
+        // $this->load->model('sk_ds/vw_ds_antrian_ttd_model');
+        // $this->load->model('sk_ds/vw_ds_antrian_korektor_model');
 
 		$ses_nip    = trim($this->auth->username());
+		$data_pegawai = $this->pegawai_model->find_by('NIP_BARU',$ses_nip);
+		$pns_id = $data_pegawai->PNS_ID;
 		$records_proses = $this->vw_ds_jumlah_pernip_model->find_jumlah_blm_ttd($ses_nip);
 		$jumlah_sk_proses = isset($records_proses->jumlah) ? $records_proses->jumlah : 0;
 
@@ -486,6 +491,19 @@ class reports extends Admin_Controller
 		$jumlah_all = isset($records_all->jml_all) ? $records_all->jml_all : 0;
 
 		$jumlah_sk_selesai = $this->sk_ds_model->count_all_pegawai_ttd($ses_nip);
+
+		$antrian_korektor = $this->sk_ds_model->count_antrian_koreksi($pns_id);
+
+		$antrian_ttd = $this->sk_ds_model->count_antrian_ttd($pns_id);
+
+		$resume_sk = array (
+			'jml_siap_koreksi' => $antrian_korektor[0]->jumlah,
+			'jml_siap_ttd' =>$antrian_ttd[0]->jumlah,
+			'jumlah' => $antrian_korektor[0]->jumlah+$antrian_ttd[0]->jumlah
+		);
+
+		$resume_sk = (object) $resume_sk;
+
 		Template::set("jumlah_sk_proses",$jumlah_sk_proses);
 		// izin-izin
 		// $this->load->helper('aplikasi');
@@ -500,7 +518,7 @@ class reports extends Admin_Controller
 		// 	$ajumlah_status[$row->STATUS_PENGAJUAN] = $row->jumlah;
 		// }
 		// Template::set("ajumlah_status",$ajumlah_status);
-
+		Template::set("resume_sk",$resume_sk);
 		Template::set("jumlah_sk_selesai",$jumlah_sk_selesai);
 		Template::set("jumlah_all",$jumlah_all);
 		Template::set('toolbar_title', "Dashboard Pribadi");

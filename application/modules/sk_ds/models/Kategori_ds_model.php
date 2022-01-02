@@ -70,5 +70,4 @@ class Kategori_ds_model extends BF_Model
 		 
 		return parent::find_all();
 	}
-	 
 }
