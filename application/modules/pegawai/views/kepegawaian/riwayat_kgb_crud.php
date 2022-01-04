@@ -70,7 +70,7 @@
                         <span class='help-inline'><?php echo form_error('no_sk'); ?></span>
                     </div>
                 </div>
-                <div class="control-group col-sm-4">
+                <div class="control-group col-sm-6">
                     <label for="inputNAMA" class="control-label">TANGGAL SK</label>
                     <div class="input-group date">
                     <div class="input-group-addon">
@@ -80,7 +80,7 @@
                         <span class='help-inline'><?php echo form_error('tgl_sk'); ?></span>
                     </div>
                 </div> 
-                <div class="control-group col-sm-4">
+                <div class="control-group col-sm-6">
                     <label class="control-label">TMT KGB</label>
                     <div class="input-group date">
                     <div class="input-group-addon">
@@ -107,32 +107,22 @@
                         <span class='help-inline'><?php echo form_error('n_tmt_jabatan'); ?></span>
                     </div>
                 </div>   
- 
-                <div class="control-group<?php echo form_error('last_education') ? ' error' : ''; ?> col-sm-6">
-                    <?php echo form_label("Pendidikan", 'Pendidikan', array('class' => 'control-label')); ?>
+                <div class="control-group<?php echo form_error('pejabnama_pejabatat') ? ' error' : ''; ?> col-sm-12">
+                    <?php echo form_label("Nama Pejabat", 'nama_pejabat', array('class' => 'control-label')); ?>
                     <div class='controls'>
-                        <input id='last_education' type='text' class="form-control" name='last_education' maxlength='200' value="<?php echo set_value('last_education', isset($detail_riwayat->last_education) ? trim($detail_riwayat->last_education) : ''); ?>" />
-                        <span class='help-inline'><?php echo form_error('last_education'); ?></span>
+                        <input id='nama_pejabat' type='text' class="form-control" name='nama_pejabat' maxlength='200' value="<?php echo set_value('nama_pejabat', isset($detail_riwayat->nama_pejabat) ? trim($detail_riwayat->nama_pejabat) : ''); ?>" />
+                        <span class='help-inline'><?php echo form_error('nama_pejabat'); ?></span>
                     </div>
                 </div>
-                <div class="control-group col-sm-4">
-                    <label class="control-label">TGL LULUS</label>
-                    <div class="input-group date">
-                    <div class="input-group-addon">
-                        <i class="fa fa-calendar"></i>
-                    </div>
-                        <input type='text' class="form-control pull-right datepicker" name='last_education_date'  value="<?php echo set_value('last_education_date', isset($detail_riwayat->last_education_date) ? $detail_riwayat->last_education_date : ''); ?>" />
-                        <span class='help-inline'><?php echo form_error('last_education_date'); ?></span>
-                    </div>
-                </div>   
-                <div class="control-group<?php echo form_error('pejabat') ? ' error' : ''; ?> col-sm-4">
-                    <?php echo form_label("Pejabat", 'Pejabat', array('class' => 'control-label')); ?>
+                <div class="control-group<?php echo form_error('nama_pejabat_lama') ? ' error' : ''; ?> col-sm-12">
+                    <?php echo form_label("Pejabat Lama", 'nama_pejabat_lama', array('class' => 'control-label')); ?>
                     <div class='controls'>
-                        <input id='pejabat' type='text' class="form-control" name='pejabat' maxlength='200' value="<?php echo set_value('pejabat', isset($detail_riwayat->pejabat) ? trim($detail_riwayat->pejabat) : ''); ?>" />
-                        <span class='help-inline'><?php echo form_error('pejabat'); ?></span>
+                        <input id='nama_pejabat_lama' type='text' class="form-control" name='nama_pejabat_lama' maxlength='200' value="<?php echo set_value('nama_pejabat_lama', isset($detail_riwayat->nama_pejabat_lama) ? trim($detail_riwayat->nama_pejabat_lama) : ''); ?>" />
+                        <span class='help-inline'><?php echo form_error('nama_pejabat_lama'); ?></span>
                     </div>
                 </div>
-                <div class="control-group<?php echo form_error('kantor_pembayaran') ? ' error' : ''; ?> col-sm-4">
+                
+                <div class="control-group<?php echo form_error('kantor_pembayaran') ? ' error' : ''; ?> col-sm-12">
                     <?php echo form_label("Kantor Pembayaran", 'Kantor Pembayaran', array('class' => 'control-label')); ?>
                     <div class='controls'>
                         <input id='kantor_pembayaran' type='text' class="form-control" name='kantor_pembayaran' maxlength='200' value="<?php echo set_value('kantor_pembayaran', isset($detail_riwayat->kantor_pembayaran) ? trim($detail_riwayat->kantor_pembayaran) : ''); ?>" />

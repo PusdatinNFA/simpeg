@@ -209,8 +209,8 @@ class Riwayat_kgb extends Admin_Controller
             'name_bergelar'=>$pegawai_data->NAMA,
             'nip'=>$pegawai_data->NIP_BARU,
             'location'=>"Jakarta",
-            'to'=>'Kepala Kantor Pelayanan Perbendaharaan Negara',
-            'kantor_kppn_region'=>$kgb_data->kantor_pembayaran,
+            'to'=>'Kantor Pelayanan Perbendaharaan Negara II',
+            'kantor_kppn_region'=>$kgb_data->kantor_pembayaran ?$kgb_data->kantor_pembayaran : "Jakarta",
             'tgl_sk'=>date('d-m-Y'),
             'tempat'=>'Jakarta',
             'p_birth_place'=>'',
@@ -233,11 +233,11 @@ class Riwayat_kgb extends Admin_Controller
             'lastpangkat_tgl_sk'    => $sk_sebelum->tgl_sk ? getIndonesiaFormat($sk_sebelum->tgl_sk) : "",
             'lastpangkat_no_sk'     => $sk_sebelum->no_sk ? $sk_sebelum->no_sk : "",
             'lastpangkat_tmt'       => $sk_sebelum->tmt_sk ? getIndonesiaFormat($sk_sebelum->tmt_sk) : "",
-            'lastpangkat_wpy'       => $sk_sebelum->masa_kerja_thn ? $sk_sebelum->masa_kerja_thn : "",
-            'lastpangkat_wpm'       => $sk_sebelum->masa_kerja_bln ? $sk_sebelum->masa_kerja_bln : "",
+            'lastpangkat_wpy'       => $sk_sebelum->masa_kerja_thn != "" ? $sk_sebelum->masa_kerja_thn : "0",
+            'lastpangkat_wpm'       => $sk_sebelum->masa_kerja_bln != "" ? $sk_sebelum->masa_kerja_bln : "0",
             'gol_notation'          => $list_golongan->NAMA_PANGKAT."-".$list_golongan->NAMA,
-
-            'pejabat'=>$kgb_data->nama_pejabat,
+            'pejabat'               => $kgb_data->nama_pejabat_lama,
+            'pejabat_baru'          => $kgb_data->nama_pejabat,
         );
         // print_r($sk_data);
         $sk_datas = array();
@@ -296,6 +296,7 @@ class Riwayat_kgb extends Admin_Controller
         $data["unit_kerja_text"]        = $unit_kerja_induk_data->NAMA_UNOR;
         $data["unit_kerja_induk_text"]  = $unit_kerja_induk_data->ABBREVIATION;
         $data["unit_kerja_induk_id"]    = $unit_kerja_induk_data->UNOR_INDUK;
+        $data["kantor_pembayaran"]      = "KPPN II";
         $data["tgl_sk"]                 = date("Y-m-d");
         $data["tmt_sk"]                 = $tanggal;
         $data["n_golongan_id"]          = $list_golongan->ID;
@@ -303,12 +304,14 @@ class Riwayat_kgb extends Admin_Controller
         $data["n_masakerja_thn"]        = $mk_tahun;
         $data["n_masakerja_bln"]        = 0;
         $data["n_gapok"]                = $wages->BASIC;
-        $data['pejabat']                = trim($this->settings_lib->item('site.pejabat_kgb_nama'));
+        $data["pejabat"]                =  trim($this->settings_lib->item('site.pejabat_jabatan'));
+        $data['nama_pejabat']           = trim($this->settings_lib->item('site.pejabat_kgb_nama'));
+        $data['nama_pejabat_lama']      = $sk_sebelum->nama_pejabat; // ambil dari nama pejabat dari sk yang lama
         // jabatan terakhir
         $data["o_gol_ruang"]            = $list_golongan->NAMA_PANGKAT." - ".$list_golongan->NAMA;
         $data["o_gol_tmt"]              = $sk_sebelum->tmt_sk;
         $data["o_masakerja_thn"]        = $sk_sebelum->masa_kerja_thn;
-        $data["o_masakerja_bln"]        = $sk_sebelum->masa_kerja_bln;
+        $data["o_masakerja_bln"]        = $sk_sebelum->masa_kerja_bln != "" ? $sk_sebelum->masa_kerja_bln : 0;
         if(empty($data["tgl_sk"])){
             unset($data["tgl_sk"]);
         }
@@ -375,10 +378,11 @@ class Riwayat_kgb extends Admin_Controller
                 'lastpangkat_tgl_sk'    => $sk_sebelum->tgl_sk ? getIndonesiaFormat($sk_sebelum->tgl_sk) : "",
                 'lastpangkat_no_sk'     => $sk_sebelum->no_sk ? $sk_sebelum->no_sk : "",
                 'lastpangkat_tmt'       => $sk_sebelum->tmt_sk ? getIndonesiaFormat($sk_sebelum->tmt_sk) : "",
-                'lastpangkat_wpy'       => $sk_sebelum->masa_kerja_thn ? $sk_sebelum->masa_kerja_thn : "",
-                'lastpangkat_wpm'       => $sk_sebelum->masa_kerja_bln ? $sk_sebelum->masa_kerja_bln : "",
+                'lastpangkat_wpy'       => $sk_sebelum->masa_kerja_thn != "" ? $sk_sebelum->masa_kerja_thn : "0",
+                'lastpangkat_wpm'       => $sk_sebelum->masa_kerja_bln != "" ? $sk_sebelum->masa_kerja_bln : "0",
                 'gol_notation'          => $list_golongan->NAMA_PANGKAT."-".$list_golongan->NAMA,
-                'pejabat'               => $kgb_data->nama_pejabat,
+                'pejabat'               => $kgb_data->nama_pejabat_lama,
+                'pejabat_baru'          => $kgb_data->nama_pejabat,
             );
             // print_r($sk_data);
             $sk_datas = array();
@@ -551,6 +555,13 @@ class Riwayat_kgb extends Admin_Controller
         if(empty($data["tmt_sk"])){
             unset($data["tmt_sk"]);
         }
+        if(empty($data["last_education_date"])){
+            unset($data["last_education_date"]);
+        }
+        if(empty($data["n_tmt_jabatan"])){
+            unset($data["n_tmt_jabatan"]);
+        }
+        
         $id_data = $this->input->post("id");
         if(isset($id_data) && !empty($id_data)){
             $this->riwayat_kgb_model->update($id_data,$data);

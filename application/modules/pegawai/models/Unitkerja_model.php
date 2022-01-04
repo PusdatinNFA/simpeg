@@ -148,7 +148,7 @@ class Unitkerja_model extends BF_Model
 			foreach ($rows as $row) {
 				$data[$row->ID] = $row;
 			}
-			$this->cache->write($data, 'unors');
+			$this->cache->save($data, 'unors');
 		}
 		return $data;
 	}
@@ -176,7 +176,7 @@ class Unitkerja_model extends BF_Model
 		foreach ($rows as $row) {
 			$data[$row->ID] = $row;
 		}
-		$this->cache->write($data, 'unors');
+		$this->cache->save($data, 'unors');
 		//}
 		return $data;
 	}

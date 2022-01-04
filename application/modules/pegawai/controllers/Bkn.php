@@ -366,7 +366,7 @@ class Bkn extends Admin_Controller
 	        $decodejson    = json_decode($jsonsatkers);
 	        $decodejson    = json_decode($decodejson);
 	        $data_utama_pegawai 	= json_decode($decodejson->data);
-            $this->cache->write($data_utama_pegawai,'data_utama_'.$nip_baru,43200);
+            $this->cache->save($data_utama_pegawai,'data_utama_'.$nip_baru,43200);
         }
         return $data_utama_pegawai;
 	}
@@ -381,7 +381,7 @@ class Bkn extends Admin_Controller
 	        $jsonrwt_golongan = json_decode($jsonrwt_golongan);
 	        $jsonrwt_golongan = json_decode($jsonrwt_golongan);
 	        $data_golongan = $jsonrwt_golongan->data;
-            $this->cache->write($data_golongan,'golongan_'.$nip_baru,43200);
+            $this->cache->save($data_golongan,'golongan_'.$nip_baru,43200);
         }
         return $data_golongan;
 	}
@@ -395,7 +395,7 @@ class Bkn extends Admin_Controller
             $jsonrwt_golongan = json_decode($jsonrwt_golongan);
             $jsonrwt_golongan = json_decode($jsonrwt_golongan);
             $data_golongan = $jsonrwt_golongan->data;
-            $this->cache->write($data_golongan,'cltn_'.$nip_baru,43200);
+            $this->cache->save($data_golongan,'cltn_'.$nip_baru,43200);
         }
         return $data_golongan;
     }
@@ -408,7 +408,7 @@ class Bkn extends Admin_Controller
 	        $jsonrwt_golongan = json_decode($jsonrwt_golongan);
 	        $jsonrwt_golongan = json_decode($jsonrwt_golongan);
 	        $data_dp3 = $jsonrwt_golongan->data;
-            $this->cache->write($data_dp3,'data_dp3_'.$nip_baru,43200);
+            $this->cache->save($data_dp3,'data_dp3_'.$nip_baru,43200);
         }
         return $data_dp3;
 	}
@@ -421,7 +421,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_pasangan = $json_return->data;
-            $this->cache->write($data_pasangan,'data_pasangan_'.$nip_baru,43200);
+            $this->cache->save($data_pasangan,'data_pasangan_'.$nip_baru,43200);
         }
         return $data_pasangan;
 	}
@@ -434,7 +434,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_ortu = $json_return->data;
-            $this->cache->write($data_ortu,'data_ortu_'.$nip_baru,43200);
+            $this->cache->save($data_ortu,'data_ortu_'.$nip_baru,43200);
         }
         return $data_ortu;
 	}
@@ -448,7 +448,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'data_anak_'.$nip_baru,43200);
+            $this->cache->save($data_return,'data_anak_'.$nip_baru,43200);
         // }
         print_r($data_return);
         return $data_return;
@@ -462,7 +462,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_kursus = $json_return->data;
-            $this->cache->write($data_kursus,'data_kursus_'.$nip_baru,43200);
+            $this->cache->save($data_kursus,'data_kursus_'.$nip_baru,43200);
         }
         return $data_kursus;
 	}
@@ -475,7 +475,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'data_penghargaan_'.$nip_baru,43200);
+            $this->cache->save($data_return,'data_penghargaan_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -488,7 +488,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'data_pindah_instansi_'.$nip_baru,43200);
+            $this->cache->save($data_return,'data_pindah_instansi_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -526,7 +526,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'data_rwt_skp_'.$nip_baru,43200);
+            $this->cache->save($data_return,'data_rwt_skp_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -538,7 +538,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'data_rwt_cltn_'.$nip_baru,43200);
+            $this->cache->save($data_return,'data_rwt_cltn_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -550,7 +550,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'data_rwt_pemberhentian_'.$nip_baru,43200);
+            $this->cache->save($data_return,'data_rwt_pemberhentian_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -562,7 +562,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'data_rwt_ak_'.$nip_baru,43200);
+            $this->cache->save($data_return,'data_rwt_ak_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -574,7 +574,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'data_rwt_pnsunor_'.$nip_baru,43200);
+            $this->cache->save($data_return,'data_rwt_pnsunor_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -586,7 +586,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'data_rwt_hukdis_'.$nip_baru,43200);
+            $this->cache->save($data_return,'data_rwt_hukdis_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -598,7 +598,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'data_kpo_sk_'.$nip_baru,43200);
+            $this->cache->save($data_return,'data_kpo_sk_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -610,7 +610,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'data_kpo_sk_hist_'.$nip_baru,43200);
+            $this->cache->save($data_return,'data_kpo_sk_hist_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -622,7 +622,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'data_ppo_sk_'.$nip_baru,43200);
+            $this->cache->save($data_return,'data_ppo_sk_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -634,7 +634,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'ppo_sk_hist_'.$nip_baru,43200);
+            $this->cache->save($data_return,'ppo_sk_hist_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -646,7 +646,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'rwt_pendidikan_'.$nip_baru,43200);
+            $this->cache->save($data_return,'rwt_pendidikan_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -658,7 +658,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'rwt_jabatan_'.$nip_baru,43200);
+            $this->cache->save($data_return,'rwt_jabatan_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -670,7 +670,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'rwt_diklat_'.$nip_baru,43200);
+            $this->cache->save($data_return,'rwt_diklat_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -682,7 +682,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'rwt_masakerja_'.$nip_baru,43200);
+            $this->cache->save($data_return,'rwt_masakerja_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -694,7 +694,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'rwt_pwk_'.$nip_baru,43200);
+            $this->cache->save($data_return,'rwt_pwk_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -706,7 +706,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'usul_wafat_'.$nip_baru,43200);
+            $this->cache->save($data_return,'usul_wafat_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -718,7 +718,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'usul_wafat_hist_'.$nip_baru,43200);
+            $this->cache->save($data_return,'usul_wafat_hist_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -730,7 +730,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'update_pns_'.$nip_baru,43200);
+            $this->cache->save($data_return,'update_pns_'.$nip_baru,43200);
         }
         return $data_return;
 	}
@@ -742,7 +742,7 @@ class Bkn extends Admin_Controller
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
-            $this->cache->write($data_return,'update_pns_hist_'.$nip_baru,43200);
+            $this->cache->save($data_return,'update_pns_hist_'.$nip_baru,43200);
         }
         return $data_return;
 	}

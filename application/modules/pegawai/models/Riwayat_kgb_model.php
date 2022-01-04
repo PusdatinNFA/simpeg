@@ -42,17 +42,17 @@ class Riwayat_kgb_model extends BF_Model
 		array(
 			'field' => 'PNS_ID',
 			'label' => 'PNS ID',
-			'rules' => 'max_length[32]|required',
+			'rules' => 'max_length[32]',
 		),
 		array(
 			'field' => 'last_education_date',
 			'label' => 'TGL LULUS PENDIDIKAN',
-			'rules' => 'required',
+			'rules' => 'max_length[32]',
 		),
 		 
 	);
 	protected $insert_validation_rules  = array();
-	protected $skip_validation 			= true;
+	protected $skip_validation 			= false;
 
     /**
      * Constructor
@@ -115,7 +115,7 @@ class Riwayat_kgb_model extends BF_Model
 				$adata[$row->GOLONGAN."_".$row->WORKING_PERIOD] = $row;
 			}
 			$data = $adata;
-			$this->cache->write($data, 'wage');
+			$this->cache->save($data, 'wage');
 		}
 		return isset($data[$golongan."_".$working_periode]) ? $data[$golongan."_".$working_periode] : null;
 	}
