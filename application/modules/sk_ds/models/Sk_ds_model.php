@@ -1183,16 +1183,21 @@ class Sk_ds_model extends BF_Model
 		$this->db->where("id_file",$id_file);
 		return parent::count_all()>0;
 	}
-	public function count_antrian_koreksi($id_pns = '')
+	public function count_antrian_koreksi($id_pns = '', $pribadi = false)
 	{
 		$sql = "SELECT 
 				k.id_pegawai_korektor,
 					count(*) AS jumlah
 				FROM hris.tbl_file_ds d
-					JOIN hris.vw_ds_korektor k ON d.id_file::text = k.id_file::text
-				WHERE d.is_signed <> 1::smallint AND d.ds_ok = 1 AND d.kategori::text <> '< Semua >'::text and k.is_corrected = 2";
+					JOIN hris.tbl_file_ds_corrector k ON d.id_file::text = k.id_file::text
+				WHERE d.is_signed <> 1::smallint AND d.ds_ok = 1 AND d.kategori::text <> '< Semua >'::text and k.is_corrected = 2 ";
 				// if ($id_pns)
 					$sql.=" and k.id_pegawai_korektor = '$id_pns'";
+
+				if ($pribadi)
+					$sql.=" and k.jenis_koreksi = 1";
+				else 
+					$sql.=" and k.jenis_koreksi <> 1";
 
 				$sql.="GROUP BY k.id_pegawai_korektor";
 		return $this->db->query($sql)->result();

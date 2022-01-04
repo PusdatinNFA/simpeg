@@ -478,8 +478,6 @@ class reports extends Admin_Controller
 		$this->auth->restrict($this->permissionViewPribadi);
 		$this->load->model('izin_pegawai/izin_pegawai_model');
 		$this->load->model('pegawai/pegawai_model');
-        // $this->load->model('sk_ds/vw_ds_antrian_ttd_model');
-        // $this->load->model('sk_ds/vw_ds_antrian_korektor_model');
 
 		$ses_nip    = trim($this->auth->username());
 		$data_pegawai = $this->pegawai_model->find_by('NIP_BARU',$ses_nip);
@@ -494,12 +492,15 @@ class reports extends Admin_Controller
 
 		$antrian_korektor = $this->sk_ds_model->count_antrian_koreksi($pns_id);
 
+		$antrian_pribadi = $this->sk_ds_model->count_antrian_koreksi($pns_id, true);
+
 		$antrian_ttd = $this->sk_ds_model->count_antrian_ttd($pns_id);
 
 		$resume_sk = array (
 			'jml_siap_koreksi' => $antrian_korektor[0]->jumlah,
 			'jml_siap_ttd' =>$antrian_ttd[0]->jumlah,
-			'jumlah' => $antrian_korektor[0]->jumlah+$antrian_ttd[0]->jumlah
+			'jumlah' => $antrian_korektor[0]->jumlah+$antrian_ttd[0]->jumlah,
+			'jml_pribadi_siap_ds' => $antrian_pribadi[0]->jumlah,
 		);
 
 		$resume_sk = (object) $resume_sk;
