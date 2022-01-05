@@ -4,6 +4,7 @@
 	}
 </style>
 <!--tab-pane-->
+ 
 <div class="tab-pane active" id="<?php echo $TAB_ID;?>">
     <div class="form-group">
             <div class="box-header">
@@ -55,6 +56,7 @@
                 </table>
             </div>
              
+ 
     </div>
      
     <script type="text/javascript">

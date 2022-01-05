@@ -1200,6 +1200,7 @@ class Sk_ds_model extends BF_Model
 					$sql.=" and k.jenis_koreksi <> 1";
 
 				$sql.=" GROUP BY k.id_pegawai_korektor";
+ 
 		return $this->db->query($sql)->result();
 	}
 	public function count_antrian_ttd($id_pns = '')

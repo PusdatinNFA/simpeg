@@ -479,8 +479,6 @@ class reports extends Admin_Controller
 		$this->auth->restrict($this->permissionViewPribadi);
 		$this->load->model('izin_pegawai/izin_pegawai_model');
 		$this->load->model('pegawai/pegawai_model');
-        // $this->load->model('sk_ds/vw_ds_antrian_ttd_model');
-        // $this->load->model('sk_ds/vw_ds_antrian_korektor_model');
 
 		$ses_nip    = trim($this->auth->username());
 		$data_pegawai = $this->pegawai_model->find_by('NIP_BARU',$ses_nip);
