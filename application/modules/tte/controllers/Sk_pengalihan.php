@@ -368,6 +368,7 @@ class Sk_pengalihan extends Admin_Controller
         $records=$this->trx_pengalihan_model->find_all();
         $this->db->flush_cache();
         $nomor_urut=$start+1;
+        $path = str_replace(FCPATH, base_url(), $this->settings_lib->item('site.pathsk'));
         if(isset($records) && is_array($records) && count($records)):
             foreach ($records as $record) {
                 $class_delete = "";
@@ -397,22 +398,22 @@ class Sk_pengalihan extends Admin_Controller
 
                 $btn_actions = array(); 
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_BAP.docx")){
-                        $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_BAP.docx' data-toggle='tooltip' title='SK BAP' class='btn btn-sm btn-success'><i class='fa fa-download'></i> </a>";
+                        $btn_actions  [] = "<a href='".trim($path)."template/{$record->nip}_{$record->id}_BAP.docx' data-toggle='tooltip' title='SK BAP' class='btn btn-sm btn-success'><i class='fa fa-download'></i> </a>";
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JF.docx")){
                         $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_JF.docx' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning'><i class='fa fa-download'></i> </a>";
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JFU.docx")){
-                        $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_JFU.docx' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning'><i class='fa fa-download'></i> </a>";
+                        $btn_actions  [] = "<a href='".trim($path)."template/{$record->nip}_{$record->id}_JFU.docx' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning'><i class='fa fa-download'></i> </a>";
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMJP.docx")){
-                        $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPMJP.docx' data-toggle='tooltip' title='SK SPMJ' class='btn btn-sm btn-danger ".$class_delete."'><i class='fa fa-download'></i> </a>";
+                        $btn_actions  [] = "<a href='".trim($path)."template/{$record->nip}_{$record->id}_SPMJP.docx' data-toggle='tooltip' title='SK SPMJ' class='btn btn-sm btn-danger ".$class_delete."'><i class='fa fa-download'></i> </a>";
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPMT.docx")){
-                    $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPMT.docx' data-toggle='tooltip' title='SK SPMT ' class='btn btn-sm btn-info ".$class_delete."'><i class='fa fa-download'></i> </a>";
+                    $btn_actions  [] = "<a href='".trim($path)."template/{$record->nip}_{$record->id}_SPMT.docx' data-toggle='tooltip' title='SK SPMT ' class='btn btn-sm btn-info ".$class_delete."'><i class='fa fa-download'></i> </a>";
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_SPPP.docx")){
-                        $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_SPPP.docx' data-toggle='tooltip' title='SK SPP ' class='btn btn-sm btn-success ".$class_delete."'><i class='fa fa-download'></i> </a>";
+                        $btn_actions  [] = "<a href='".trim($path)."template/{$record->nip}_{$record->id}_SPPP.docx' data-toggle='tooltip' title='SK SPP ' class='btn btn-sm btn-success ".$class_delete."'><i class='fa fa-download'></i> </a>";
                     }
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
                 $btn_aksi = array();
@@ -670,7 +671,7 @@ class Sk_pengalihan extends Admin_Controller
         }
         if(isset($apegawai->NIP_BARU)){
             $var_pegawai["nama"] = $apegawai->GELAR_DEPAN."".$apegawai->NAMA.", ".$apegawai->GELAR_BELAKANG;
-            $var_pegawai["nip"] = $NIP_BARU;
+            $var_pegawai["nip"] = $apegawai->NIP_BARU;
         }
         return $var_pegawai;
     }
