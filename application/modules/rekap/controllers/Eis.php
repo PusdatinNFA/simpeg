@@ -61,7 +61,7 @@ class Eis extends Admin_Controller
 			foreach($rows as $row){
 				$row->color = "#".random_color();
 			}
-			$this->cache->save($rows,'corporate_color');
+			$this->cache->write($rows,'corporate_color');
 			$corporate_color = $this->cache->get('corporate_color');
 		}
 		

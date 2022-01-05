@@ -73,7 +73,7 @@ class Golongan_model extends BF_Model
 				$adata[$row->ID] = $row;
 			}
 			$data = $adata;
-			$this->cache->save($data, 'golongan');
+			$this->cache->write($data, 'golongan');
 		}
 		return isset($data[$id]) ? $data[$id] : null;
 	}

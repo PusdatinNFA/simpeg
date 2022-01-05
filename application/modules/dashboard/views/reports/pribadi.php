@@ -17,7 +17,7 @@
 	              <div class="progress-bar" style="width: 100%"></div>
 	            </div>
 	            <span class="progress-description">
-	              Jumlah Pegawai
+	              SK SUDAH TERBIT Pegawai
 	            </span>
 	          </div><!-- /.info-box-content -->
 	        </div><!-- /.info-box -->
@@ -56,6 +56,8 @@
           </div>
         <!-- /.col -->
 </div>
+
+<?php if ($this->auth->has_permission('Sk_ds.Sk.Validasi')) : ?>
 <div class="row">
 		<div class="col-md-4 col-sm-6 col-xs-12">
 	        <div class="info-box bg-maroon-active">
@@ -106,6 +108,25 @@
           </div>
         <!-- /.col -->
 </div>
+<?php endif; ?>
+<div class="row">
+	<div class="col-md-4 col-sm-6 col-xs-12">
+		<div class="info-box bg-navy">
+			<span class="info-box-icon"><i class="fa fa-files-o"></i></span>
+			<div class="info-box-content">
+			<span class="info-box-text">SK Pribadi</span>
+			<span class="info-box-number white"><a href="<?php echo base_url(); ?>admin/sk/sk_ds/validasi"><?php echo isset($resume_sk->jml_pribadi_siap_ds) ? $resume_sk->jml_pribadi_siap_ds:"0"; ?> <small> Dokumen	</small></a></span>
+			<div class="progress">
+				<div class="progress-bar" style="width: 100%"></div>
+			</div>
+			<span class="progress-description">
+				Perlu di DS
+			</span>
+			</div><!-- /.info-box-content -->
+		</div><!-- /.info-box -->
+	</div>
+</div>
+
 
 <div class="callout callout-warning">
    <h4>Perubahan data anda</h4>

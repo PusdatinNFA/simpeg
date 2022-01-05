@@ -13,6 +13,7 @@ class reports extends Admin_Controller
 	protected $permissionFiltersatker   = 'Pegawai.Kepegawaian.Filtersatker';
 	protected $permissionEselon1   = 'Pegawai.Kepegawaian.permissionEselon1';
 	protected $permissionViewPribadi   = 'Dashboard.Pribadi.View';
+    protected $permissionValidasi   = 'Sk_ds.Sk.Validasi';
 	/**
 	 * Constructor
 	 *
@@ -494,12 +495,15 @@ class reports extends Admin_Controller
 
 		$antrian_korektor = $this->sk_ds_model->count_antrian_koreksi($pns_id);
 
+		$antrian_pribadi = $this->sk_ds_model->count_antrian_koreksi($pns_id, true);
+
 		$antrian_ttd = $this->sk_ds_model->count_antrian_ttd($pns_id);
 
 		$resume_sk = array (
 			'jml_siap_koreksi' => $antrian_korektor[0]->jumlah,
 			'jml_siap_ttd' =>$antrian_ttd[0]->jumlah,
-			'jumlah' => $antrian_korektor[0]->jumlah+$antrian_ttd[0]->jumlah
+			'jumlah' => $antrian_korektor[0]->jumlah+$antrian_ttd[0]->jumlah,
+			'jml_pribadi_siap_ds' => $antrian_pribadi[0]->jumlah,
 		);
 
 		$resume_sk = (object) $resume_sk;

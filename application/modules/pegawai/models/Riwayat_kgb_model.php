@@ -115,7 +115,7 @@ class Riwayat_kgb_model extends BF_Model
 				$adata[$row->GOLONGAN."_".$row->WORKING_PERIOD] = $row;
 			}
 			$data = $adata;
-			$this->cache->save($data, 'wage');
+			$this->cache->write($data, 'wage');
 		}
 		return isset($data[$golongan."_".$working_periode]) ? $data[$golongan."_".$working_periode] : null;
 	}

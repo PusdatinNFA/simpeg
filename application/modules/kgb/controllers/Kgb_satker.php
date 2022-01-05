@@ -101,7 +101,7 @@ class Kgb_satker extends Admin_Controller
 			foreach ($records as $record) {
 				$rec_golongan = $this->golongan_model->getGolongan($record->golongan_id);
 				$mk_tahun = $record->n_jml_bulan/12;
-				// print_r($rec_golongan);
+				// print_r($record);
 				$btn_actions_array = array();
 				if($record->riwayat_kgb_id){
 					$btn_actions_array  [] = "
@@ -114,14 +114,14 @@ class Kgb_satker extends Admin_Controller
 					";	
 				}
 				$informasi_hukdis = "";
-				if($record->total>0){
-					$informasi_hukdis = "HUKDIS";
+				if($record->riwayat_hukdis>0){
+					$informasi_hukdis = "<small class='label text-center bg-red'>HUKDIS</small>";
 				}
 				else $informasi_hukdis = "-";
 				$row = array();
                 $row []  = $nomor_urut;
                 $row []  = $record->nama_pegawai."<br>".$record->pegawai_nip;
-                $row []  = $rec_golongan->NAMA_PANGKAT." - ".$rec_golongan->NAMA."<br><b><i>Sk Terakhir:</i></b> ".date("d-m-Y", strtotime($record->tmt_sk));
+                $row []  = $rec_golongan->NAMA_PANGKAT." - ".$rec_golongan->NAMA."<br><b><i>Sk Terakhir:</i></b> ".date("d-m-Y", strtotime($record->tmt_sk))."<br><small class='label text-center bg-yellow'>".$record->riwayat."</small>";
                 $row []  = "<b><i>Lama</i></b> ".$record->o_masa_kerja_thn."th ".$record->o_masa_kerja_bln."bln, <br><b><i>Baru </i></b>".($record->n_jml_bulan/12)."th 0bln";
                	$row []  = "<b><i>Lama</i></b> ".number_format($record->gaji_lama,0,",",".").",<br><b><i>Baru </i></b>".number_format($record->gaji_baru,0,",",".");
                	$row []  = $record->ABBREVIATION;
@@ -133,7 +133,7 @@ class Kgb_satker extends Admin_Controller
                 		$btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/printsk/".$record->ref."' data-toggle='tooltip' title='Download Dokumen word' tooltip='Download word' class='btn btn-sm btn-info'><i class='fa fa-download'></i> </a>";
                 	}
                 }else{
-                	$btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/create_sk/".$record->pegawai_nip."/".$tanggal."?golongan=$rec_golongan->NAMA2&mk_tahun=$mk_tahun' data-toggle='tooltip' title='Print SK' tooltip='Print SK' class='btn btn-sm btn-warning show-modal'><i class='fa fa-print'></i> </a>";
+                	$btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/create_sk/pdf/".$record->pegawai_nip."/".$tanggal."?golongan=$rec_golongan->NAMA2&mk_tahun=$mk_tahun' data-toggle='tooltip' title='Print SK' tooltip='Print SK' class='btn btn-sm btn-warning show-modal'><i class='fa fa-print'></i> </a>";
                 }
                 
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";

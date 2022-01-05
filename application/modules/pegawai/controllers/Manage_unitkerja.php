@@ -835,8 +835,8 @@ class Manage_unitkerja extends Admin_Controller {
                 endforeach;
             endif;
             $aunitkerja =  $this->createchild(ROOT_UNOR_ID,$json);
-            $this->cache->save($aunitkerja, 'aunor',3600);
-            $this->cache->save($json, 'json_unor',3600);
+            $this->cache->write($aunitkerja, 'aunor',3600);
+            $this->cache->write($json, 'json_unor',3600);
         } 
         return $aunitkerja;
     }
@@ -857,8 +857,8 @@ class Manage_unitkerja extends Admin_Controller {
                 endforeach;
             endif;
             $aunitkerja =  $this->createchild(ROOT_UNOR_ID,$json);
-            $this->cache->save($aunitkerja, 'aunor_tree',3600);
-            $this->cache->save($json, 'json_unor_tree',3600);
+            $this->cache->write($aunitkerja, 'aunor_tree',3600);
+            $this->cache->write($json, 'json_unor_tree',3600);
         } 
         return $aunitkerja;
     }

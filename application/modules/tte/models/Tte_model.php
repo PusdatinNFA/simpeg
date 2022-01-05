@@ -88,7 +88,7 @@ class Tte_model extends BF_Model
 			foreach ($rows as $row) {
 				$data[$row->kode_proses] = $row;
 			}
-			$this->cache->save($data, 'jenisDokumen');
+			$this->cache->write($data, 'jenisDokumen');
 		}
 		return isset($data[$kode]) ? $data[$kode] : null;
 	}

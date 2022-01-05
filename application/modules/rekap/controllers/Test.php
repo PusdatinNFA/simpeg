@@ -21,7 +21,7 @@ class Test extends Admin_Controller
 		foreach($rows as $row){
 			$row->color = "#".random_color();
 		}
-		$this->cache->save($rows,'corporate_color');
+		$this->cache->write($rows,'corporate_color');
 		echo __LINE__;
 		$corporate_color = $this->cache->get('corporate_color');
 		print_r($corporate_color);
