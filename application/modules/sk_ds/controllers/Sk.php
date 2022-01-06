@@ -38,6 +38,7 @@ class Sk extends Admin_Controller
         $this->load->model('sk_ds/vw_ds_antrian_ttd_model');
         $this->load->model('sk_ds/vw_ds_antrian_korektor_model');
         $this->load->model('sk_ds/vw_ds_resume_ttd_model');
+        $this->load->model('tte/tte_model');
         $this->lang->load('sk_ds');
         
             Assets::add_css('flick/jquery-ui-1.8.13.custom.css');
