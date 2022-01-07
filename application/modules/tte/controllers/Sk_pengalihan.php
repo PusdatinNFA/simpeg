@@ -401,7 +401,7 @@ class Sk_pengalihan extends Admin_Controller
                         $btn_actions  [] = "<a href='".trim($path)."template/{$record->nip}_{$record->id}_BAP.docx' data-toggle='tooltip' title='SK BAP' class='btn btn-sm btn-success'><i class='fa fa-download'></i> </a>";
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JF.docx")){
-                        $btn_actions  [] = "<a href='".trim($this->settings_lib->item('site.urlsk'))."template/{$record->nip}_{$record->id}_JF.docx' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning'><i class='fa fa-download'></i> </a>";
+                        $btn_actions  [] = "<a href='".trim($path)."template/{$record->nip}_{$record->id}_JF.docx' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning'><i class='fa fa-download'></i> </a>";
                     }
                     if(file_exists(trim($this->settings_lib->item('site.pathsk'))."template/{$record->nip}_{$record->id}_JFU.docx")){
                         $btn_actions  [] = "<a href='".trim($path)."template/{$record->nip}_{$record->id}_JFU.docx' data-toggle='tooltip' title='SK Pengangkatan Jabatan Fungsional ' class='btn btn-sm btn-warning'><i class='fa fa-download'></i> </a>";
