@@ -157,15 +157,21 @@ class Arsip extends Admin_Controller
     public function download($id)
     {
         $this->load->helper('download');
+        $this->load->library('aws/awslib');
         if (empty($id)) {
             Template::set_message(lang('arsip_digital_invalid_id'), 'error');
             redirect(SITE_AREA . '/arsip/arsip_digital');
         }
         log_activity($this->auth->user_id(), 'Download Dokumen id : ' . $id . ' : ' . $this->input->ip_address(), 'arsip_digital');
-
         $datadetil = $this->arsip_digital_model->find_by("ref",$id);
-        $data = file_get_contents(trim($datadetil->location).trim($datadetil->name)); 
-        force_download(trim($datadetil->name), $data); 
+        $s3 = $this->connectAws();
+        $bucket = "simpeg";
+        $result = $s3->getObject([
+            'Bucket' => $bucket,
+            'Key'    => $datadetil->location.$datadetil->name
+        ]);
+        header('Content-Disposition: attachment; filename=' . $datadetil->name);    
+        echo $result['Body'];
         exit; 
     }
 
@@ -475,6 +481,7 @@ class Arsip extends Admin_Controller
         }
         $data = $this->arsip_digital_model->prep_data($this->input->post());
         if (isset($_FILES['file_dokumen']) && $_FILES['file_dokumen']['name']) {
+            $full_filename = $direktori.md5(date("ymdhis").trim($this->input->post('NIP')));
             $uploadData = handle_upload("file_dokumen",$direktori,md5(date("ymdhis").trim($this->input->post('NIP'))));
             if (isset($uploadData['error']) && !empty($uploadData['error']))
              {
@@ -501,7 +508,11 @@ class Arsip extends Admin_Controller
                 $bucket = "simpeg";
                 $sumber = trim($this->settings_lib->item('site.pathsk')).$filename;
 
-                $return = $this->createFileAws($s3,$bucket,$direktori.$data['name'],$direktori_bucket.$data['name']);
+                $return = $this->createFileAws($s3,$bucket,$direktori.$data['name'],$direktori_bucket.$data['name'],$type);
+                if($return){
+                    // delete file temp
+                    unlink($full_filename);
+                }
              }
         }
         $ISVALID = $this->input->post('ISVALID');
@@ -770,17 +781,18 @@ class Arsip extends Admin_Controller
         ]);
         return $result;
     }
-    private function createFileAws($s3,$bucket,$SourceFile,$key){
+    private function createFileAws($s3,$bucket,$SourceFile,$key,$type=""){
+        $type = $type !="" ? $type : "application/pdf";
         $result = $s3->putObject([
             "Bucket" => $bucket,
             "Key" => $key,
             "Body" => $key." Keterangan",
-            // 'ACL'    => 'public-read', // make file 'public'
+            'ACL'    => 'public-read', // make file 'public'
             // you can use relative
             "SourceFile" => $SourceFile,
         // or absolute path
         // "SourceFile" => "/home/yoga/files.pdf",
-        "ContentType" => "application/pdf",
+        "ContentType" => $type,
         ]);
         // Print the body of the result by indexing into the result object.
         return $result;
