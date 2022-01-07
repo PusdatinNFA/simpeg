@@ -26,7 +26,7 @@ endif;
 $id = isset($arsip_digital->ID) ? $arsip_digital->ID : '';
 
 ?>
-<div class="box box-warning admin-box">
+<div class="box box-danger admin-box">
     <div class="box-body">
         <div class="message"></div>
     <?php echo form_open($this->uri->uri_string(),"id=submit_form","form"); ?>
@@ -63,7 +63,7 @@ $id = isset($arsip_digital->ID) ? $arsip_digital->ID : '';
             </div>
 
             <div class="control-group<?php echo form_error('KETERANGAN') ? ' error' : ''; ?>">
-                <?php echo form_label(lang('arsip_digital_field_KETERANGAN'), 'KETERANGAN', array('class' => 'control-label')); ?>
+                <?php echo form_label("Keterangan", 'KETERANGAN', array('class' => 'control-label')); ?>
                 <div class='controls'>
                     <textarea name="KETERANGAN" class="form-control"><?php echo set_value('KETERANGAN', isset($arsip_digital->KETERANGAN) ? $arsip_digital->KETERANGAN : ''); ?></textarea>
                     <span class='help-inline'><?php echo form_error('KETERANGAN'); ?></span>
@@ -71,7 +71,7 @@ $id = isset($arsip_digital->ID) ? $arsip_digital->ID : '';
             </div>
  
             <div class="control-group<?php echo form_error('FILE_BASE64') ? ' error' : ''; ?>">
-                <?php echo form_label(lang('arsip_digital_field_FILE_BASE64'), 'FILE_BASE64', array('class' => 'control-label')); ?>
+                <?php echo form_label("File", 'FILE_BASE64', array('class' => 'control-label')); ?>
                 <div class='controls'>
                     <input id="file_dokumen" name="file_dokumen" class="file" type="file" data-preview-file-type="pdf" title="Silahkan Pilih file pdf">
                     <span class='help-inline'><?php echo form_error('FILE_BASE64'); ?></span>
@@ -90,7 +90,6 @@ $id = isset($arsip_digital->ID) ? $arsip_digital->ID : '';
 <script src="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/themes/explorer/theme.js" type="text/javascript"></script>
 <script src="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/js/fileinput.js" type="text/javascript"></script>
 <script type="text/javascript">
-   
  $(".select2").select2({});
  $("#NIP").select2({
         placeholder: 'Cari Pemilik Dokumen.....',
