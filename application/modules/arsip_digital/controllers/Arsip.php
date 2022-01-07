@@ -48,10 +48,8 @@ class Arsip extends Admin_Controller
     {
         $this->auth->restrict($this->permissionViewAll);   
         Template::set('toolbar_title', lang('arsip_digital_manage'));
-
         Template::render();
     }
-    
     /**
      * Create a arsip digital object.
      *
@@ -134,21 +132,7 @@ class Arsip extends Admin_Controller
         Template::set('toolbar_title', lang('arsip_digital_edit_heading'));
         Template::render();
     }
-    public function viewdoc($id)
-    {
-        if (empty($id)) {
-            Template::set_message(lang('arsip_digital_invalid_id'), 'error');
-            redirect(SITE_AREA . '/arsip/arsip_digital');
-        }
-        $datadetil = $this->arsip_digital_model->find_by("ref",$id);
-        if (!file_exists(trim($datadetil->location).trim($datadetil->name))) {
-            die("File tidak ditemukan");
-        }
-        $data_file = file_get_contents(trim($datadetil->location).trim($datadetil->name));
-        $FILE_BASE64 = base64_encode($data_file);
-        echo '<embed src="data:application/pdf;base64,'.$FILE_BASE64.'" width="100%" height="700" alt="pdf">';
-        die();
-    }
+    
     public function download_from_base64($id)
     {
         if (empty($id)) {
@@ -249,7 +233,7 @@ class Arsip extends Admin_Controller
         $searchKey = isset($_REQUEST['search']["key"]) ? $_REQUEST['search']["key"] : "";
 
         $selectedUnors = array();
-
+        $this->db->start_cache();
         $advanced_search_filters  = $this->input->post("search[advanced_search_filters]");
         if($advanced_search_filters){
             $filters = array();
@@ -266,7 +250,7 @@ class Arsip extends Admin_Controller
                 $this->arsip_digital_model->where('ID_JENIS_ARSIP',$filters['jenis_arsip']); 
             }
         }
-
+        $this->db->stop_cache();
         $output=array();
         $output['draw']=$draw;
         $total= $this->arsip_digital_model->count_all();
@@ -282,22 +266,6 @@ class Arsip extends Admin_Controller
         }
         $output['recordsTotal']= $output['recordsFiltered']=$total;
         $output['data']=array();
-        $advanced_search_filters  = $this->input->post("search[advanced_search_filters]");
-        if($advanced_search_filters){
-            $filters = array();
-            foreach($advanced_search_filters as  $filter){
-                $filters[$filter['name']] = $filter["value"];
-            }
-            if($filters['nama_cb']){
-                $this->arsip_digital_model->like('upper(pegawai."NAMA")',strtoupper($filters['nama_key']),"BOTH");    
-            }
-            if($filters['nip_cb']){
-                $this->arsip_digital_model->like('upper(pegawai."NIP_BARU")',strtoupper($filters['nip_key']),"BOTH"); 
-            }
-            if($filters['jenis_arsip']){
-                $this->arsip_digital_model->where('ID_JENIS_ARSIP',$filters['jenis_arsip']); 
-            }
-        }
         $this->arsip_digital_model->limit($length,$start);
         $records = $this->arsip_digital_model->find_all();
         
@@ -306,7 +274,7 @@ class Arsip extends Admin_Controller
             foreach ($records as $record) {
                 $row = array();
                 $row []  = $nomor_urut.".";
-                $row []  = "<b><a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ID_PEGAWAI."'>".$record->NIP."</a></b><br>".$record->NAMA;
+                $row []  = "<b><a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."'>".$record->NIP."</a></b><br>".$record->NAMA;
                 $row []  = "<b>".$record->NAMA_JENIS."</b>";
                 $row []  = $record->KETERANGAN."<br><i>".$record->JENIS_FILE." ".$this->formatSizeUnits($record->FILE_SIZE)."</i>"; 
                 $btn_actions = array();
@@ -507,7 +475,7 @@ class Arsip extends Admin_Controller
         }
         $data = $this->arsip_digital_model->prep_data($this->input->post());
         if (isset($_FILES['file_dokumen']) && $_FILES['file_dokumen']['name']) {
-            $uploadData = handle_upload("file_dokumen",$direktori);
+            $uploadData = handle_upload("file_dokumen",$direktori,md5(date("ymdhis").trim($this->input->post('NIP'))));
             if (isset($uploadData['error']) && !empty($uploadData['error']))
              {
                 $tipefile = $_FILES['file_dokumen']['type'];
@@ -521,10 +489,19 @@ class Arsip extends Admin_Controller
                 $file_tmp   = $_FILES['file_dokumen']['tmp_name'];
                 $type       = $_FILES['file_dokumen']['type'];
                 $data['name']  = $uploadData['data']['file_name'];
-                $data['location']  = $direktori;
+                
                 $data['EXTENSION_FILE'] = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1] : null;
                 $data['JENIS_FILE']     = $type;
                 $data['FILE_SIZE']      = $file_size;
+                $direktori_bucket = "repo_dokumen_digital_pegawai/repo1/".trim($this->input->post('NIP')).'/';
+                $data['location']  = $direktori_bucket;
+                // save to minio
+                $this->load->library('aws/awslib');
+                $s3 = $this->connectAws();
+                $bucket = "simpeg";
+                $sumber = trim($this->settings_lib->item('site.pathsk')).$filename;
+
+                $return = $this->createFileAws($s3,$bucket,$direktori.$data['name'],$direktori_bucket.$data['name']);
              }
         }
         $ISVALID = $this->input->post('ISVALID');
@@ -694,5 +671,118 @@ class Arsip extends Admin_Controller
         }
 
         exit();
+    }
+    public function viewdocold($id)
+    {
+        if (empty($id)) {
+            Template::set_message(lang('arsip_digital_invalid_id'), 'error');
+            redirect(SITE_AREA . '/arsip/arsip_digital');
+        }
+        $datadetil = $this->arsip_digital_model->find_by("ref",$id);
+        if (!file_exists(trim($datadetil->location).trim($datadetil->name))) {
+            die("File tidak ditemukan, lokasi ".trim($datadetil->location).trim($datadetil->name));
+        }
+        $data_file = file_get_contents(trim($datadetil->location).trim($datadetil->name));
+        $FILE_BASE64 = base64_encode($data_file);
+        echo '<embed src="data:application/pdf;base64,'.$FILE_BASE64.'" width="100%" height="700" alt="pdf">';
+        die();
+    }
+    public function createfile_nip(){
+        $this->load->library('aws/awslib');
+        $s3 = $this->connectAws();
+        $bucket = "simpeg";
+        $filename = "b926a2ad0dd1b4a7e1189f5148168d41.pdf";
+        $sumber = trim($this->settings_lib->item('site.pathsk')).$filename;
+        $return = $this->createFileAws($s3,$bucket,$sumber,'testdengannip.pdf');
+        var_dump($return);
+    }
+    public function viewdoc($id){
+        $this->load->library('aws/awslib');
+        $s3 = $this->connectAws();
+        $bucket = "simpeg";
+        $datadetil = $this->arsip_digital_model->find_by("ref",$id);
+        // if (!file_exists(trim($datadetil->location).trim($datadetil->name))) {
+        //     die("File tidak ditemukan, lokasi ");
+        // }
+        $file_url = $this->preSignUrl($s3,$bucket,$datadetil->location.$datadetil->name);
+        echo '<embed src="'.$file_url.'" width="100%" height="1000" alt="pdf">';
+        // echo $file_url;
+    }
+    private function preSignUrl($s3,$bucket,$key){
+        $command = $s3->getCommand('GetObject', [
+            'Bucket' => $bucket,
+            'Key'    => $key
+        ]);
+        // Create a pre-signed URL for a request with duration of 1 miniutes
+        $presignedRequest = $s3->createPresignedRequest($command, '+1 minutes');
+        // Get the actual presigned-url
+        $presignedUrl =  (string)  $presignedRequest->getUri();
+        return $presignedUrl;
+    }
+    function connectAwsDevLipi(){
+        date_default_timezone_set("Asia/Jakarta");
+        $endpoint = "https://dev-storage.lipi.go.id";
+        $s3 = new Aws\S3\S3Client([
+            "version" => "latest",
+            "region" => "us-east-1",
+            "endpoint" => $endpoint,
+            "use_path_style_endpoint" => true,
+            "credentials" => [
+                "key" => "admin",
+                "secret" => "admin2020",
+            ],
+        ]);
+        return $s3;
+    }
+    function connectAwsDev(){
+        date_default_timezone_set("Asia/Jakarta");
+        $endpoint = "https://devminio.brin.go.id";
+        $s3 = new Aws\S3\S3Client([
+            "version" => "latest",
+            "region" => "us-east-1",
+            "endpoint" => $endpoint,
+            "use_path_style_endpoint" => true,
+            "credentials" => [
+                "key" => "dev-simpeg",
+                "secret" => "d3vm1n10",
+            ],
+        ]);
+        return $s3;
+    }
+    function connectAws(){
+        date_default_timezone_set("Asia/Jakarta");
+        $endpoint =DOMAIN_MINIO;
+        $s3 = new Aws\S3\S3Client([
+            "version" => "latest",
+            "region" => "us-east-1",
+            "endpoint" => $endpoint,
+            "use_path_style_endpoint" => true,
+            "credentials" => [
+                "key" => USER_MINIO,
+                "secret" => PASS_MINIO,
+            ],
+        ]);
+        return $s3;
+    }
+    function createBucket($s3,$bucket){
+        $result = $s3->createBucket([
+            "Bucket" => $bucket,
+        ]);
+        return $result;
+    }
+    private function createFileAws($s3,$bucket,$SourceFile,$key){
+        $result = $s3->putObject([
+            "Bucket" => $bucket,
+            "Key" => $key,
+            "Body" => $key." Keterangan",
+            // 'ACL'    => 'public-read', // make file 'public'
+            // you can use relative
+            "SourceFile" => $SourceFile,
+        // or absolute path
+        // "SourceFile" => "/home/yoga/files.pdf",
+        "ContentType" => "application/pdf",
+        ]);
+        // Print the body of the result by indexing into the result object.
+        return $result;
     }
 }

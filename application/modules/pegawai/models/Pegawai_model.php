@@ -62,12 +62,12 @@ class Pegawai_model extends BF_Model
 		array(
 			'field' => 'GELAR_DEPAN',
 			'label' => 'lang:pegawai_field_GELAR_DEPAN',
-			'rules' => 'max_length[20]',
+			'rules' => 'max_length[30]',
 		),
 		array(
 			'field' => 'GELAR_BELAKANG',
 			'label' => 'lang:pegawai_field_GELAR_BELAKANG',
-			'rules' => 'max_length[20]',
+			'rules' => 'max_length[30]',
 		),
 		array(
 			'field' => 'TEMPAT_LAHIR_ID',
