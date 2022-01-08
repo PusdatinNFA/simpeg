@@ -33,21 +33,21 @@
 						<select class="form-control select2" name="filter_bulan">
                             <?php 
                                 $bulans = array(
-                                    'Januari',
-                                    'Februari',
-                                    'Maret',
-                                    'April',
-                                    'Mei',
-                                    'Juni',
-                                    'Juli',
-                                    'Agustus',
-                                    'September',
-                                    'Oktober',
-                                    'Nopember',
-                                    'Desember'
+                                    '01'=>'Januari',
+                                    '02'=>'Februari',
+                                    '03'=>'Maret',
+                                    '04'=>'April',
+                                    '05'=>'Mei',
+                                    '06'=>'Juni',
+                                    '07'=>'Juli',
+                                    '08'=>'Agustus',
+                                    '09'=>'September',
+                                    '10'=>'Oktober',
+                                    '11'=>'Nopember',
+                                    '12'=>'Desember'
                                 );
                                 foreach($bulans as  $key=>$value){
-                                    echo "<option value='".((int)($key+1))."'>$value</option>";
+                                    echo "<option value='".$key."'>$value</option>";
                                 }
                             ?>
 						</select>
