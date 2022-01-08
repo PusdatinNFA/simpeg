@@ -115,6 +115,7 @@ class Arsip_digital_model extends BF_Model
 			JENIS_FILE,NAMA_JENIS,FILE_SIZE,EXTENSION_FILE,ISVALID,arsip.ref');
 
 		$this->db->join('jenis_arsip', 'arsip.ID_JENIS_ARSIP = jenis_arsip.ID', 'left');
+		$this->order_by("arsip.ID","desc");
 		return parent::find_all();
 	}
 	public function count_all_pegawai()

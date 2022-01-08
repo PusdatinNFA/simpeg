@@ -481,7 +481,6 @@ class Arsip extends Admin_Controller
         }
         $data = $this->arsip_digital_model->prep_data($this->input->post());
         if (isset($_FILES['file_dokumen']) && $_FILES['file_dokumen']['name']) {
-            $full_filename = $direktori.md5(date("ymdhis").trim($this->input->post('NIP')));
             $uploadData = handle_upload("file_dokumen",$direktori,md5(date("ymdhis").trim($this->input->post('NIP'))));
             if (isset($uploadData['error']) && !empty($uploadData['error']))
              {
@@ -490,28 +489,26 @@ class Arsip extends Admin_Controller
              }else{
                 $file_name =$_FILES['file_dokumen']['name'];
                 // $file_name =$_FILES['image']['tmp_name'];
-                $file_ext   = explode('.',$file_name);
-                $jmltitik   = count($file_ext);
-                $file_size  = $_FILES['file_dokumen']['size'];
-                $file_tmp   = $_FILES['file_dokumen']['tmp_name'];
-                $type       = $_FILES['file_dokumen']['type'];
-                $data['name']  = $uploadData['data']['file_name'];
+                $file_ext       = explode('.',$file_name);
+                $jmltitik       = count($file_ext);
+                $file_size      = $_FILES['file_dokumen']['size'];
+                $file_tmp       = $_FILES['file_dokumen']['tmp_name'];
+                $type           = $_FILES['file_dokumen']['type'];
+                $data['name']   = $uploadData['data']['file_name'];
                 
                 $data['EXTENSION_FILE'] = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1] : null;
                 $data['JENIS_FILE']     = $type;
                 $data['FILE_SIZE']      = $file_size;
-                $direktori_bucket = "repo_dokumen_digital_pegawai/repo1/".trim($this->input->post('NIP')).'/';
-                $data['location']  = $direktori_bucket;
+                $direktori_bucket       = "repo_dokumen_digital_pegawai/repo1/".trim($this->input->post('NIP')).'/';
+                $data['location']       = $direktori_bucket;
                 // save to minio
                 $this->load->library('aws/awslib');
                 $s3 = $this->connectAws();
                 $bucket = "simpeg";
-                $sumber = trim($this->settings_lib->item('site.pathsk')).$filename;
-
                 $return = $this->createFileAws($s3,$bucket,$direktori.$data['name'],$direktori_bucket.$data['name'],$type);
                 if($return){
                     // delete file temp
-                    unlink($full_filename);
+                    unlink($direktori.$data['name']);
                 }
              }
         }
@@ -668,15 +665,21 @@ class Arsip extends Admin_Controller
     public function deletedata()
     {
         $this->auth->restrict($this->permissionDelete);
+        $this->load->library('aws/awslib');
+        $s3 = $this->connectAws();
+        $bucket = "simpeg";
         $id     = $this->input->post('kode');
         $data = $this->arsip_digital_model->find($id);
+        $return_delete = $this->deleteObject($s3,$bucket,trim($data->location).trim($data->name));
         if (file_exists(trim($data->location).trim($data->name)) and $data->name != "") {
             unlink(trim($data->location).trim($data->name));
         }
         if ($this->arsip_digital_model->delete($id)) {
-             log_activity($this->auth->user_id(), 'Hapus arsip digital : ' . $id . ' : ' . $this->input->ip_address(), 'arsip_digital');
-             Template::set_message("Berhasil Hapus dokumen", 'success');
-             echo "Sukses";
+            // delete ke server minio
+            $return_delete = $this->deleteObject($s3,$bucket,trim($data->location).trim($data->name));
+            log_activity($this->auth->user_id(), 'Hapus arsip digital : ' . $id . ' : ' . $this->input->ip_address(), 'arsip_digital');
+            Template::set_message("Berhasil Hapus dokumen", 'success');
+            echo "Sukses";
         }else{
             echo "Gagal";
         }
@@ -793,6 +796,14 @@ class Arsip extends Admin_Controller
         // or absolute path
         // "SourceFile" => "/home/yoga/files.pdf",
         "ContentType" => $type,
+        ]);
+        // Print the body of the result by indexing into the result object.
+        return $result;
+    }
+    private function deleteObject($s3,$bucket,$key){
+        $result = $s3->deleteObject([
+            "Bucket" => $bucket,
+            "Key" => $key,
         ]);
         // Print the body of the result by indexing into the result object.
         return $result;
