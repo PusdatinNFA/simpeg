@@ -1061,7 +1061,7 @@ class Bkn extends Admin_Controller
                     $data["NOMOR_SK"]       = $row->nomorSk;
                     // struktur
                     $data["ID_UNOR_BKN"]    = $row->unorId;
-                    $data["ID_UNOR"]        = isset($unor_local->ID) ? $unor_local->ID : $row->unorId;
+                    $data["ID_UNOR"]        = isset($unor_local->ID) ? $unor_local->ID : null;
                     $data["UNOR"]           = $row->unorNama;
                     
                     $data["ID_SATUAN_KERJA"]    = $row->satuanKerjaId;
@@ -1114,7 +1114,7 @@ class Bkn extends Admin_Controller
                     $data["NOMOR_SK"]       = $row->nomorSk;
                     // struktur
                     $data["ID_UNOR_BKN"]    = $row->unorId;
-                    $data["ID_UNOR"]        = isset($unor_local->ID) ? $unor_local->ID : $row->unorId;
+                    $data["ID_UNOR"]        = isset($unor_local->ID) ? $unor_local->ID : null;
                     $data["UNOR"]           = $row->unorNama;
                     
                     $data["ID_SATUAN_KERJA"]    = $row->satuanKerjaId;

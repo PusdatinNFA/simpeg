@@ -4,7 +4,7 @@
 <?php 
     $id = isset($detail_riwayat->ID) ? $detail_riwayat->ID : '';
 ?>
-<div class='box box-warning' id="form-riwayat-jabatan-add">
+<div class='box box-danger' id="form-riwayat-jabatan-add">
 	<div class="box-body">
         <div class="messages">
         </div>
@@ -56,7 +56,7 @@
 					</select>
                 </div>
 			</div> 
-            <div class="control-group<?php echo form_error('ID_JABATAN') ? ' error' : ''; ?> col-sm-10">
+            <div class="control-group<?php echo form_error('ID_JABATAN') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label('JABATAN', 'ID_JABATAN', array('class' => 'control-label')); ?>
                 <div class='controls'>
                 	<div class='slcjabatan'>
@@ -69,8 +69,18 @@
 						<?php endif;?>
 					</select>
 					</div>
-					<span class='divjabatan'><?php echo set_value('NAMA_JABATAN', isset($detail_riwayat->NAMA_JABATAN) ? $detail_riwayat->NAMA_JABATAN : ''); ?></span>
                     <span class='help-inline'><?php echo form_error('ID_JABATAN'); ?></span>
+                </div>
+            </div>
+            <div class="control-group<?php echo form_error('status_jabatan') ? ' error' : ''; ?> col-sm-4">
+                <?php echo form_label('Jenis', 'status_jabatan', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <select name="status_jabatan" id="status_jabatan" class="form-control select2  col-sm-12" width="100%">
+                        <option value="">-- Silahkan Pilih --</option>
+                        <option value="Plt." <?php echo $detail_riwayat->status_jabatan == 'Plt.' ? "selected" : '';  ?>>Plt.</option>
+                        <option value="Definitif" <?php echo $detail_riwayat->status_jabatan == 'Definitif' ? "selected" : '';  ?>>Definitif</option>
+                    </select>
+                    <span class='help-inline'><?php echo form_error('status_jabatan'); ?></span>
                 </div>
             </div>   
             <div class="control-group col-sm-2">
@@ -277,13 +287,6 @@
 	 });
 </script>
 <script>
-<?php if(isset($detail_riwayat->ID_JENIS_JABATAN) and $detail_riwayat->ID_JENIS_JABATAN == "1"){
-?>
-	 $('.slcjabatan').hide();
-	 
-<?php
-}
-?>
 	$('#ID_SATUAN_KERJA').change(function() {
 		var valuesatker = $('#ID_SATUAN_KERJA').val();
 			$("#ID_UNOR").empty().append("<option>loading...</option>"); //show loading...

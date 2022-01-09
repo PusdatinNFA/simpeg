@@ -377,7 +377,6 @@ class Riwayatjabatan extends Admin_Controller
             }
 
         }
-        
         $data["ID_SATUAN_KERJA"]    = trim($this->input->post("ID_SATUAN_KERJA"));
         if(empty($data["TMT_JABATAN"])){
             unset($data["TMT_JABATAN"]);
@@ -393,6 +392,7 @@ class Riwayatjabatan extends Admin_Controller
         $data['TERMINATED_DATE']                     = $this->input->post('TERMINATED_DATE') ? $this->input->post('TERMINATED_DATE') : null;
         $data['kawasan_id']                          = $this->input->post('kawasan_id') ? $this->input->post('kawasan_id') : null;
         $data['tusi_id']                             = $this->input->post('tusi_id') ? $this->input->post('tusi_id') : null;
+        $data['status_jabatan']                      = $this->input->post('status_jabatan');
         $data["LAST_UPDATED"] 	                     = date("Y-m-d");
         $id_data = $this->input->post("ID");
         if(isset($id_data) && !empty($id_data)){
@@ -436,6 +436,8 @@ class Riwayatjabatan extends Admin_Controller
                 $data_unit['NAMA_PEJABAT']      = $data_pegawai->NAMA;
                 $data_unit['PEMIMPIN_PNS_ID']   = $data_pegawai->PNS_ID;
                 $data_unit['JABATAN_ID']        = $jabatan_aktifs->ID_JABATAN;
+                $data_unit['status_jabatan']    = $jabatan_aktifs->status_jabatan;
+                
                 $this->unitkerja_model->skip_validation(true);
                 $this->unitkerja_model->update_where("ID",TRIM($jabatan_aktifs->ID_UNOR), $data_unit);
                 $this->cache->delete("aunor");

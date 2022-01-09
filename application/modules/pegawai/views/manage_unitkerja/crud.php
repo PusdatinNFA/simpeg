@@ -1,7 +1,7 @@
 <?php 
     $id = isset($detail_riwayat->ID) ? $detail_riwayat->ID : '';
 ?>
-<div class='box box-warning' id="form-pendidikan-add">
+<div class='box box-danger' id="form-pendidikan-add">
 	<div class="box-body">
         <div class="messages">
         </div>
@@ -23,8 +23,15 @@
                     <span class='help-inline'><?php echo form_error('PARENT_ID'); ?></span>
                 </div>
             </div>
+            <div class="control-group<?php echo form_error('bkn_id') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label("ID (ID dari BKN)", 'bkn_id', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <input id='bkn_id' type='text' class="form-control" name='bkn_id'  value="<?php echo set_value('bkn_id', isset($data->bkn_id) ? $data->bkn_id : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('bkn_id'); ?></span>
+                </div>
+            </div>
             <div class="control-group<?php echo form_error('ID') ? ' error' : ''; ?> col-sm-12">
-                <?php echo form_label("ID (ID dari BKN)", 'ID', array('class' => 'control-label')); ?>
+                <?php echo form_label("ID", 'ID', array('class' => 'control-label')); ?>
                 <div class='controls'>
                     <input id='ID' type='text' class="form-control" name='ID'  value="<?php echo set_value('ID', isset($data->ID) ? $data->ID : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('ID'); ?></span>
@@ -92,9 +99,21 @@
                     <span class='help-inline'><?php echo form_error('UNOR_INDUK'); ?></span>
                 </div>
             </div>
-
+            <div class="control-group<?php echo form_error('status_jabatan') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label('Jenis', 'status_jabatan', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <div class='slcjabatan'>
+                    <select name="status_jabatan" id="status_jabatan" class="form-control select2  col-sm-12 slcjabatan" width="100%">
+                        <option value="">-- Silahkan Pilih --</option>
+                        <option value="Plt." <?php echo $data->status_jabatan == 'Plt.' ? "selected" : '';  ?>>Plt.</option>
+                        <option value="Definitif" <?php echo $data->status_jabatan == 'Definitif' ? "selected" : '';  ?>>Definitif</option>
+                    </select>
+                    </div>
+                    <span class='help-inline'><?php echo form_error('status_jabatan'); ?></span>
+                </div>
+            </div>   
 	    <!--END--->
-			<div class="control-group col-sm-3">
+			<div class="control-group col-sm-12">
 				<label for="inputNAMA" class="control-label">Expired Date</label>
 				<div class="input-group date">
 				  <div class="input-group-addon">
@@ -118,7 +137,7 @@
                     <span class='help-inline'><?php echo form_error('ABBREVIATION'); ?></span>
                 </div>
             </div>
-            <div class="control-group<?php echo form_error('WAKTU') ? ' error' : ''; ?> col-sm-12">
+            <!-- <div class="control-group<?php echo form_error('WAKTU') ? ' error' : ''; ?> col-sm-12">
                 <?php echo form_label("WAKTU", 'WAKTU', array('class' => 'control-label')); ?>
                 <div class='controls'>
                     <select id="WAKTU" name="WAKTU" style="width:100%" class="form-control select2">
@@ -129,7 +148,7 @@
                         </select>
                     <span class='help-inline'><?php echo form_error('PARENT_ID'); ?></span>
                 </div>
-            </div>
+            </div> -->
             <div class="control-group<?php echo form_error('JENIS') ? ' error' : ''; ?> col-sm-12">
                 <?php echo form_label("JENIS SATKER", 'JENIS', array('class' => 'control-label')); ?>
                 <div class='controls'>
