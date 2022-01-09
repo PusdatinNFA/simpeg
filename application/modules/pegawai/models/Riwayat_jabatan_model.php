@@ -44,6 +44,12 @@ class Riwayat_jabatan_model extends BF_Model
 			'label' => 'PNS ID',
 			'rules' => 'max_length[100]|required',
 		),
+		
+		array(
+			'field' => 'ID_SATUAN_KERJA',
+			'label' => 'SATUAN KERJA',
+			'rules' => 'required',
+		),
 		array(
 			'field' => 'NOMOR_SK',
 			'label' => 'NO SK',
@@ -319,6 +325,7 @@ class Riwayat_jabatan_model extends BF_Model
 				TRIM("PNS_NAMA") "PNS_NAMA",
 				TRIM("ID_UNOR") "ID_UNOR",
 				TRIM("UNOR") "UNOR",
+				satker."NAMA_UNOR",
 				TRIM("ID_JENIS_JABATAN") "ID_JENIS_JABATAN",
 				TRIM("JENIS_JABATAN") "JENIS_JABATAN",
 				TRIM("ID_JABATAN") "ID_JABATAN",

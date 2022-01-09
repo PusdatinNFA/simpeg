@@ -65,19 +65,12 @@ class Riwayatjabatan extends Admin_Controller
 		$this->riwayat_jabatan_model->limit($length,$start);
 		/*Urutkan dari alphabet paling terkahir*/
         
-		$kolom = $iSortCol != "" ? $iSortCol : "TMT_JABATAN";
-		$sSortCol == "desc" ? "desc" : "asc";
-		$this->riwayat_jabatan_model->order_by($iSortCol,$sSortCol);
-        
+		$kolom = "TMT_JABATAN";
+		$sSortCol = "desc";
         //$this->riwayat_jabatan_model->where("PNS_ID",$pegawai_data->PNS_ID); 
         $this->riwayat_jabatan_model->where("PNS_NIP",$NIP_BARU); 
-		$this->riwayat_jabatan_model->ORDER_BY($kolom,$sSortCol);
+        $this->riwayat_jabatan_model->order_by($kolom,$sSortCol);
         $records=$this->riwayat_jabatan_model->find_all();
-            
-		/*Ketika dalam mode pencarian, berarti kita harus
-		'recordsTotal' dan 'recordsFiltered' sesuai dengan jumlah baris
-		yang mengandung keyword tertentu
-		*/
 		if($search != "")
 		{
 			$this->riwayat_jabatan_model->where('upper("NAMA_JABATAN") LIKE \''.strtoupper($search).'%\'');
@@ -284,16 +277,11 @@ class Riwayatjabatan extends Admin_Controller
             $errors=array();
             $allowed_ext = array('pdf');
             $file_name  = $_FILES['file_dokumen']['name'];
-            // $file_name =$_FILES['image']['tmp_name'];
             $file_ext   = explode('.',$file_name);
             $jmltitik   = count($file_ext);
             $file_size  = $_FILES['file_dokumen']['size'];
             $file_tmp   = $_FILES['file_dokumen']['tmp_name'];
             $type       = $_FILES['file_dokumen']['type'];
-            //echo $file_ext[1];echo "<br>";
-            $data_base64 = file_get_contents($file_tmp);
-            $base64 = 'data:' . $type . ';base64,' . base64_encode($data_base64);
-
             if(in_array(end($file_ext),$allowed_ext) === false)
             {
                 $errors[]='Extension not allowed';
@@ -324,13 +312,13 @@ class Riwayatjabatan extends Admin_Controller
                 echo json_encode($response);
                 exit();
             }
-        }
-        if($base64 == "")
-            unset($data['FILE_BASE64']);
-        else{
-            $data['FILE_BASE64']        = $base64;
+            // save to s3
+            $name       = "repo_dokumen_digital_pegawai/repo1/".trim($this->input->post('PNS_ID')).'/'.md5(uniqid()).".".$file_ext[$jmltitik-1];
+            $content    = file_get_contents($file_tmp);
+            $result_s3 = $this->createFileAws("simpeg",$content,$name,$type);
             $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
         }
+         
         // end upload berkas
         $pegawai_data = $this->pegawai_model->find_by("NIP_BARU",$this->input->post("PNS_ID"));
         if ($pegawai_data->NIP_BARU == "") {
@@ -634,5 +622,49 @@ class Riwayatjabatan extends Admin_Controller
         $FILE_BASE64 = $datadetil->FILE_BASE64;
         echo '<embed src="'.$FILE_BASE64.'" width="100%" height="700" alt="pdf">';
         die();
+    }
+    // aws
+    private function preSignUrl($s3,$bucket,$key){
+        $command = $s3->getCommand('GetObject', [
+            'Bucket' => $bucket,
+            'Key'    => $key
+        ]);
+        // Create a pre-signed URL for a request with duration of 1 miniutes
+        $presignedRequest = $s3->createPresignedRequest($command, '+1 minutes');
+        // Get the actual presigned-url
+        $presignedUrl =  (string)  $presignedRequest->getUri();
+        return $presignedUrl;
+    }
+    function connectAws(){
+        date_default_timezone_set("Asia/Jakarta");
+        $endpoint =DOMAIN_MINIO;
+        $s3 = new Aws\S3\S3Client([
+            "version" => "latest",
+            "region" => "us-east-1",
+            "endpoint" => $endpoint,
+            "use_path_style_endpoint" => true,
+            "credentials" => [
+                "key" => USER_MINIO,
+                "secret" => PASS_MINIO,
+            ],
+        ]);
+        return $s3;
+    }
+    private function createFileAws($bucket,$SourceFile,$key,$type=""){
+        $this->load->library('aws/awslib');
+        $s3 = $this->connectAws();
+        $type = $type !="" ? $type : "application/pdf";
+        $result = $s3->putObject([
+            "Bucket" => $bucket,
+            "Key" => $key,
+            'ACL'    => 'public-read', // make file 'public'
+            // you can use relative
+            "Body" => $SourceFile,
+        // or absolute path
+        // "SourceFile" => "/home/yoga/files.pdf",
+        "ContentType" => $type,
+        ]);
+        // Print the body of the result by indexing into the result object.
+        return $result;
     }
 }

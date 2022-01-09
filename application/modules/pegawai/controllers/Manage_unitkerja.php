@@ -696,7 +696,7 @@ class Manage_unitkerja extends Admin_Controller {
             $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4,$no,$record->PEMIMPIN_PNS_ID);
             $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(5,$no,$record->GELAR_DEPAN." ".$record->PEJABAT_NAMA." ".$record->GELAR_BELAKANG);
             $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(6,$no,$record->JENIS_SATKER);
-            $nomor_peraturan = isset($a_peraturan[$record->PERATURAN]) ? $a_peraturan[$record->PERATURAN] : "";
+            $nomor_peraturan = "";//isset($a_peraturan[$record->PERATURAN]) ? $a_peraturan[$record->PERATURAN] : "";
             $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(7,$no,$nomor_peraturan);
             $no++;
         }

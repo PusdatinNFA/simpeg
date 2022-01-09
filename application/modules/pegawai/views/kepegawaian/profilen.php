@@ -132,7 +132,12 @@ endif;
                   <ul>
                   <?php 
                       foreach($jabatan_aktifs as $jabatan){
-                          echo "<li><strong>".$jabatan->NAMA_JABATAN."</strong></li>";        
+                          if($jabatan->JENIS_JABATAN == "Struktural"){
+                            $status_jabatan = $jabatan->status_jabatan == "Plt." ? "Plt." : "";
+                            echo "<li><strong>".$status_jabatan.$jabatan->NAMA_JABATAN." ".$jabatan->NAMA_UNOR."</strong></li>";        
+                          }else{
+                            echo "<li><strong>".$jabatan->NAMA_JABATAN."</strong></li>";        
+                          }
                       }
                   ?>
                 </ul>
