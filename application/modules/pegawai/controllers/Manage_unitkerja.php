@@ -706,7 +706,8 @@ class Manage_unitkerja extends Admin_Controller {
         header('Cache-Control: max-age=0');
 
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  //downloadable file is in Excel 2003 format (.xls)
-        //$objWriter = PHPExcel_IOFactory::createWriter($objTpl, 'Excel2007'); 
+        //$objWriter = PHPExcel_IOFactory::createWriter($objTpl, 'Excel2007');
+        ob_end_clean(); 
         $objWriter->save('php://output');  //send it to user, of course you can save it to disk also!
         exit; //done.. exiting!
     }
