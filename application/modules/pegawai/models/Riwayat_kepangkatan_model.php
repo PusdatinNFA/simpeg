@@ -51,6 +51,21 @@ class Riwayat_kepangkatan_model extends BF_Model
 			'rules' => 'required',
 		),
 		array(
+			'field' => 'ID_GOLONGAN',
+			'label' => 'GOLONGAN',
+			'rules' => 'required',
+		),
+		array(
+			'field' => 'MK_GOLONGAN_TAHUN',
+			'label' => 'MASA KERJA TAHUN',
+			'rules' => 'required',
+		),
+		array(
+			'field' => 'MK_GOLONGAN_BULAN',
+			'label' => 'MASA KERJA BULAN',
+			'rules' => 'required',
+		),
+		array(
 			'field' => 'SK_TANGGAL',
 			'label' => 'TANGGAL SK',
 			'rules' => 'required',
@@ -118,5 +133,19 @@ class Riwayat_kepangkatan_model extends BF_Model
 		$query = $this->db->query($sql, array($PNS_ID));
 		$row = $query->first_row();
 		return $row->jml;
+	}
+	public function find_aktif($PNS_NIP = "")
+	{
+
+		if (empty($this->selects)) {
+			$this->select(
+				'ID_GOLONGAN,
+				PANGKAT,SK_NOMOR,PNS_NIP'
+			);
+			//$this->select($this->table_name .'.STATUS_SATKER');
+		}
+		$this->db->where('PNS_NIP', $PNS_NIP);
+		$this->db->order_by("TMT_GOLONGAN","DESC");
+		return parent::find_all();
 	}
 }

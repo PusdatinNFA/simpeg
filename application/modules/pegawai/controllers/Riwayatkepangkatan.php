@@ -200,7 +200,7 @@ class Riwayatkepangkatan extends Admin_Controller
 		Template::render();
     }
     public function save(){
-        $this->auth->restrict($this->permissionVerifikasiS);
+        $this->auth->restrict($this->permissionCreate);
         if (!$this->input->is_ajax_request()) {
             die("Only ajax request");
         }
@@ -338,12 +338,6 @@ class Riwayatkepangkatan extends Admin_Controller
             $dataupdate["PANGKAT_TERAKHIR"] = 0;
             $this->riwayat_kepangkatan_model->skip_validation(true);
             $this->riwayat_kepangkatan_model->update_where("PNS_NIP",$this->input->post("NIP_BARU"), $dataupdate);
-            $dataupdate = array();
-            $dataupdate['GOL_ID']           = $this->input->post('ID_GOLONGAN');
-            $dataupdate['TMT_GOLONGAN']     = $this->input->post('TMT_GOLONGAN') ? $this->input->post('TMT_GOLONGAN') : null;
-            $this->pegawai_model->skip_validation(true);
-            $this->pegawai_model->update_where("NIP_BARU",$this->input->post("NIP_BARU"), $dataupdate);
-
             $data["PANGKAT_TERAKHIR"]    = 1;
         }
 
@@ -368,10 +362,21 @@ class Riwayatkepangkatan extends Admin_Controller
             log_activity_pegawai($NIP_BARU,$this->auth->user_id(),"Tambah data Riwayat Pangkat", 'rwt_pangkat');
             
         } 
+        $this->set_pangkat_aktif($NIP_BARU);
         $response ['success']= true;
         $response ['msg']= "Transaksi berhasil";
         echo json_encode($response);    
 
+    }
+    private function set_pangkat_aktif($nip){
+        $golongan_aktifs = $this->riwayat_kepangkatan_model->limit(1)->find_aktif($nip);
+        if($golongan_aktifs[0]->ID_GOLONGAN != ""){
+            $dataupdate = array();
+            $dataupdate['GOL_ID']           = $golongan_aktifs[0]->ID_GOLONGAN;
+            $dataupdate['TMT_GOLONGAN']     = $golongan_aktifs[0]->TMT_GOLONGAN;
+            $this->pegawai_model->skip_validation(true);
+            $this->pegawai_model->update_where("NIP_BARU",$this->input->post("NIP_BARU"), $dataupdate);
+        }
     }
     public function savemandiri(){
          // Validate the data

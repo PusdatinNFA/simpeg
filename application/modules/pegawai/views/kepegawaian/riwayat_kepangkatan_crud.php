@@ -131,7 +131,7 @@
                     <span class='help-inline'><?php echo form_error('KETERANGAN'); ?></span>
                 </div>
             </div>
-            <div class="control-group col-sm-9">
+            <!-- <div class="control-group col-sm-9">
                 <label for="inputNAMA" class="control-label">Berkas</label>
                 <div class='controls'>
                     <div id="form_upload">
@@ -148,7 +148,7 @@
                         <a href="<?php echo base_url(); ?>pegawai/riwayatkepangkatan/viewdoc/<?php echo $detail_riwayat->ID; ?>" class="btn btn-warning show-modal" tooltip="Lihat dokumen <?php echo isset($detail_riwayat->SK_NOMOR) ? $detail_riwayat->SK_NOMOR : ''; ?>" ><span class="fa fa-file-o"></span> Lihat</a>
                     <?php } ?>  
                 </div>
-            </div>
+            </div> -->
             </fieldset>
         <?php if ($this->auth->has_permission('RiwayatPendidikan.Kepegawaian.VerifikasiS')) { ?>
         <fieldset>
