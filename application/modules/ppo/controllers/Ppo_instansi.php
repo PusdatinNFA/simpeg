@@ -456,6 +456,7 @@ class Ppo_instansi extends Admin_Controller
         }
 		$TBS->MergeBlock('o',$data);
 		$output_file_name = "Daftar Usulan Ppo.xlsx";
+        ob_end_clean();
 		$TBS->Show(OPENTBS_DOWNLOAD, $output_file_name); // Also merges all [onshow] automatic fields.
     }
     public function form_dok_pendukung($ID){

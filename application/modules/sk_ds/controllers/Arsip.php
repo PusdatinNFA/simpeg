@@ -862,6 +862,7 @@ class Arsip extends Admin_Controller
 
         $output_file_name = 'daftar_tandatangan.xlsx';
         $output_file_name = str_replace('.', '_'.date('Y-m-d').'.', $output_file_name);
+        ob_end_clean();
         $TBS->Show(OPENTBS_DOWNLOAD, $output_file_name); // Also merges all [onshow] automatic fields.
     }
     public function downloadxls_blmttd(){
@@ -934,6 +935,7 @@ class Arsip extends Admin_Controller
 
         $output_file_name = 'daftar_tandatangan.xlsx';
         $output_file_name = str_replace('.', '_'.date('Y-m-d').'.', $output_file_name);
+        ob_end_clean();
         $TBS->Show(OPENTBS_DOWNLOAD, $output_file_name); // Also merges all [onshow] automatic fields.
     }
 }

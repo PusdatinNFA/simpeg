@@ -645,6 +645,7 @@ class Ppo_satker extends Admin_Controller
         }
 		$TBS->MergeBlock('o',$data);
 		$output_file_name = "Daftar Usulan Ppo.xlsx";
+        ob_end_clean();
 		$TBS->Show(OPENTBS_DOWNLOAD, $output_file_name); // Also merges all [onshow] automatic fields.
     }
 }
