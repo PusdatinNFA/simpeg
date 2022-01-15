@@ -345,8 +345,8 @@ class Arsip extends Admin_Controller
         $orders = $this->input->post('order');
         foreach($orders as $order){
             
-            if($order['column']==2){
-                $this->arsip_digital_model->order_by("ID_JENIS_ARSIP",$order['dir']);
+            if($order['column']==1){
+                $this->arsip_digital_model->order_by("NAMA_JENIS",$order['dir']);
             }
             
         }

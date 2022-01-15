@@ -18,7 +18,7 @@
             <table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-data table-hover table-datatablearsip">
                 <thead>
                 <tr>
-                    <th width="2%">No</th>
+                    <th width="50px">No</th>
                     <th width="40%">Jenis Arsip</th>
                     <th>Keterangan</th>
                     <th width="18%" align="center">#</th></tr>
@@ -36,14 +36,13 @@
 	(function($){
 		var $container = $("#<?php echo $TAB_ID;?>");
 		var grid_daftararsip = $(".table-datatablearsip",$container).DataTable({
-				ordering: false,
 				processing: true,
 				"bFilter": false,
 				"bLengthChange": false,
 				serverSide: true,
 				"columnDefs": [
-					//{"className": "dt-center", "targets": "_all"}
-					{"className": "dt-center", "targets": [0,3]}
+					{"className": "dt-center", "targets": [0,3]},
+					{ "targets": [0,2,3], "orderable": false }
 				],
 				ajax: {
 					url: "<?php echo base_url() ?>admin/arsip/arsip_digital/ajax_list",
