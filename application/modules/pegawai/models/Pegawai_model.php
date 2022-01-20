@@ -1330,6 +1330,27 @@ class Pegawai_model extends BF_Model
 		$this->db->order_by('KATEGORI_JABATAN', "ASC");
 		return parent::find_all();
 	}
+	public function grupby_kelompok_jabatan($unor_id = '')
+	{
+		$where_clause = '';
+		if ($unor_id != '') {
+			$where_clause = 'AND (vw."ESELON_1" = \'' . $unor_id . '\' OR vw."ESELON_2" = \'' . $unor_id . '\' OR vw."ESELON_3" = \'' . $unor_id . '\' OR vw."ESELON_4" = \'' . $unor_id . '\')';
+		}
+
+		if (empty($this->selects)) {
+			$this->select('case when "kel_jabatan" is not null  then "kel_jabatan" else \'Kosong\' END AS "keterangan",
+				sum(case when "kel_jabatan" is not null  then 1 else 0  end) as jumlah');
+		}
+		$this->db->join("vw_unit_list as vw", "pegawai.UNOR_ID=vw.ID", 'left');
+		$this->db->join("hris.jabatan ", "pegawai.JABATAN_INSTANSI_REAL_ID=jabatan.KODE_JABATAN", 'left');
+		$this->db->join("hris.kelompok_jabatan ", "jabatan.KELOMPOK_JABATAN_ID=kelompok_jabatan.id", 'left');
+		$this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "LEFT");
+		$this->db->where('pa."ID" is not null', NULL, FALSE);
+		$this->db->where_not_in("pegawai.KEDUDUKAN_HUKUM_ID",$this->STATUS_NON_ACTIVE);
+		$this->db->group_by('kel_jabatan');
+		$this->db->order_by('kel_jabatan', "ASC");
+		return parent::find_all();
+	}
 	public function grupby_kategori_jabatan_eselon1($unor_id = '')
 	{
 		$where_clause = '';

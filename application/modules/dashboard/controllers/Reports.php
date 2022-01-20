@@ -154,6 +154,9 @@ class reports extends Admin_Controller
 			$index++;
 		}
 		Template::set('json_kategori_jabatan', json_encode($data_jml_pegawai_perkategori_jabatan));
+		// group kelompok jabatan
+		$data_jml_pegawai_perkelompok_jabatan = $this->pegawai_model->grupby_kelompok_jabatan($this->UNOR_ID);
+		Template::set('json_kelompok_jabatan', json_encode($data_jml_pegawai_perkelompok_jabatan));
 
 		$action = $this->input->get("action");
 		if($action=="download"){
@@ -354,6 +357,32 @@ class reports extends Admin_Controller
 				$objWriter->save('php://output');  //send it to user, of course you can save it to disk also!
 				exit; //done.. exiting!
 			}
+			else if($data =='kelompok_jabatan'){
+				$o = json_decode(Template::get('json_kelompok_jabatan'));
+				$this->load->library('Excel');
+				$objPHPExcel = new PHPExcel();
+				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/assets/templates/template_data_dashboard_jenis_kelamin.xlsx');
+
+				$objPHPExcel->setActiveSheetIndex(0);
+				$objPHPExcel->getActiveSheet()->setCellValue('B2', "Rekap Berdasarkan Kelompok Jabatan");
+				$objPHPExcel->getActiveSheet()->setCellValue('B4', "Kelompok Jabatan");
+				$start_row = 5;
+				foreach($o as $row){
+					$objPHPExcel->getActiveSheet()->setCellValue('B'.$start_row, $row->keterangan);
+					$objPHPExcel->getActiveSheet()->setCellValue('C'.$start_row, $row->jumlah);
+					$start_row++;			
+				}
+				$filename = 'kelompok_jabatan.xls';
+				header('Content-Type: application/vnd.ms-excel');
+				header('Content-Disposition: attachment;filename="'.$filename.'"');
+				header('Cache-Control: max-age=0');
+
+				$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  //downloadable file is in Excel 2003 format (.xls) 
+				ob_end_clean();
+				$objWriter->save('php://output');  //send it to user, of course you can save it to disk also!
+				exit; //done.. exiting!
+			}
+			
 			else if($data =='kategori_jabatan_eselon1'){
 				$o = json_decode(Template::get('json_kategori_jabatan'));
 				$this->load->library('Excel');

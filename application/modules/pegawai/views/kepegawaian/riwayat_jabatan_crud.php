@@ -271,7 +271,7 @@
 	        <?php } ?>
         </div>
   		<div class="box-footer">
-  			<a href="javascript:;" id="btnsave_riwayatjabatan" class="btn green btn-primary button-submit"> Kirimkan Data
+  			<a href="javascript:;" id="btnsave_riwayatjabatan" class="btn green btn-primary button-submit"> Simpan Data
                 <i class="fa fa-save"></i>
             </a>
         </div>

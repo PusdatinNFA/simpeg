@@ -189,6 +189,21 @@
               <!-- /.row -->
             </div>
             <!-- /.box-body -->
+
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="chart-responsive">
+                    <div id="divumur" style="width: 100%; height: 300px;"></div>
+                  </div>
+                  <!-- ./chart-responsive -->
+                </div>
+                <!-- /.col -->
+              </div>
+              <!-- /.row -->
+            </div>
+            <!-- /.box-body -->
             
             <!-- /.footer -->
           </div>
@@ -223,7 +238,6 @@
             
             <!-- /.footer -->
           </div>
-        
 	</div>
 	<div class="col-md-5">
 		<div class="box box-danger">
@@ -315,6 +329,38 @@
                 <div class="col-md-12">
                   <div class="chart-responsive">
                     <div id="divjeniskelamin" style="width: 100%; height: 300px;"></div>
+                  </div>
+                  <!-- ./chart-responsive -->
+                </div>
+                <!-- /.col -->
+              </div>
+              <!-- /.row -->
+            </div>
+            <!-- /.box-body -->
+            
+            <!-- /.footer -->
+          </div>
+
+          <div class="box box-warning">
+            <div class="box-header with-border">
+              <h3 class="box-title">Grafik Kelompok Jabatan</h3>
+
+             
+              <div class="box-tools pull-right">
+								<div class="btn-group ">
+									<a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=kelompok_jabatan" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
+								</div>	
+								<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+								</button>
+								<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+							</div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="chart-responsive">
+                    <div id="divkelompok_jabatan" style="width: 100%; height: 300px;"></div>
                   </div>
                   <!-- ./chart-responsive -->
                 </div>
@@ -766,6 +812,91 @@ for (i = 0; i < input_kategorijabatan.length; i++) {input_kategorijabatan[i].col
 				   
 					"titles" : [{
 						  "text": "KATEGORI_JABATAN"
+					  }, {
+						  "text": "",
+						  "bold": false
+					  }],
+				  "trendLines": [],
+				  "graphs": [
+					  {
+						  "balloonText": "<b>[[category]]: [[value]]</b>",
+						  "colorField": "color",
+						  "fillAlphas": 0.8,
+						  "id": "AmGraph-1",
+						  "lineAlpha": 0.2,
+						  "type": "column",
+						  "valueField": "jumlah",
+              "labelText": "[[value]]",
+              "labelPosition": "top",
+					  } 
+				  ],
+				  "guides": [],
+				  "valueAxes": [
+					  {
+						  "id": "ValueAxis-1",
+						  "position": "top",
+						  "axisAlpha": 0
+					  }
+				  ],
+				  "allLabels": [],
+				  "balloon": {},
+				  "titles": [],
+				  
+				  "export": {
+            "enabled": true,
+          }
+          ,"exportConfig": {
+                "menuTop": "20px",
+                "menuBottom": "auto",
+                "menuLeft": "23px",
+                "backgroundColor": "#efefef",
+               "menuItemStyle"  : {
+                "backgroundColor"           : '#EFEFEF',
+                "rollOverBackgroundColor"   : '#DDDDDD'},
+
+                "menuItems": [{
+                    "textAlign": 'center',
+                    
+                    "icon": 'http://www.amcharts.com/lib/3/images/export.png',
+                    "onclick":function(){},
+                    "items": [{
+                        "title": 'JPG',
+                        "format": 'jpg'
+                    }, {
+                        "title": 'PNG',
+                        "format": 'png'
+                    }]
+                }]
+            }
+
+	});
+	var input_kelompokjabatan = <?php echo $json_kelompok_jabatan; ?>;
+for (i = 0; i < input_kelompokjabatan.length; i++) {input_kelompokjabatan[i].color = colors[i];}	
+	 var chart_kelompok_jabatan =  AmCharts.makeChart("divkelompok_jabatan", {
+				  "type": "serial",
+				  "dataProvider":   input_kelompokjabatan,
+				   "theme": "light",
+				  "categoryField": "keterangan",
+				  "rotate": false,
+				  "startDuration": 0,
+				  "depth3D": 2,
+				  "angle": 30,
+				  
+				  "chartCursor": {
+					  "categoryBalloonEnabled": false,
+					  "cursorAlpha": 0,
+					  "zoomable": false,
+				  },    
+				   "categoryAxis": {
+					 "gridPosition": "start",
+					 "labelRotation": 45,
+					 "axisAlpha": 0,
+					 "autoWrap":false,
+					 minHorizontalGap:0,
+				   },
+				   
+					"titles" : [{
+						  "text": "Kelompok Jabatan"
 					  }, {
 						  "text": "",
 						  "bold": false
