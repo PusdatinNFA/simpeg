@@ -1,0 +1,9 @@
+.DS_Store
+.env
+assets/*
+themes/*
+bonfire/*
+application/config/*
+applicatin/third_party/*
+application/libraries/*
+application/cache/*
