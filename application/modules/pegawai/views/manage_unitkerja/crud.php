@@ -99,6 +99,19 @@
                     <span class='help-inline'><?php echo form_error('UNOR_INDUK'); ?></span>
                 </div>
             </div>
+            <div class="control-group<?php echo form_error('ID_SATKER_PENUGASAN') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label("SATUAN KERJA PENUGASAN", 'SATUAN KERJA PENUGASAN', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <select id="ID_SATKER_PENUGASAN" name="ID_SATKER_PENUGASAN" width="100%" class="form-control select2">
+                        <?php
+                        if($selectedUnorPenugasan){
+                            echo "<option selected value='".$selectedUnorPenugasan->ID."'>".$selectedUnorPenugasan->NAMA_UNOR."</option>";
+                        }
+                        ?>
+                    </select>
+                    <span class='help-inline'><?php echo form_error('ID_SATKER_PENUGASAN'); ?></span>
+                </div>
+            </div>
             <div class="control-group<?php echo form_error('status_jabatan') ? ' error' : ''; ?> col-sm-12">
                 <?php echo form_label('Jenis', 'status_jabatan', array('class' => 'control-label')); ?>
                 <div class='controls'>
@@ -266,6 +279,23 @@
         }
     });
     $("#UNOR_INDUK").select2({
+        placeholder: 'Cari Unit Kerja...',
+        width: '100%',
+        minimumInputLength: 3,
+        allowClear: true,
+        ajax: {
+            url: '<?php echo site_url("pegawai/manage_unitkerja/ajaxall");?>',
+            dataType: 'json',
+            data: function(params) {
+                return {
+                    term: params.term || '',
+                    page: params.page || 1
+                }
+            },
+            cache: true
+        }
+    });
+    $("#ID_SATKER_PENUGASAN").select2({
         placeholder: 'Cari Unit Kerja...',
         width: '100%',
         minimumInputLength: 3,

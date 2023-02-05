@@ -99,8 +99,8 @@ class Riwayathukdis extends Admin_Controller
                 $row []  = $record->MASA_BULAN;
 
                 $btn_actions = array();
-                if($record->KETERANGAN_BERKAS != ""){
-                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayathukdis/viewdoc/".$record->ID."' data-toggle='tooltip' title='Lihat Dokumen' tooltip='Lihat Dokumen ".$record->SK_NOMOR."' class='btn btn-sm btn-info show-modal'><i class='glyphicon glyphicon-eye-open'></i> </a>";
+                if($record->id_arsip != ""){
+                    $btn_actions  [] = "<a href='".base_url()."admin/arsip/arsip_digital/viewdoc2/".$record->id_arsip."' data-toggle='tooltip' title='Lihat Dokumen' tooltip='Lihat Dokumen' class='btn btn-sm btn-info modal-custom-global'><i class='glyphicon glyphicon-eye-open'></i> </a>";
                 }
                 if($this->auth->has_permission($this->permissionEdit))
                 {    
@@ -181,6 +181,9 @@ class Riwayathukdis extends Admin_Controller
 		
 		
         $data = $this->riwayat_huk_dis_model->prep_data($this->input->post());
+
+        $this->pegawai_model->where("PNS_ID",$this->input->post("PNS_ID"));
+        $pegawai_data = $this->pegawai_model->find_first_row(); 
         // Make sure we only pass in the fields we want
         $base64     = "";
         $file_ext   = "";
@@ -199,10 +202,23 @@ class Riwayathukdis extends Admin_Controller
             $file_tmp   = $_FILES['file_dokumen']['tmp_name'];
             $type       = $_FILES['file_dokumen']['type'];
             //echo $file_ext[1];echo "<br>";
-            $data_base64 = file_get_contents($file_tmp);
-            $base64 = 'data:' . $type . ';base64,' . base64_encode($data_base64);
+            // $data_base64 = file_get_contents($file_tmp);
+            // $base64 = 'data:' . $type . ';base64,' . base64_encode($data_base64);
 
-            if(in_array(end($file_ext),$allowed_ext) === false)
+            $content    = file_get_contents($file_tmp);
+            $this->load->library('Api_s3_aws');
+            $aws = new Api_s3_aws;
+            
+            $keterangan = "TANGGAL SK ".$data['SK_TANGGAL'];
+            $id_jenis_arsip = 29;
+            $result_s3 = $aws->insertArsip($pegawai_data->NIP_BARU,$data['SK_NOMOR'],$id_jenis_arsip,$keterangan,$content,$file_name);
+            if ($result_s3){
+                $data['id_arsip'] = $result_s3;
+            } else {
+                unset($data['id_arsip']);
+            }
+
+            if(in_array(strtolower(end($file_ext)),$allowed_ext) === false)
             {
                 $errors[]='Extension not allowed';
                 $response['msg'] = "
@@ -233,15 +249,13 @@ class Riwayathukdis extends Admin_Controller
                 exit();
             }
         }
-        if($base64 == "")
-            unset($data['FILE_BASE64']);
-        else{
-            $data['FILE_BASE64']        = $base64;
-            $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
-        }
-        // end upload berkas
-       	$this->pegawai_model->where("PNS_ID",$this->input->post("PNS_ID"));
-        $pegawai_data = $this->pegawai_model->find_first_row();  
+        // if($base64 == "")
+        //     unset($data['FILE_BASE64']);
+        // else{
+        //     $data['FILE_BASE64']        = $base64;
+        //     $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
+        // }
+        // end upload berkas 
         $data["PNS_NIP"]    = $pegawai_data->NIP_BARU;
         $data["PNS_ID"]     = $pegawai_data->PNS_ID;
         
@@ -263,8 +277,13 @@ class Riwayathukdis extends Admin_Controller
         $id_data = $this->input->post("ID");
         if(isset($id_data) && !empty($id_data)){
             $this->riwayat_huk_dis_model->update($id_data,$data);
+            log_activity($this->auth->user_id(), 'Update data Riwayat Hukdis: ' . $id_data . ' : ' . $this->input->ip_address(), 'pegawai');  
+        
         }
-        else $this->riwayat_huk_dis_model->insert($data);
+        else {
+            $id = $this->riwayat_huk_dis_model->insert($data);
+            log_activity($this->auth->user_id(), 'Insert data Riwayat Hukdis: ' . $id . ' : ' . $this->input->ip_address(), 'pegawai');  
+        }
         $response ['success']= true;
         $response ['msg']= "Berhasil";
         echo json_encode($response);    
@@ -288,14 +307,19 @@ class Riwayathukdis extends Admin_Controller
         Template::set('TAB_ID', uniqid("TAB_CONTOH"));
         Template::render();
     }
-    public function viewdoc($id)
+    private function viewdoc($id)
     {
         if (empty($id)) {
             Template::set_message("ID tidak ditemukan", 'error');
         }
         $datadetil = $this->riwayat_huk_dis_model->find($id);
-        $FILE_BASE64 = $datadetil->FILE_BASE64;
-        echo '<embed src="'.$FILE_BASE64.'" width="100%" height="700" alt="pdf">';
+        $this->load->model('arsip_digital/arsip_digital_model');
+        $arsip = $this->arsip_digital_model->find($datadetil->id_arsip);
+        if ($arsip){
+            $this->load->library('Api_s3_aws');
+            $aws = new Api_s3_aws;
+            $aws->viewdoc($arsip->location.$arsip->name);
+        }
         die();
     }
 }

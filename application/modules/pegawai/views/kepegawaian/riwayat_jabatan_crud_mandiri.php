@@ -150,6 +150,37 @@
                 </div>
             </div>
 			</fieldset>
+			<fieldset id="field_jft">
+				<div class="control-group col-sm-6">
+					<label for="inputNAMA" class="control-label">NO PAK</label>
+					<div class='controls'>
+						<input type='text' class="form-control pull-right" name='nomor_pak'  value="<?php echo set_value('nomor_pak', isset($detail_riwayat->nomor_pak) ? $detail_riwayat->nomor_pak : ''); ?>" />
+						<span class='help-inline'><?php echo form_error('nomor_pak'); ?></span>
+					</div>
+				</div> 
+				<div class="control-group col-sm-6">
+					<label for="inputNAMA" class="control-label">Tanggal PAK</label>
+					<div class='controls'>
+						<input type='text' class="form-control pull-right datepicker" name='tanggal_pak'  value="<?php echo set_value('tanggal_pak', isset($detail_riwayat->tanggal_pak) ? $detail_riwayat->tanggal_pak : ''); ?>" />
+						<span class='help-inline'><?php echo form_error('tanggal_pak'); ?></span>
+					</div>
+				</div> 
+				<div class="control-group col-sm-6">
+					<label for="inputNAMA" class="control-label">Nilai Angka Kredit</label>
+					<div class='controls'>
+						<input type='text' class="form-control pull-right" name='ANGKA_KREDIT'  value="<?php echo set_value('ANGKA_KREDIT', isset($detail_riwayat->ANGKA_KREDIT) ? $detail_riwayat->ANGKA_KREDIT : ''); ?>" />
+						<span class='help-inline'><?php echo form_error('ANGKA_KREDIT'); ?></span>
+					</div>
+				</div> 
+				<div class="control-group col-sm-6">
+					<label for="inputNAMA" class="control-label">Bidang Kepakaran</label>
+					<div class='controls'>
+						<input type='text' class="form-control pull-right" name='kepakaran'  value="<?php echo set_value('kepakaran', isset($detail_riwayat->kepakaran) ? $detail_riwayat->kepakaran : ''); ?>" />
+						<span class='help-inline'><?php echo form_error('kepakaran'); ?></span>
+					</div>
+					<span class='help-inline'>* Khusus Peneliti</span>
+				</div> 
+			</fieldset>
 			<fieldset>
 			<legend>Jika tidak ada</legend>
 			<div class="callout callout-warning">
@@ -203,6 +234,15 @@
 <script src="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/themes/explorer/theme.js" type="text/javascript"></script>
 <script src="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/js/fileinput.js" type="text/javascript"></script>
 <script>
+	var jenis_jabatan = '<?php echo isset($detail_riwayat->ID_JENIS_JABATAN)?$detail_riwayat->ID_JENIS_JABATAN:0; ?>'
+	if (jenis_jabatan == 0){
+		jenis_jabatan = '<?php echo $jenis_jabatan?>'
+	}
+	if (jenis_jabatan == 2){
+		$("#field_jft").show()
+	} else {
+		$("#field_jft").hide()
+	}
 	 $(".select2").select2({
 	 	width: '100%',
 	 	dropdownParent: $("#modal-custom-global")
@@ -240,7 +280,8 @@
 	$('#ID_UNOR').change(function() {
 		var val = $('#ID_UNOR').val();
 		
-		var json_url = "<?php echo base_url(); ?>pegawai/manage_unitkerja/getnamajabatan_byid?unor=" + encodeURIComponent(val);
+		// var json_url = "<?php echo base_url(); ?>pegawai/manage_unitkerja/getnamajabatan_byid?unor=" + encodeURIComponent(val);
+		var json_url = "<?php echo base_url(); ?>pegawai/manage_unitkerja/getsatkerpenugasan?unor=" + encodeURIComponent(val);
 		$.ajax({    
 		   type: "POST",
 		   url: json_url,
@@ -257,6 +298,9 @@
 				// 	$('.slcjabatan').show();
 				// 	$('.divjabatan').html("");
 				// }	
+				if (data){
+					$('#ID_SATKER_PENUGASAN').val(data).trigger('change');
+				}				
 		   }});
 		 
 	});
@@ -281,6 +325,11 @@
 	*/
 	$('#ID_JENIS_JABATAN').change(function() {
 		var valuejenisjabatan = $('#ID_JENIS_JABATAN').val();
+		if (valuejenisjabatan == 2){
+			$("#field_jft").show()
+		} else {
+			$("#field_jft").hide()
+		}
 			$("#ID_JABATAN").empty().append("<option>loading...</option>"); //show loading...
 			 
 			var json_url = "<?php echo base_url(); ?>admin/masters/jabatan/getbyjenis?jenis=" + encodeURIComponent(valuejenisjabatan);
@@ -313,7 +362,7 @@
 <script>
 	$("#btnsavejabatanmandiri").click(function(){
 		$('#btnsavejabatanmandiri').text('Sedang Mengirim...');
-        $('#btnsavejabatanmandiri').addClass('disabled');
+        $('#btnsavejabatanmandiri').prop('disabled',true);
 		submitdata_jabatan_mandiri();
 		return false; 
 	});	
@@ -336,11 +385,11 @@
                     swal("Pemberitahuan!", data.msg, "success");
                     $("#modal-custom-global").trigger("sukses-tambah-riwayat-jabatan");
 					 $("#modal-custom-global").modal("hide");
-					 $('#btnsavejabatanmandiri').removeClass('disabled');
+					 $('#btnsavejabatanmandiri').prop('disabled',false);
                      $('#btnsavejabatanmandiri').text('Kirimkan Data');
                 }
                 else {
-                	$('#btnsavejabatanmandiri').removeClass('disabled');
+                	$('#btnsavejabatanmandiri').prop('disabled',false);
                     $('#btnsavejabatanmandiri').text('Kirimkan Data');
                     $("#form-riwayat-jabatan-add .messages").empty().append(data.msg);
                 }

@@ -88,6 +88,7 @@ class Riwayat_pendidikan_model extends BF_Model
 		}
 		$this->db->join('tkpendidikan as tk', 'tk.ID = rwt_pendidikan.TINGKAT_PENDIDIKAN_ID', 'left');
 		$this->db->join('pendidikan', 'rwt_pendidikan.PENDIDIKAN_ID = pendidikan.ID', 'left');
+		$this->db->order_by("TANGGAL_LULUS","ASC");
 		return parent::find_all();
 	}
 	public function find_all_by_nip_unorid($PNS_ID = "", $UNOR_ID = "")

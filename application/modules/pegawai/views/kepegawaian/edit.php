@@ -73,7 +73,13 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
                     <span class='help-inline'><?php echo form_error('GELAR_BELAKANG'); ?></span>
                 </div>
             </div>
-
+            <div class="control-group<?php echo form_error('username_intra') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label("username Intra", 'username_intra', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <input id='username_intra' type='text' class="form-control" name='username_intra' maxlength='18' value="<?php echo set_value('username_intra', isset($pegawai->username_intra) ? $pegawai->username_intra : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('username_intra'); ?></span>
+                </div>
+            </div>
             <div class="control-group<?php echo form_error('TEMPAT_LAHIR_ID') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label(lang('pegawai_field_TEMPAT_LAHIR_ID'), 'TEMPAT_LAHIR_ID', array('class' => 'control-label')); ?>
                 <div class='controls'>
@@ -125,14 +131,30 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
             </div>
 
             
-
-            <div class="control-group<?php echo form_error('NIK') ? ' error' : ''; ?> col-sm-12">
+            
+            <?php if ($this->auth->has_permission('Privacy.Kepegawaian.View') || $this->auth->username() == $pegawai->NIP_BARU){ ?>
+            <div class="control-group<?php echo form_error('NIK') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label(lang('pegawai_field_NIK'), 'NIK', array('class' => 'control-label')); ?>
                 <div class='controls'>
                     <input id='NIK' type='text' class="form-control" name='NIK' maxlength='32' value="<?php echo set_value('NIK', isset($pegawai->NIK) ? $pegawai->NIK : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('NIK'); ?></span>
                 </div>
             </div>
+            <div class="control-group<?php echo form_error('no_kk') ? ' error' : ''; ?> col-sm-6">
+            <label for="inputNAMA" class="control-label">Nomor KK</label>
+                <div class='controls'>
+                    <input id='no_kk' type='text' class="form-control" name='no_kk' maxlength='32' value="<?php echo set_value('no_kk', isset($pegawai->no_kk) ? $pegawai->no_kk : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('no_kk'); ?></span>
+                </div>
+            </div>
+            <div class="control-group<?php echo form_error('kode_pos') ? ' error' : ''; ?> col-sm-6">
+            <label for="inputNAMA" class="control-label">Kode Pos (Sesuai KK)</label>
+                <div class='controls'>
+                    <input id='kode_pos' type='text' class="form-control" name='kode_pos' maxlength='32' value="<?php echo set_value('kode_pos', isset($pegawai->kode_pos) ? $pegawai->kode_pos : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('kode_pos'); ?></span>
+                </div>
+            </div>
+            <?php } ?>
             <div class="control-group col-sm-6">
                 <label for="inputNAMA" class="control-label">Nomor Darurat</label>
                 <div class="input-group date">
@@ -173,13 +195,23 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
                     <span class='help-inline'><?php echo form_error('EMAIL_PRIVATE'); ?></span>
                 </div>
             </div> 
+
+            <?php if ($this->auth->has_permission('Privacy.Kepegawaian.View') || $this->auth->username() == $pegawai->NIP_BARU){ ?>
             <div class="control-group<?php echo form_error('ALAMAT') ? ' error' : ''; ?> col-sm-12">
-                <?php echo form_label(lang('pegawai_field_ALAMAT'), 'ALAMAT', array('class' => 'control-label')); ?>
+                <?php echo form_label('Alamat Domisili', 'ALAMAT', array('class' => 'control-label')); ?>
                 <div class='controls'>
                     <?php echo form_textarea(array('name' => 'ALAMAT', 'id' => 'ALAMAT', 'rows' => '5', 'cols' => '80', 'value' => set_value('ALAMAT', isset($pegawai->ALAMAT) ? $pegawai->ALAMAT : ''))); ?>
                     <span class='help-inline'><?php echo form_error('ALAMAT'); ?></span>
                 </div>
             </div>
+            <div class="control-group<?php echo form_error('ALAMAT_KTP') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label('Alamat sesuai KTP', 'ALAMAT', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <?php echo form_textarea(array('name' => 'ALAMAT_KTP', 'id' => 'ALAMAT_KTP', 'rows' => '5', 'cols' => '80', 'value' => set_value('ALAMAT_KTP', isset($pegawai->ALAMAT_KTP) ? $pegawai->ALAMAT_KTP : ''))); ?>
+                    <span class='help-inline'><?php echo form_error('ALAMAT_KTP'); ?></span>
+                </div>
+            </div>
+            <?php } ?>
 
             
 
@@ -245,7 +277,7 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
             <div class="control-group<?php echo form_error('NOMOR_SK_CPNS') ? ' error' : ''; ?> col-sm-3">
                 <?php echo form_label(lang('pegawai_field_NOMOR_SK_CPNS'), 'NOMOR_SK_CPNS', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                    <input id='NOMOR_SK_CPNS' type='text' class="form-control" name='NOMOR_SK_CPNS' maxlength='50' value="<?php echo set_value('NOMOR_SK_CPNS', isset($pegawai->NOMOR_SK_CPNS) ? $pegawai->NOMOR_SK_CPNS : ''); ?>" />
+                    <input id='NOMOR_SK_CPNS' type='text' class="form-control" name='NOMOR_SK_CPNS' maxlength='100' value="<?php echo set_value('NOMOR_SK_CPNS', isset($pegawai->NOMOR_SK_CPNS) ? $pegawai->NOMOR_SK_CPNS : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('NOMOR_SK_CPNS'); ?></span>
                 </div>
             </div>
@@ -396,6 +428,13 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
 					<span class='help-inline'><?php echo form_error('TMT_GOLONGAN'); ?></span>
 				</div>
 			</div> 
+            <div class="control-group col-sm-12" id="form_no_induk_jf">
+				<?php echo form_label("Nomor Induk Jabatan Fungsional", 'no_induk_jf', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <input id='no_induk_jf' type='text' class="form-control" name='no_induk_jf' maxlength='32' value="<?php echo set_value('no_induk_jf', isset($pegawai->no_induk_jf) ? $pegawai->no_induk_jf : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('no_induk_jf'); ?></span>
+                </div>
+			</div> 
 			 <div class="control-group<?php echo form_error('TK_PENDIDIKAN') ? ' error' : ''; ?> col-sm-3">
                 <?php echo form_label("TINGKAT PENDIDIKAN", 'TK_PENDIDIKAN', array('class' => 'control-label')); ?>
                 <div class='controls'>
@@ -434,6 +473,45 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
                     <span class='help-inline'><?php echo form_error('TAHUN_LULUS'); ?></span>
                 </div>
             </div>
+            <!-- <div class="control-group<?php echo form_error('kepakaran') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label('Kepakaran', 'kepakaran', array('class' => 'control-label')); ?>
+            <div class='controls'>
+                <select name="kepakaran[]" id="kepakaran" multiple="multiple" class="form-control select2">
+                    <?php 
+                        if (isset($kepakarans) && is_array($kepakarans) && count($kepakarans)) :
+                            foreach ($kepakarans as $kepakaran) :                             
+                                if ($kepakaran->kode){
+                                    $selected = 'selected';
+                                    echo "<option $selected value='$kepakaran->kode'>" . $kepakaran->namaid.' ('.$kepakaran->namaen.')' . "</option>";
+                                }
+                            endforeach;
+                        endif;?>
+                </select>
+                </div>
+            </div> -->
+            <div class="control-group<?php echo form_error('penelitian') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label('Bidang Kepakaran', 'penelitian', array('class' => 'control-label')); ?>
+            <div class='controls'>
+                <select name="penelitian[]" id="bidangpenelitian" multiple="multiple" class="form-control select2">
+                    <?php 
+                        if (isset($penelitians) && is_array($penelitians) && count($penelitians)) :
+                            foreach ($penelitians as $penelitian) :                                
+                                if ($penelitian->kode){
+                                    $selected = 'selected';
+                                    echo "<option $selected value='$penelitian->kode'>" . $penelitian->namaid.' ('.$penelitian->namaen.')' . "</option>";
+                                }
+                            endforeach;
+                        endif;?>
+                </select>
+                </div>
+            </div>
+            <div class="control-group<?php echo form_error('detail_kepakaran') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label('Detail Kepakaran', 'detail_kepakaran', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <textarea id='detail_kepakaran' type='text' rows="15" class="form-control" name='detail_kepakaran' style="width:100%" placeholder="Tuliskan detail kepakaran secara rinci, jelas dan lengkap terkait keahlian atau kepakaran Anda. Detail kepakaran ini nantinya akan digunakan sebagai media informasi terkait bidang keahlian SDM IPTEK BRIN secara perorangan/individu."><?php echo set_value('detail_kepakaran', isset($pegawai->detail_kepakaran) ? trim($pegawai->detail_kepakaran) : ''); ?></textarea>
+                    <span class='help-inline'><?php echo form_error('detail_kepakaran'); ?></span>
+                </div>
+            </div> 
 
             <div class="control-group<?php echo form_error('KPKN_ID') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label(lang('pegawai_field_KPKN_ID'), 'KPKN_ID', array('class' => 'control-label')); ?>
@@ -517,17 +595,32 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
                     <span class='help-inline'><?php echo form_error('tusi_id'); ?></span>
                 </div>
             </div>
-            <div class="control-group<?php echo form_error('satker_penempatan_id') ? ' error' : ''; ?> col-sm-12">
+            <div class="control-group<?php echo form_error('satker_penempatan_id') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label("Satker Penempatan", 'satker_penempatan_id', array('class' => 'control-label')); ?>
                 <div class='controls'>
                     <select name="satker_penempatan_id" id="satker_penempatan_id" class="form-control select2">
-                        <?php 
-                            if($satker_penempatan_ids){
-                                echo "<option selected value='".$satker_penempatan_ids->ID."'>".$satker_penempatan_ids->NAMA_UNOR."</option>";
-                            }
-                        ?>
+                        <?php if (isset($recsatker) && is_array($recsatker) && count($recsatker)) : ?>
+                            <option value="">Silahkan Pilih</option>
+							<?php foreach ($recsatker as $record) : ?>
+								<option value="<?php echo $record->ID ?>" <?php if (isset($satker_penempatan_ids->ID))  echo (trim($satker_penempatan_ids->ID) == trim($record->ID)) ? "selected" : ""; ?>>[<?php echo $record->ID ?>] <?php echo $record->NAMA_UNOR; ?></option>
+							<?php endforeach; ?>
+						<?php endif; ?>
                     </select>
                     <span class='help-inline'><?php echo form_error('satker_penempatan_id'); ?></span>
+                </div>
+            </div>
+            <div class="control-group<?php echo form_error('pengelola_sdm_kawasan_id') ? ' error' : ''; ?> col-sm-6">
+                <?php echo form_label("Pengelola Kawasan SDM", 'pengelola_sdm_kawasan_id', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <select name="pengelola_sdm_kawasan_id" id="pengelola_sdm_kawasan_id" class="form-control select2">
+                        <?php if (isset($pengelolasdms) && is_array($pengelolasdms) && count($pengelolasdms)) : ?>
+                            <option value="">Silahkan Pilih</option>
+							<?php foreach ($pengelolasdms as $record) : ?>
+								<option value="<?php echo $record->id ?>" <?php if (isset($pegawai->pengelola_sdm_kawasan_id))  echo (trim($pegawai->pengelola_sdm_kawasan_id) == trim($record->id)) ? "selected" : ""; ?>><?php echo $record->nama; ?></option>
+							<?php endforeach; ?>
+						<?php endif; ?>
+                    </select>
+                    <span class='help-inline'><?php echo form_error('pengelola_sdm_kawasan_id'); ?></span>
                 </div>
             </div>
         </fieldset>
@@ -559,6 +652,46 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
 					</select>
                     <span class='help-inline'><?php echo form_error('JENIS_KAWIN_ID'); ?></span>
                 </div>
+            </div>
+            <div class="control-group col-sm-6">
+                <label class="control-label">Situs Pribadi </label>
+                <input type="text" class="form-control" name="situs_pribadi" value="<?=$pegawai->situs_pribadi?>" />
+            </div>
+            <div class="control-group col-sm-6">
+                <label class="control-label">Facebook </label>
+                <input type="text" class="form-control" name="facebook" value="<?=$pegawai->facebook?>" />
+            </div>
+            <div class="control-group col-sm-6">
+                <label class="control-label">Twitter </label>
+                <input type="text" class="form-control" name="twitter" value="<?=$pegawai->twitter?>" />
+            </div>
+            <div class="control-group col-sm-6">
+                <label class="control-label">Google Plus </label>
+                <input type="text" class="form-control" name="google_plus" value="<?=$pegawai->google_plus?>" />
+            </div>
+            <div class="control-group col-sm-6">
+                <label class="control-label">Google Scholar </label>
+                <input type="text" class="form-control" name="google_scholar" value="<?=$pegawai->google_scholar?>" />
+            </div>
+            <div class="control-group col-sm-6">
+                <label class="control-label">LinkedIn </label>
+                <input type="text" class="form-control" name="linkedin" value="<?=$pegawai->linkedin?>" />
+            </div>
+            <div class="control-group col-sm-6">
+                <label class="control-label">ORCID </label>
+                <input type="text" class="form-control" name="orcid" value="<?=$pegawai->orcid?>" />
+            </div>
+            <div class="control-group col-sm-6">
+                <label class="control-label">ResearchGate </label>
+                <input type="text" class="form-control" name="research_gate" value="<?=$pegawai->research_gate?>" />
+            </div>
+            <div class="control-group col-sm-6">
+                <label class="control-label">ResearcherID </label>
+                <input type="text" class="form-control" name="researcher_id" value="<?=$pegawai->researcher_id?>" />
+            </div>
+            <div class="control-group col-sm-6">
+                <label class="control-label">Scopus </label>
+                <input type="text" class="form-control" name="scopus" value="<?=$pegawai->scopus?>" />
             </div>
             <div class="control-group<?php echo form_error('NO_SURAT_DOKTER') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label("NO SURAT KETERANGAN SEHAT DOKTER", 'NO_SURAT_DOKTER', array('class' => 'control-label')); ?>
@@ -688,13 +821,25 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
 					<span class='help-inline'><?php echo form_error('terminated_date'); ?></span>
 				</div>
 			</div> 
+            <div class="control-group col-sm-6">
+				<?php echo form_label("JENIS PEMBERHENTIAN", 'JENIS_PEMBERHENTIAN', array('class' => 'control-label')); ?>
+                <div class='controls'>
+				 <select class="text-input form-control" name="JENIS_PEMBERHENTIAN" id="JENIS_PEMBERHENTIAN" class="chosen-select-deselect">
+					  <option value="">-- Pilih  --</option>
+					  <?php foreach ($jenis_pemberhentians as $jenis) { ?>
+                        <option value="<?=$jenis->id?>" <?=$pegawai->JENIS_PEMBERHENTIAN == $jenis->id?'selected':'' ?>><?=$jenis->nama?></option>
+                      <?php } ?>
+				  </select>
+				</div>
+			</div> 
              <div class="control-group<?php echo form_error('status_pegawai') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label("Status Pegawai", 'status_pegawai', array('class' => 'control-label')); ?>
                 <div class='controls'>
                     <select class="validate[required] text-input form-control" name="status_pegawai" id="status_pegawai" class="chosen-select-deselect">
                         <option value="">-- Pilih  --</option>
                         <option value="1" <?php if(isset($pegawai->status_pegawai))  echo  ("1"==$pegawai->status_pegawai) ? "selected" : ""; ?>> PNS</option>
-                        <option value="2" <?php if(isset($pegawai->status_pegawai))  echo  ("2"==$pegawai->status_pegawai) ? "selected" : ""; ?>> Bukan PNS</option>
+                        <option value="2" <?php if(isset($pegawai->status_pegawai))  echo  ("2"==$pegawai->status_pegawai) ? "selected" : ""; ?>> P3K</option>
+                        <option value="3" <?php if(isset($pegawai->status_pegawai))  echo  ("3"==$pegawai->status_pegawai) ? "selected" : ""; ?>> Bukan ASN</option>
                     </select>
                     <span class='help-inline'><?php echo form_error('status_pegawai'); ?></span>
                 </div>
@@ -705,7 +850,8 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
             <input type='submit' name='save' class='btn btn-primary btnsaveprofile' value="Simpan" />
             <?php echo lang('bf_or'); ?>
             <?php echo anchor(SITE_AREA . '/kepegawaian/pegawai', lang('pegawai_cancel'), 'class="btn btn-warning"'); ?>
-            
+            <?php echo lang('bf_or'); ?>
+            <?php echo anchor(SITE_AREA . '/kepegawaian/pegawai/profilen/'.$pegawai->ref, "Halaman Profile Pegawai", 'class="btn btn-success"'); ?>
         </div>
     </form>
 </div>
@@ -785,6 +931,7 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
                 if(data.success){
                     swal("Pemberitahuan!", data.msg, "success");
                     $("#btnsaveprofile").val('Simpan data').attr('disabled', false).addClass('bt-hud').unbind('click');
+                    window.location.replace("<?=base_url()?>admin/kepegawaian/pegawai/profilen/"+'<?=$pegawai->ref?>');
                 }
                 else {
 
@@ -929,7 +1076,7 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
         }
     });
       
-     $("#Unor_ID").select2({
+    $("#Unor_ID").select2({
         placeholder: 'Cari Unit Kerja...',
         width: '100%',
         minimumInputLength: 3,
@@ -963,13 +1110,30 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
             cache: true
         }
     });
-    $("#satker_penempatan_id").select2({
-        placeholder: 'Cari Unit Kerja...',
+    // $("#satker_penempatan_id").select2({
+    //     placeholder: 'Cari Unit Kerja...',
+    //     width: '100%',
+    //     minimumInputLength: 3,
+    //     allowClear: true,
+    //     ajax: {
+    //         url: '<?php echo site_url("pegawai/manage_unitkerja/ajaxall");?>',
+    //         dataType: 'json',
+    //         data: function(params) {
+    //             return {
+    //                 term: params.term || '',
+    //                 page: params.page || 1
+    //             }
+    //         },
+    //         cache: true
+    //     }
+    // });
+    $("#kepakaran").select2({
+        placeholder: '  Cari Kepakaran...',
         width: '100%',
         minimumInputLength: 3,
         allowClear: true,
         ajax: {
-            url: '<?php echo site_url("pegawai/manage_unitkerja/ajaxall");?>',
+            url: '<?php echo site_url("pegawai/kepegawaian/ajax_bidang_kepakaran");?>',
             dataType: 'json',
             data: function(params) {
                 return {
@@ -978,6 +1142,30 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
                 }
             },
             cache: true
-        }
+        },
+        templateResult: formatOutput
     });
+    $("#bidangpenelitian").select2({
+    placeholder: '  Cari Bidang Kepakaran...',
+    width: '100%',
+    minimumInputLength: 3,
+    allowClear: true,
+    ajax: {
+        url: '<?php echo site_url("pegawai/kepegawaian/ajax_bidang_penelitian");?>',
+        dataType: 'json',
+        data: function(params) {
+            return {
+                term: params.term || '',
+                page: params.page || 1
+            }
+        },
+        cache: true
+    },
+    templateResult: formatOutput
+});
+    function formatOutput (optionElement) {
+        if (!optionElement.id) { return optionElement.text; }
+        var $state = $('<span><strong>' + optionElement.long_text + '</span>');
+        return $state;
+    };
 </script>

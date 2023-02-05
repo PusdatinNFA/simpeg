@@ -13,10 +13,10 @@ if ($can_delete) {
 ?>
 
 <div class="callout callout-warning">
-   <h4>Pegawai PPNPN</h4>
-   <p><b>Pegawai Pemerintah Non Pegawai Negeri</b> adalah pegawai tidak tetap, pegawai honorer, staf khusus, dan pegawai lain yang dibayarkan oleh Anggaran Pendapatan dan Belanja Negara</p>
+   <h4>Pegawai Non ASN</h4>
+   <p><b>Pegawai Pemerintah Non ASN</b> adalah pegawai tidak tetap, pegawai honorer, staf khusus, dan pegawai lain yang dibayarkan oleh Anggaran Pendapatan dan Belanja Negara</p>
  </div>
-<div class="admin-box box box-primary expanded-box">
+<div class="admin-box box box-danger expanded-box">
 	<div class="box-header">
               <h3 class="box-title">Pencarian Lanjut</h3>
 			   <div class="box-tools pull-right">
@@ -78,7 +78,7 @@ if ($can_delete) {
 		?>
 	</div>
 </div>
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
 	<div class="box-header box-tools">
 		<?php if ($this->auth->has_permission('Pegawai.Kepegawaian.CreatePpnpn')) : ?>
 		<a href="<?php echo site_url($areaUrl . '/create_ppnpn'); ?>" class="btn btn-warning pull-right"><i class="fa fa-plus"></i> Tambah Pegawai</a>
@@ -90,7 +90,7 @@ if ($can_delete) {
 			<tr>
 				<th style="width:10px">No</th>
 				<th>ID</th>
-				<th>NAMA Pegawai</th>
+				<th>Nama Pegawai</th>
 				<th>Unit Kerja</th>
 				<th width="70px" align="center">#</th></tr>
 			</thead>
@@ -129,7 +129,7 @@ $table = $(".table-data").DataTable({
 	processing: true,
 	serverSide: true,
 	"columnDefs": [
-					{"className": "dt-center", "targets": [4]}
+					{"className": "text-center", "targets": [4]}
 				],
 	ajax: {
 	  url: "<?php echo base_url() ?>admin/kepegawaian/pegawai/getdatappnpn",

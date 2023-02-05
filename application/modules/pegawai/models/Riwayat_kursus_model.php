@@ -46,12 +46,12 @@ class Riwayat_kursus_model extends BF_Model
 		),
 		array(
 			'field' => 'TIPE_KURSUS',
-			'label' => 'TIPE KURSUS',
+			'label' => 'TIPE PELATIHAN',
 			'rules' => 'max_length[32]|required',
 		),
 		array(
 			'field' => 'NAMA_KURSUS',
-			'label' => 'NAMA KURSUS',
+			'label' => 'NAMA PELATIHAN',
 			'rules' => 'required',
 		)
 	);
@@ -72,11 +72,13 @@ class Riwayat_kursus_model extends BF_Model
 		
 		if(empty($this->selects))
 		{
-			$this->select($this->table_name .'.*');
+			$this->select($this->table_name .'.*,initcap(j.nama) "JENIS_KURSUS"');
 		}
 		if($PNS_ID!=""){
 			$this->db->where('PNS_ID',$PNS_ID);
 		}
+		$this->db->join('hris.jenis_kursus j', 'j.id::varchar(30) = rwt_kursus."JENIS_KURSUS"', 'left');
+		$this->db->order_by("TANGGAL_KURSUS","ASC");
 		return parent::find_all();
 	}
 	public function find_all_detil($PNS_ID ="")
@@ -88,7 +90,7 @@ class Riwayat_kursus_model extends BF_Model
 			TRIM("PNS_NIP") PNS_ID,
 			TRIM("PNS_NIP") pns_nip,
 			TRIM("TIPE_KURSUS") TIPE_KURSUS,
-			TRIM("JENIS_KURSUS") JENIS_KURSUS,
+			TRIM(j.nama) JENIS_KURSUS,
 			TRIM("NAMA_KURSUS") LAMA_KURSUS,
 			"LAMA_KURSUS" lama_kursus,
 			"TANGGAL_KURSUS" tanggal_kursus,
@@ -97,6 +99,7 @@ class Riwayat_kursus_model extends BF_Model
 			TRIM("INSTITUSI_PENYELENGGARA") INSTITUSI_PENYELENGGARA
 				');
 		}
+		$this->db->join('hris.jenis_kursus j', 'j.id::varchar(30) = rwt_kursus."JENIS_KURSUS"', 'left');
 		if($PNS_ID!=""){
 			$this->db->where('PNS_ID',$PNS_ID);
 		}

@@ -127,8 +127,22 @@ if ($can_delete) {
 					</td>
 				</tr>
 				<tr>
+					<td width="200px"><label for="example-text-input" class="col-form-label">Jenis Pemberhentian</label></td>
+					<td colspan=2>
+						<select name="jenis_pemberhentian" id="jenis_pemberhentian" class="form-control select2">
+	                        <option value="">-- Silahkan Pilih --</option>
+	                        <?php if (isset($jenis_pemberhentians) && is_array($jenis_pemberhentians) && count($jenis_pemberhentians)):?>
+							<?php foreach($jenis_pemberhentians as $record):?>
+								<option value="<?php echo $record->id?>" <?php if(isset($pegawai->JENIS_PEMBERHENTIAN))  echo  ($pegawai->JENIS_PEMBERHENTIAN==$record->id) ? "selected" : ""; ?>><?php echo $record->nama; ?></option>
+								<?php endforeach;?>
+							<?php endif;?>
+	                    </select>
+					</td>
+				</tr>
+				<tr>
 					<td colspan="3">
 						<button type="submit" class="btn btn-success pull-right "><i class="fa fa-search"></i> Cari</button>
+						<button type="button" class="btn btn-warning pull-right download_xls" target="_blank"><i class="fa fa-download"></i> Download</button>
 					</td>
 				</tr>
 			</table>
@@ -147,6 +161,8 @@ if ($can_delete) {
 				<th>NIP</th>
 				<th>Nama Pegawai</th>
 				<th>Golongan</th>
+				<th>Kedudukan Hukum <br> TMT</th>
+				<th>Jenis Pemberhentian</th>
 				<th>Unit Kerja</th>
 				<th width="120px" align="center">#</th></tr>
 			</thead>
@@ -168,7 +184,7 @@ $(".download_foto").click(function(){
 	var xyz = $("#form_search_pegawai").serialize();
 	window.open("<?php echo base_url('admin/kepegawaian/pegawai/downloadphotopensiun');?>?"+xyz);
 });
-
+$('.select2').select2();
 $("#unit_id_key").select2({
 	placeholder: 'Cari Unit Kerja...',
 	width: '100%',
@@ -194,7 +210,7 @@ $table = $(".table-data").DataTable({
 	processing: true,
 	serverSide: true,
 	"columnDefs": [
-					{"className": "dt-center", "targets": [4]},
+					{"className": "text-center", "targets": [0,5,6,8]},
 					{ "targets": [0,5], "orderable": false }
 				],
 	ajax: {

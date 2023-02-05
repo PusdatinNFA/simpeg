@@ -10,8 +10,13 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-21 col-xs-12">
             <?php if ($this->auth->has_permission('Riwayatcltn.Kepegawaian.Create')) : ?>
-            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayat_cltn/add/<?php echo $NIP_BARU ?>" tooltip="Tambah Riwayat CLTN" title="Tambah Riwayat Tugas Belajar">
+            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayat_cltn/add/<?php echo $NIP_BARU ?>" tooltip="Tambah Riwayat CLTN" title="Tambah Riwayat CLTN">
 				<i class="fa fa-plus"></i> Tambah
+            </a>
+            <?php endif; ?>
+			<?php if ($this->auth->has_permission('Riwayatcltn.Kepegawaian.UpdateMandiri')) : ?>
+            <a type="button" class="show-modal-custom btn btn-default btn-info margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayat_cltn/addmandiri/<?php echo $NIP_BARU ?>" tooltip="Tambah Riwayat CLTN" title="Tambah Riwayat CLTN">
+				<i class="fa fa-plus"></i> Tambah Mandiri
             </a>
             <?php endif; ?>
             <?php if ($this->auth->has_permission('Riwayatcltn.Kepegawaian.Sinkron')) : ?>
@@ -23,9 +28,10 @@
             <thead>
                 <tr>
                     <th width='20px' >No</th>
+                    <th>JENIS</th>
                     <th>NOMOR/ TANGGAL SK</th>
-                    <th>TANGGAL CLTN</th>
-					<th>KETERANGAN</th>
+                    <th>TANGGAL</th>
+					<th>STATUS</th>
                     <th width='10%' align="center">AKSI</th>
                 </tr>
             </thead>
@@ -57,7 +63,7 @@
 				serverSide: true,
 				"columnDefs": [
 					//{"className": "dt-center", "targets": "_all"}
-					{"className": "dt-center", "targets": [0,2,4]}
+					{"className": "dt-center", "targets": [0,3,5]}
 				],
 				ajax: {
 					url: "<?php echo base_url() ?>pegawai/riwayat_cltn/ajax_list",

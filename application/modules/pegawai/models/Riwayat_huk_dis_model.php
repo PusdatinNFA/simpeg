@@ -73,6 +73,22 @@ class Riwayat_huk_dis_model extends BF_Model
 			$this->db->where('PNS_ID',$PNS_ID);
 		}
 		$this->db->join('jenis_hukuman', 'jenis_hukuman.ID = rwt_hukdis.ID_JENIS_HUKUMAN', 'left');
+		$this->db->order_by('TANGGAL_MULAI_HUKUMAN','ASC');
+		return parent::find_all();
+	}
+	public function find_detil()
+	{
+		
+		if(empty($this->selects))
+		{
+			$this->select($this->table_name .'.*, initcap(jenis_hukuman."NAMA") as NAMA_HUKUMAN, jenis_hukuman.TINGKAT_HUKUMAN, 
+			pegawai.NAMA, pegawai.NIP_BARU, pegawai.username_intra, pegawai.ref, unitkerja.NAMA_UNOR');
+		}
+		$this->db->join('pegawai', 'pegawai.NIP_BARU = rwt_hukdis.PNS_NIP', 'inner');
+		$this->db->join('jenis_hukuman', 'jenis_hukuman.ID = rwt_hukdis.ID_JENIS_HUKUMAN', 'left');
+		$this->db->join('unitkerja', 'unitkerja.ID = pegawai.UNOR_INDUK_ID', 'left');
+		$this->db->order_by('SK_TANGGAL','ASC');
+		$this->db->order_by('TANGGAL_MULAI_HUKUMAN','ASC');
 		return parent::find_all();
 	}
 	public function count_all($PNS_ID ="")
@@ -82,6 +98,8 @@ class Riwayat_huk_dis_model extends BF_Model
 		{
 			$this->select($this->table_name .'.*');
 		}
+		$this->db->join('pegawai', 'pegawai.NIP_BARU = rwt_hukdis.PNS_NIP', 'left');
+		$this->db->join('jenis_hukuman', 'jenis_hukuman.ID = rwt_hukdis.ID_JENIS_HUKUMAN', 'left');
 		if($PNS_ID!=""){
 			$this->db->where('PNS_ID',$PNS_ID);
 		}

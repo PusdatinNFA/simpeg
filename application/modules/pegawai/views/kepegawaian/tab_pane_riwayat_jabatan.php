@@ -15,12 +15,12 @@
             	</a>
             <?php endif; ?>
             <?php if ($this->auth->has_permission('riwayatjabatan.Kepegawaian.Create')) : ?>
-            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatjabatan/add/<?php echo $NIP_BARU ?>" tooltip="Tambah Riwayat Jabatan">
+            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatjabatan/add/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Jabatan">
 				<i class="fa fa-plus"></i> Tambah
             </a>
             <?php endif; ?>
             <?php if ($this->auth->has_permission('riwayatjabatan.Kepegawaian.Updmandiri')) : ?>
-	            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatjabatan/addmandiri/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Jabatan (Mandiri)">
+	            <a type="button" class="show-modal-custom btn btn-default btn-info margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatjabatan/addmandiri/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Jabatan (Mandiri)">
 					<i class="fa fa-plus"></i> Tambah Mandiri
 	            </a>
             <?php endif; ?>
@@ -30,8 +30,9 @@
                     <th width='15px' >No</th>
                     <th>Jabatan</th>
                     <th>Unit Kerja</th>
-                    <th width='100px' >TMT</th>
-                    <th width='120px' align="center">Aksi</th>
+                    <th>TMT Jabatan</th>
+                    <th>TMT Berhenti</th>
+                    <th width='100px' align="center">Aksi</th>
                 </tr>
             </thead>
             <tfoot>
@@ -61,13 +62,14 @@
 				serverSide: true,
 				"columnDefs": [
 					//{"className": "dt-center", "targets": "_all"}
-					{"className": "text-center", "targets": [0,3,4]}
+					{"className": "text-center", "targets": [0,3,4,5]}
 				],
 				ajax: {
 					url: "<?php echo base_url() ?>pegawai/riwayatjabatan/ajax_list",
 					type:'POST',
 					data : {
-						NIP_BARU:'<?php echo $NIP_BARU;?>'
+						NIP_BARU:'<?php echo $NIP_BARU;?>',
+						PNS_ID:'<?php echo $PNS_ID;?>'
 					}
 				}
 		});

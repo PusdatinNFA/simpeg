@@ -1218,4 +1218,40 @@ class Sk_ds_model extends BF_Model
 				$sql.=" GROUP BY d.is_signed, d.id_pegawai_ttd";
 		return $this->db->query($sql)->result();
 	}
+
+	public function find_unsigned_id()
+	{
+		$this->select('id_pengajuan_ds');
+		$this->distinct('id_pengajuan_ds');
+		$this->db->where('is_signed','0');
+		$this->db->where('id_pengajuan_ds is not null');
+		return parent::find_all();
+	}
+
+	public function find_by_id_master_proses($id_master_proses = array())
+	{
+		$this->select('tbl_file_ds.*, id_master_proses, d.tmt_sk as tmt_sk');
+		$this->db->join('hris.tte_trx_draft_sk d', 'd.id_file = tbl_file_ds.id_file', 'inner');
+		$this->db->where_in('d.id_master_proses',$id_master_proses);
+		$this->db->where('is_signed','1');
+		return parent::find_all();
+	}
+
+	public function count_all_by_id_pengajuan($id_pengajuan)
+	{
+		$this->select('id_file');
+		$this->db->where('id_pengajuan_ds', $id_pengajuan);
+		return parent::count_all();
+	}
+	public function find_all_by_id_pengajuan($id_pengajuan)
+	{
+		$this->select('id_file,nomor_sk,nip_sk,lokasi_file');
+		$this->db->where('id_pengajuan_ds', $id_pengajuan);
+		return parent::find_all();
+	}
+	public function find_all_custom()
+	{
+		$this->select('*');
+		return parent::find_all();
+	}
 }

@@ -8,9 +8,11 @@ $this->load->library('convert');
         <input type="hidden" name="id_file" value="<?php echo $data->id_file; ?>">
         
         <div class="col-md-9">     
-             <!--<embed src="<?php echo $url_sk; ?>" width="100%" height="700" alt="pdf"> -->
-              <embed src="data:application/pdf;base64,<?php echo $b64; ?>" width="100%" height="900" alt="pdf">
-              
+        <?php if ($data->is_signed){ ?>
+            <embed src="<?php echo $url_sk; ?>" width="100%" height="700" alt="pdf">
+          <?php } else { ?>
+              <embed src="data:application/pdf;base64,<?php echo $b64; ?>" width="100%" height="700" alt="pdf">
+          <?php } ?>  
         </div>
         <!-- /.col -->
         <div class="col-md-3">
@@ -23,7 +25,7 @@ $this->load->library('convert');
             <div class="box-body">
               <strong><i class="fa fa-user margin-r-5"></i> Pemilik Dokumen </strong>
               <p class="text-muted">
-                  <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN : ''; ?>  <?php echo isset($pegawai->NAMA) ? $pegawai->NAMA : ''; ?> <?php echo isset($pegawai->GELAR_BELAKANG) ? $pegawai->GELAR_BELAKANG : $data->nama_pemilik_sk; ?>
+                  <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN.' ' : ''; ?>  <?php echo isset($pegawai->NAMA) ? trim($pegawai->NAMA) : ''; ?> <?php echo isset($pegawai->GELAR_BELAKANG) ? ', '.$pegawai->GELAR_BELAKANG : $data->nama_pemilik_sk; ?>
               </p>
               <hr>
               <strong><i class="fa fa-user margin-r-5"></i> Penandatangan Dokumen</strong>
@@ -85,7 +87,7 @@ $this->load->library('convert');
               
               <?php if($data->is_signed != "1" and $data->is_signed != "3"){ ?>
                 
-                <a class="btn btn-block btn-social btn-flickr" id="btn_sign">
+                <!-- <a class="btn btn-block btn-social btn-flickr" id="btn_sign">
                 <i class="fa fa-edit"></i> Tanda Tangan Dokumen
               </a>
               <br>
@@ -93,7 +95,7 @@ $this->load->library('convert');
               
               <a class="btn btn-block btn-social btn-google" id="btn_koreksi_batal">
                       <i class="fa fa-arrow-left"></i> Koreksi/Kembalikan Ke Pemroses
-                    </a>
+                    </a> -->
             <?php }else if($data->is_signed != "3" and $data->is_signed == "1"){ ?>
               <a class="btn btn-block btn-social btn-google" id="btn_notsign">
                 <i class="fa fa-key disabled"></i> sudah ditanda Tangan

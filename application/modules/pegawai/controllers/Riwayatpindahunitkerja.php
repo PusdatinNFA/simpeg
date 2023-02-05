@@ -23,6 +23,9 @@ class Riwayatpindahunitkerja extends Admin_Controller
         $this->load->model('pegawai/pegawai_model');
         $this->load->model('pegawai/instansi_model');
         $this->load->model('pegawai/unitkerja_model');
+        $this->load->model('masters/pengelola_sdm_kawasan_model');
+		$pengelolasdms = $this->pengelola_sdm_kawasan_model->find_all();
+		Template::set('pengelolasdms', $pengelolasdms);
     }
     public function get_unor_ajax(){
         $json = array();
@@ -216,24 +219,19 @@ class Riwayatpindahunitkerja extends Admin_Controller
             ECHO "die";
             die();
         }
-        $this->pegawai_model->where("PNS_ID",$PNS_ID);
+        $this->pegawai_model->where("NIP_BARU",$PNS_ID);
         $pegawai_data = $this->pegawai_model->find_first_row();
        
 		$length= $this->input->post('length');
 		$start= $this->input->post('start');
 
 		$search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
-		$this->riwayat_pindah_unit_kerja_model->where("PNS_ID",$pegawai_data->PNS_ID);
+		$this->riwayat_pindah_unit_kerja_model->where("PNS_NIP",$pegawai_data->NIP_BARU);
 		$total= $this->riwayat_pindah_unit_kerja_model->count_all();;
 		$output=array();
 		$output['draw']=$draw;
-
-		
 		$output['recordsTotal']= $output['recordsFiltered']=$total;
 		$output['data']=array();
-        
-		
-        
 		/*Jika $search mengandung nilai, berarti user sedang telah 
 		memasukan keyword didalam filed pencarian*/
 		if($search!=""){
@@ -245,39 +243,35 @@ class Riwayatpindahunitkerja extends Admin_Controller
 		$kolom = $iSortCol != "" ? $iSortCol : "NAMA";
 		$sSortCol == "asc" ? "asc" : "desc";
 		$this->riwayat_pindah_unit_kerja_model->order_by($iSortCol,$sSortCol);
-        
-        $this->riwayat_pindah_unit_kerja_model->where("PNS_ID",$pegawai_data->PNS_ID);  
-		
+        $this->riwayat_pindah_unit_kerja_model->where("PNS_NIP",$pegawai_data->NIP_BARU);  
         $records=$this->riwayat_pindah_unit_kerja_model->find_all();
-            
-		/*Ketika dalam mode pencarian, berarti kita harus
-		'recordsTotal' dan 'recordsFiltered' sesuai dengan jumlah baris
-		yang mengandung keyword tertentu
-		*/
 		if($search != "")
 		{
 			$this->riwayat_pindah_unit_kerja_model->where('upper("NAMA_UNOR_BARU") LIKE \''.strtoupper($search).'%\'');
 			$jum	= $this->riwayat_pindah_unit_kerja_model->count_all();
 			$output['recordsTotal']=$output['recordsFiltered']=$jum;
 		}
-		
 		$nomor_urut=$start+1;
 		if(isset($records) && is_array($records) && count($records)):
 			foreach ($records as $record) {
+                $penugasan = "";
+                if($record->NAMA_UNOR != ''){
+                    $penugasan = "<br><b>Penugasan: </b>".$record->NAMA_UNOR;
+                }
                 $row = array();
                 $row []  = $nomor_urut;
-                $row []  = $record->NAMA_UNOR_BARU;
-                $row []  = $record->NAMA_SATUAN_KERJA;
+                $row []  = $record->ABBREVIATION." - ".$record->NAMA_UNOR_BARU.$penugasan;
                 $row []  = $record->SK_NOMOR;
                 $row []  = $record->SK_TANGGAL;
+                $row []  = $record->TMT_SK;
 
                 $btn_actions = array();
-                if($record->KETERANGAN_BERKAS != ""){
-                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayatpindahunitkerja/viewdoc/".$record->ID."' data-toggle='tooltip' title='Lihat Dokumen' tooltip='Lihat Dokumen ".$record->SK_NOMOR."' class='btn btn-sm btn-info show-modal'><i class='glyphicon glyphicon-eye-open'></i> </a>";
+                if($record->id_arsip != ""){
+                    $btn_actions  [] = "<a href='".base_url()."admin/arsip/arsip_digital/viewdoc2/".$record->id_arsip."' data-toggle='tooltip' title='Lihat Dokumen' tooltip='Lihat Dokumen' class='btn btn-sm btn-info modal-custom-global'><i class='glyphicon glyphicon-eye-open'></i> </a>";
                 }
                 if($this->auth->has_permission($this->permissionEdit))
                 {    
-                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayatpindahunitkerja/edit/".$PNS_ID."/".$record->ID."' data-toggle='tooltip' title='Ubah data' tooltip='Ubah data' class='btn btn-sm btn-success show-modal-custom'><i class='fa fa-pencil'></i> </a>";
+                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayatpindahunitkerja/edit/".$record->PNS_NIP."/".$record->ID."' data-toggle='tooltip' title='Ubah data' tooltip='Ubah data' class='btn btn-sm btn-success show-modal-custom'><i class='fa fa-pencil'></i> </a>";
                 }
                 
                 if($this->auth->has_permission($this->permissionDelete))
@@ -392,7 +386,7 @@ class Riwayatpindahunitkerja extends Admin_Controller
             $data_base64 = file_get_contents($file_tmp);
             $base64 = 'data:' . $type . ';base64,' . base64_encode($data_base64);
 
-            if(in_array(end($file_ext),$allowed_ext) === false)
+            if(in_array(strtolower(end($file_ext)),$allowed_ext) === false)
             {
                 $errors[]='Extension not allowed';
                 $response['msg'] = "
@@ -423,55 +417,78 @@ class Riwayatpindahunitkerja extends Admin_Controller
                 exit();
             }
         }
-        if($base64 == "")
-            unset($data['FILE_BASE64']);
-        else{
-            $data['FILE_BASE64']        = $base64;
-            $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
-        }
+        // if($base64 == "")
+        //     unset($data['FILE_BASE64']);
+        // else{
+        //     $data['FILE_BASE64']        = $base64;
+        //     $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
+        // }
         // end upload berkas
-        $this->pegawai_model->where("PNS_ID",$this->input->post("PNS_ID"));
-        $NIP_BARU = $pegawai_data->NIP_BARU;
+        $this->pegawai_model->where("NIP_BARU",$this->input->post("PNS_ID"));
         $pegawai_data = $this->pegawai_model->find_first_row();  
+        $NIP_BARU = $pegawai_data->NIP_BARU;
         $data["PNS_ID"] = $pegawai_data->PNS_ID;
         $data["PNS_NAMA"] = $pegawai_data->NAMA;
         $data["PNS_NIP"] = $pegawai_data->NIP_BARU;
-       
         $unor_baru_data = $this->unitkerja_model->find($data['ID_UNOR_BARU']);
-        //$data["NAMA_UNOR_BARU"] = $unor_baru_data->NAMA_ESELON_I."-".$unor_baru_data->NAMA_ESELON_II."-".$unor_baru_data->NAMA_ESELON_III."-".$unor_baru_data->NAMA_ESELON_IV;
         $data["NAMA_UNOR_BARU"] = $unor_baru_data->NAMA_UNOR;
-        $instansi_baru_data = $this->instansi_model->find($data['ID_INSTANSI']);
-        $data["NAMA_INSTANSI"] = $instansi_baru_data->NAMA;
-        
         $recordunors = $this->unitkerja_model->find($this->input->post("ID_SATUAN_KERJA"));
         $NAMA_SATKER = ISSET($recordunors->NAMA_UNOR) ? $recordunors->NAMA_UNOR : "";
- //       die($NAMA_SATKER."ini");
         $data["NAMA_SATUAN_KERJA"] = $NAMA_SATKER;
-
+        $data["ID_SATUAN_KERJA_PANUGASAN"] = $this->input->post("ID_SATKER_PENUGASAN")?$this->input->post("ID_SATKER_PENUGASAN"):null;
+        $data["pengelola_sdm_kawasan_id"] = $this->input->post("pengelola_sdm_kawasan_id") ? $this->input->post("pengelola_sdm_kawasan_id"):null;
 
         if(empty($data["SK_TANGGAL"])){
             unset($data["SK_TANGGAL"]);
+        }
+        if(empty($data["TMT_SK"])){
+            unset($data["TMT_SK"]);
         }
         $id_data = $this->input->post("ID");
         if(isset($id_data) && !empty($id_data)){
             $this->riwayat_pindah_unit_kerja_model->update($id_data,$data);
             // add log
-            log_activity_pegawai($NIP_BARU,$this->auth->user_id(),"Update data Riwayat Pindah Unit", 'rwt_pindahunitkerja');
+            // log_activity_pegawai($NIP_BARU,$this->auth->user_id(),"Update data Riwayat Pindah Unit", 'rwt_pindahunitkerja');
+            log_activity($this->auth->user_id(),"Update data Riwayat Pindah Unit ".json_encode($data), 'rwt_pindahunitkerja');
         }
         else{ 
             $this->riwayat_pindah_unit_kerja_model->insert($data);
             // add log
-            log_activity_pegawai($NIP_BARU,$this->auth->user_id(),"Tambah data Riwayat Pindah Unit", 'rwt_pindahunitkerja');
+            // log_activity_pegawai($NIP_BARU,$this->auth->user_id(),"Tambah data Riwayat Pindah Unit", 'rwt_pindahunitkerja');
+            log_activity($this->auth->user_id(),"Tambah data Riwayat Pindah Unit ".json_encode($data), 'rwt_pindahunitkerja');
         }
+        $this->set_unor_active($pegawai_data->NIP_BARU);
         $response ['success']= true;
         $response ['msg']= "Transaksi berhasil";
         echo json_encode($response);    
 
     }
+    private function set_unor_active($nip){
+        $unor_aktif = $this->riwayat_pindah_unit_kerja_model->limit(1)->find_aktif($nip);
+        if($unor_aktif[0]->ID_UNOR_BARU != ""){
+            $unor_aktif = $unor_aktif[0];
+            // update unor dan satker jika ada isinya
+            if($unor_aktif->ID_UNOR_BARU != ""){
+                $dataupdate['UNOR_ID']                      = $unor_aktif->ID_UNOR_BARU ? $unor_aktif->ID_UNOR_BARU : null;  
+            }
+            if($unor_aktif->ID_SATUAN_KERJA != ""){
+                $dataupdate['UNOR_INDUK_ID']                = $unor_aktif->ID_SATUAN_KERJA ? $unor_aktif->ID_SATUAN_KERJA : null;    
+            }
+            $dataupdate['satker_penempatan_id']         = $unor_aktif->ID_SATUAN_KERJA_PANUGASAN;
+            if(empty($dataupdate["satker_penempatan_id"])){
+                unset($dataupdate["satker_penempatan_id"]);
+            }
+            if($unor_aktif->pengelola_sdm_kawasan_id != "")
+                $dataupdate['pengelola_sdm_kawasan_id']         = $unor_aktif->pengelola_sdm_kawasan_id ? $unor_aktif->pengelola_sdm_kawasan_id:null;
+            $this->pegawai_model->skip_validation(true);
+            $this->pegawai_model->update_where("NIP_BARU",$nip, $dataupdate);
+            log_activity($this->auth->user_id(),"Update unor aktif dari riwayat pindah unit ".json_encode($dataupdate), 'rwt_pindahunitkerja');
+        }
+    }
     public function delete($record_id){
         $this->auth->restrict($this->permissionDelete);
 		if ($this->riwayat_pindah_unit_kerja_model->delete($record_id)) {
-			 log_activity($this->auth->user_id(), 'delete data Riwayat Diklat Kepangkatan : ' . $record_id . ' : ' . $this->input->ip_address(), 'pegawai');
+			 log_activity($this->auth->user_id(), 'delete data Riwayat Pindah Unit : ' . $record_id . ' : ' . $this->input->ip_address(), 'pegawai');
 			 Template::set_message("Sukses Hapus data", 'success');
 			 echo "Sukses";
 		}else{
@@ -486,14 +503,19 @@ class Riwayatpindahunitkerja extends Admin_Controller
         Template::set('TAB_ID', uniqid("TAB_CONTOH"));
         Template::render();
     }
-    public function viewdoc($id)
+    private function viewdoc($id)
     {
         if (empty($id)) {
             Template::set_message("ID tidak ditemukan", 'error');
         }
         $datadetil = $this->riwayat_pindah_unit_kerja_model->find($id);
-        $FILE_BASE64 = $datadetil->FILE_BASE64;
-        echo '<embed src="'.$FILE_BASE64.'" width="100%" height="700" alt="pdf">';
+        $this->load->model('arsip_digital/arsip_digital_model');
+        $arsip = $this->arsip_digital_model->find($datadetil->id_arsip);
+        if ($arsip){
+            $this->load->library('Api_s3_aws');
+            $aws = new Api_s3_aws;
+            $aws->viewdoc($arsip->location.$arsip->name);
+        }
         die();
     }
 }

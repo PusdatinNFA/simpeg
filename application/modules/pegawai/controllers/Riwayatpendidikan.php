@@ -26,6 +26,7 @@ class Riwayatpendidikan extends Admin_Controller
         $this->load->model('pegawai/tingkatpendidikan_model');
         $this->load->model('pegawai/pendidikan_model');//rifkyz
         $this->load->model('pegawai/update_mandiri_model');
+        $this->load->helper('aplikasi');
         
     }
     public function ajax_list(){
@@ -79,12 +80,12 @@ class Riwayatpendidikan extends Admin_Controller
                 $STATUS_SATKER  = $record->STATUS_SATKER;
                 $STATUS_BIRO    = $record->STATUS_BIRO;
                 $msgverifikasi = "";
-                if($STATUS_SATKER == "0")
-                    $msgverifikasi = "<br><b class='text-red'>(Perlu Verifikasi Satker)</b>";
-                if($STATUS_BIRO == "0")
-                    $msgverifikasi = "<br><b class='text-red'>(Perlu Verifikasi Biro)</b>";
-                elseif($STATUS_BIRO == "1")
-                    $msgverifikasi = "<br><b class='text-blue'>(Sudah diverifikasi Biro)</b>";
+                // if($STATUS_SATKER == "0")
+                //     $msgverifikasi = "<br><b class='text-red'>(Perlu Verifikasi Satker)</b>";
+                // if($STATUS_BIRO == "0")
+                //     $msgverifikasi = "<br><b class='text-red'>(Perlu Verifikasi Biro)</b>";
+                // elseif($STATUS_BIRO == "1")
+                //     $msgverifikasi = "<br><b class='text-blue'>(Sudah diverifikasi Biro)</b>";
                 $row = array();
                 $row []  = $nomor_urut;
                 $row []  = $record->tk_pendidikan_text.$msgverifikasi;
@@ -94,8 +95,8 @@ class Riwayatpendidikan extends Admin_Controller
                 $row []  = $record->NOMOR_IJASAH;
                 
                 $btn_actions = array();
-                if($record->KETERANGAN_BERKAS != ""){
-                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayatpendidikan/viewdoc/".$record->ID."' data-toggle='tooltip' title='Lihat Dokumen' tooltip='Lihat Dokumen ".$record->NOMOR_IJASAH."' class='btn btn-sm btn-info show-modal'><i class='glyphicon glyphicon-eye-open'></i> </a>";
+                if($record->id_arsip != ""){
+                    $btn_actions  [] = "<a href='".base_url()."admin/arsip/arsip_digital/viewdoc2/".$record->id_arsip."' data-toggle='tooltip' title='Lihat Dokumen' tooltip='Lihat Dokumen' class='btn btn-sm btn-info modal-custom-global'><i class='glyphicon glyphicon-eye-open'></i> </a>";
                 }
                 /*
                 $btn_actions  [] = "
@@ -107,9 +108,13 @@ class Riwayatpendidikan extends Admin_Controller
                 ";
                 
                 */
-                if($this->auth->has_permission("RiwayatPendidikan.Kepegawaian.VerifikasiS"))
+                // if($this->auth->has_permission("RiwayatPendidikan.Kepegawaian.VerifikasiS"))
+                // {    
+                //     $btn_actions  [] = "<a href='".base_url()."pegawai/riwayatpendidikan/verifikasi/".$PNS_ID."/".$record->ID."' data-toggle='tooltip' title='Verifikasi data' tooltip='Verifikasi data' class='btn btn-sm btn-warning show-modal-custom'><i class='fa fa-edit'></i> </a>";
+                // }
+                if($this->auth->has_permission($this->permissionUpdmandiri))
                 {    
-                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayatpendidikan/verifikasi/".$PNS_ID."/".$record->ID."' data-toggle='tooltip' title='Verifikasi data' tooltip='Verifikasi data' class='btn btn-sm btn-warning show-modal-custom'><i class='fa fa-edit'></i> </a>";
+                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayatpendidikan/editmandiri/".$PNS_ID."/".$record->ID."' data-toggle='tooltip' title='Ubah data mandiri' tooltip='Ubah data mandiri' class='btn btn-sm btn-warning show-modal-custom'><i class='fa fa-pencil'></i> </a>";
                 }
                 if($this->auth->has_permission($this->permissionEdit))
                 {    
@@ -151,11 +156,56 @@ class Riwayatpendidikan extends Admin_Controller
             //$this->auth->restrict($this->permissionEdit);
             Template::set_view("kepegawaian/riwayat_pendidikan_add");
             $detail_riwayat = $this->riwayat_pendidikan_model->find($record_id);
-            $selectedPendidikanID = $this->pendidikan_model->find(trim($$detail_riwayat->PENDIDIKAN_ID));
+            $selectedPendidikanID = $this->pendidikan_model->find(trim($detail_riwayat->PENDIDIKAN_ID));
             Template::set('detail_riwayat', $detail_riwayat);    
             Template::set('selectedPendidikanID',$this->pendidikan_model->find(trim($detail_riwayat->PENDIDIKAN_ID)));
 
             Template::set('PNS_ID', $PNS_ID);
+            Template::set('toolbar_title', "Ubah Riwayat Pendidikan");
+
+            Template::render();
+        }
+    }
+    public function show2($data,$read_only =  false){
+        $tingkatpendidikans = $this->tingkatpendidikan_model->find_all();
+		Template::set('tk_pendidikans', $tingkatpendidikans);        
+        if (!$read_only)
+                $read_only = $data->STATUS != '' && 
+            ($this->auth->has_permission('Pegawai.Kepegawaian.VerifikasiUpdate') 
+            || $this->auth->has_permission('Pegawai.Kepegawaian.VerifikasiUpdate3'));
+        $pendidikans = $this->pendidikan_model->find_all();
+        Template::set('pendidikans', $pendidikans);
+        $perubahan = json_decode($data->PERUBAHAN);
+        Template::set('read_only', $read_only);
+        //
+        if(empty($data->ID_TABEL)){
+            if (!$read_only)
+                $this->auth->restrict($this->permissionCreate);
+            Template::set_view("kepegawaian/riwayat_pendidikan_add");
+            $detail_riwayat = $perubahan;
+            $selectedPendidikanID = $this->pendidikan_model->find(trim($detail_riwayat->PENDIDIKAN_ID));
+            Template::set('detail_riwayat', $detail_riwayat);    
+            Template::set('selectedPendidikanID',$selectedPendidikanID);
+            Template::set('id_update_mandiri',$data->ID);
+            Template::set('PNS_ID', $perubahan->PNS_ID);
+            Template::set('toolbar_title', "Tambah Riwayat Pendidikan");
+
+            Template::render();
+        }
+        else {
+            if (!$read_only)
+                $this->auth->restrict($this->permissionEdit);
+            Template::set_view("kepegawaian/riwayat_pendidikan_add");
+            $detail_riwayat = $this->riwayat_pendidikan_model->find($data->ID_TABEL);
+            if (!$detail_riwayat)
+                Template::set_message('Data Tidak Ditemukan/Data Telah Dihapus', 'error');
+            $detail_riwayat = array_replace((array) $detail_riwayat,(array) $perubahan);
+            $detail_riwayat = (object) $detail_riwayat;
+            $selectedPendidikanID = $this->pendidikan_model->find(trim($detail_riwayat->PENDIDIKAN_ID));
+            Template::set('detail_riwayat', $detail_riwayat);    
+            Template::set('selectedPendidikanID',$selectedPendidikanID);
+            Template::set('id_update_mandiri',$data->ID);
+            Template::set('PNS_ID', $detail_riwayat->PNS_ID);
             Template::set('toolbar_title', "Ubah Riwayat Pendidikan");
 
             Template::render();
@@ -181,7 +231,7 @@ class Riwayatpendidikan extends Admin_Controller
             $this->auth->restrict($this->permissionUpdmandiri);
             Template::set_view("kepegawaian/riwayat_pendidikan_add_mandiri");
             $detail_riwayat = $this->riwayat_pendidikan_model->find($record_id);
-            $selectedPendidikanID = $this->pendidikan_model->find(trim($$detail_riwayat->PENDIDIKAN_ID));
+            // $selectedPendidikanID = $this->pendidikan_model->find(trim($$detail_riwayat->PENDIDIKAN_ID));
             Template::set('detail_riwayat', $detail_riwayat);    
             Template::set('selectedPendidikanID',$this->pendidikan_model->find(trim($detail_riwayat->PENDIDIKAN_ID)));
             Template::set('detail_riwayat', $detail_riwayat);    
@@ -208,6 +258,11 @@ class Riwayatpendidikan extends Admin_Controller
     public function editmandiri($PNS_ID,$record_id=''){
         $this->auth->restrict($this->permissionUpdmandiri);
         $this->showmandiri($PNS_ID,$record_id);
+    }
+    public function verifikasi2($ID,$read_only = false){
+        // $this->auth->restrict($this->VerifikasiS);
+        $data = $this->update_mandiri_model->find($ID);
+        $this->show2($data,$read_only);
     }
     public function detil($PNS_ID,$record_id=''){
         $tingkatpendidikans = $this->tingkatpendidikan_model->find_all();
@@ -243,7 +298,8 @@ class Riwayatpendidikan extends Admin_Controller
             echo json_encode($response);
             exit();
         }
-
+        $pegawai_data = $this->pegawai_model->find_by("PNS_ID",$this->input->post("PNS_ID"));
+        $NIP_BARU = $pegawai_data->NIP_BARU;
         $data = $this->riwayat_pendidikan_model->prep_data($this->input->post());
         // Make sure we only pass in the fields we want
         $base64     = "";
@@ -264,9 +320,9 @@ class Riwayatpendidikan extends Admin_Controller
             $type       = $_FILES['file_dokumen']['type'];
             //echo $file_ext[1];echo "<br>";
             $data_base64 = file_get_contents($file_tmp);
-            $base64 = 'data:' . $type . ';base64,' . base64_encode($data_base64);
+            // $base64 = 'data:' . $type . ';base64,' . base64_encode($data_base64);
 
-            if(in_array(end($file_ext),$allowed_ext) === false)
+            if(in_array(strtolower(end($file_ext)),$allowed_ext) === false)
             {
                 $errors[]='Extension not allowed';
                 $response['msg'] = "
@@ -296,16 +352,58 @@ class Riwayatpendidikan extends Admin_Controller
                 echo json_encode($response);
                 exit();
             }
+            $content = file_get_contents($file_tmp);
+            $keterangan = "TANGGAL LULUS ".$this->input->post('TANGGAL_LULUS');
+            $this->load->library('Api_s3_aws');
+            $aws = new Api_s3_aws;
+            $id_jenis_arsip = 0;
+            if ($data['TINGKAT_PENDIDIKAN_ID'] == '05'){
+                $id_jenis_arsip = 6;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '10'){
+                $id_jenis_arsip = 7;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '12'){
+                $id_jenis_arsip = 7;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '15'){
+                $id_jenis_arsip = 8;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '17'){
+                $id_jenis_arsip = 8;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '18'){
+                $id_jenis_arsip = 8;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '20'){
+                $id_jenis_arsip = 9;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '25'){
+                $id_jenis_arsip = 10;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '30'){
+                $id_jenis_arsip = 11;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '35'){
+                $id_jenis_arsip = 116;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '40'){
+                $id_jenis_arsip = 12;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '45'){
+                $id_jenis_arsip = 13;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '50'){
+                $id_jenis_arsip = 14;
+            } else {
+                $id_jenis_arsip = 83;
+            }
+
+            $id = $aws->insertArsip($NIP_BARU,$data['NOMOR_IJASAH'],$id_jenis_arsip,$keterangan, $content,$file_name);
+            if ($id){
+                $data['id_arsip'] = $id;
+            } else {
+                if (empty($data['id_arsip']))
+                    unset($data['id_arsip']);
+            }
         }
-        if($base64 == "")
-            unset($data['FILE_BASE64']);
-        else{
-            $data['FILE_BASE64']        = $base64;
-            $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
-        }
+        // if($base64 == "")
+        //     unset($data['FILE_BASE64']);
+        // else{
+        //     $data['FILE_BASE64']        = $base64;
+        //     $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
+        // }
         // end upload berkas
         if(empty($data['TANGGAL_LULUS'])){
-            //unset($data['TANGGAL_LULUS']);
+            unset($data['TANGGAL_LULUS']);
         }
         if($this->input->post("STATUS_SATKER") == "1"){
             $data["STATUS_SATKER"]    = 1;
@@ -328,22 +426,35 @@ class Riwayatpendidikan extends Admin_Controller
             $dataupdate['PENDIDIKAN_ID']    = $this->input->post('PENDIDIKAN_ID');
             $dataupdate['PENDIDIKAN']       = isset($recpendidikan->NAMA) ? $recpendidikan->NAMA : "";
             $dataupdate['TK_PENDIDIKAN']    = $this->input->post('TINGKAT_PENDIDIKAN_ID');
+            $dataupdate['nama_sekolah_terakhir']    = $this->input->post('NAMA_SEKOLAH');
             $this->pegawai_model->skip_validation(true);
             $this->pegawai_model->update_where("PNS_ID",$this->input->post("PNS_ID"), $dataupdate);
         }
         $id_data = $this->input->post("id_data");
+        $id_update_mandiri = $this->input->post("id_update_mandiri");
         if(isset($id_data) && !empty($id_data)){
+            $current = $this->riwayat_pendidikan_model->find($id_data);
+            $perubahan = arrDiff($current,$data);
             $this->riwayat_pendidikan_model->update($id_data,$data);
-            // Update status pada update data mandiri untuk riwayat pendidikan berdasarkan ID
-            $dataupdate = array();
-            $data_update['STATUS']          = $data["STATUS_BIRO"];
-            //$data_update['UPDATED_BY']      = $this->auth->user_id();
-            $data_update['VERIFIKASI_BY']   = $this->auth->user_id();
-            $data_update['VERIFIKASI_TGL']  = date("Y-m-d");
-            $result = $this->update_mandiri_model->update_where("ID_TABEL",$id_data,$data_update);
-            // end update histori update mandiri
+            log_activity($this->auth->user_id(), 'Update data Riwayat pendidikan: ' . $NIP_BARU . ' perubahan : '.json_encode($perubahan).' ' . $this->input->ip_address(), 'pegawai');  
         }
-        else $this->riwayat_pendidikan_model->insert($data);
+        else {
+            $id = $this->riwayat_pendidikan_model->insert($data);
+            log_activity($this->auth->user_id(), 'Insert data Riwayat pendidikan: ' .$NIP_BARU . ' data : '.json_encode($data). ' : ' . $this->input->ip_address(), 'pegawai');  
+        }
+        if ($id_update_mandiri){
+            $data_update = array();
+            $data_update['VERIFIKASI_BY']	= $this->auth->user_id();
+            $data_update['VERIFIKASI_TGL']	= date("Y-m-d");
+            $data_update['STATUS']			= 1;
+            $this->update_mandiri_model->update($id_update_mandiri,$data_update);
+            log_activity($this->auth->user_id(), 'Verifikasi update mandiri id : ' . $id_update_mandiri . ' STATUS : 1 ' . $this->input->ip_address(), 'pegawai');
+
+            if ($data['id_arsip']){
+                $this->load->model('arsip_digital/arsip_digital_model');
+                $this->arsip_digital_model->update($data['id_arsip'], array('ISVALID'=>1));
+            }
+        }
         $response ['success']= true;
         $response ['msg']= "Transaksi berhasil";
         echo json_encode($response);    
@@ -374,6 +485,7 @@ class Riwayatpendidikan extends Admin_Controller
         }
 
        $data = $this->riwayat_pendidikan_model->prep_data($this->input->post());
+       $pegawai_data = $this->pegawai_model->find_by("PNS_ID",$this->input->post("PNS_ID"));
        // Make sure we only pass in the fields we want
         $base64     = "";
         $file_ext   = "";
@@ -395,7 +507,7 @@ class Riwayatpendidikan extends Admin_Controller
             $data_base64 = file_get_contents($file_tmp);
             $base64 = 'data:' . $type . ';base64,' . base64_encode($data_base64);
 
-            if(in_array(end($file_ext),$allowed_ext) === false)
+            if(in_array(strtolower(end($file_ext)),$allowed_ext) === false)
             {
                 $errors[]='Extension not allowed';
                 $response['msg'] = "
@@ -425,43 +537,108 @@ class Riwayatpendidikan extends Admin_Controller
                 echo json_encode($response);
                 exit();
             }
-        }
-        if($base64 == "")
-            unset($data['FILE_BASE64']);
-        else{
-            $data['FILE_BASE64']        = $base64;
-            $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
-        }
-        // end upload berkas
-       if(empty($data['TANGGAL_LULUS'])){
-            unset($data['TANGGAL_LULUS']);
-       }
-        $id_data = $this->input->post("id_data");
-        if(isset($id_data) && !empty($id_data)){
-            $this->riwayat_pendidikan_model->update($id_data,$data);
-        }
-        else{
-            $data["STATUS_SATKER"]  = 0;
-            $data["STATUS_BIRO"]    = 0;
-            $insert_id = $this->riwayat_pendidikan_model->insert($data);
+            $content = file_get_contents($file_tmp);
 
-            // tambahkan pada notifikasi BIRO
-            $PNS_ID         = trim($this->input->post('PNS_ID'));
-            $PENDIDIKAN_ID = trim($this->input->post('PENDIDIKAN_ID'));
-            $NOMOR_IJASAH = trim($this->input->post('NOMOR_IJASAH'));
-            if($PENDIDIKAN_ID != ""){
+            $keterangan = "TANGGAL LULUS ".$this->input->post('TANGGAL_LULUS');
+            $this->load->library('Api_s3_aws');
+            $aws = new Api_s3_aws;
+            $id_jenis_arsip = 0;
+            if ($data['TINGKAT_PENDIDIKAN_ID'] == '05'){
+                $id_jenis_arsip = 6;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '10'){
+                $id_jenis_arsip = 7;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '12'){
+                $id_jenis_arsip = 7;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '15'){
+                $id_jenis_arsip = 8;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '17'){
+                $id_jenis_arsip = 8;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '18'){
+                $id_jenis_arsip = 8;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '20'){
+                $id_jenis_arsip = 9;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '25'){
+                $id_jenis_arsip = 10;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '30'){
+                $id_jenis_arsip = 11;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '35'){
+                $id_jenis_arsip = 116;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '40'){
+                $id_jenis_arsip = 12;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '45'){
+                $id_jenis_arsip = 13;
+            } else if ($data['TINGKAT_PENDIDIKAN_ID'] == '50'){
+                $id_jenis_arsip = 14;
+            } else {
+                $id_jenis_arsip = 83;
+            }
+            
+            $NIP_BARU = $pegawai_data->NIP_BARU;
+            $id = $aws->insertArsip($NIP_BARU,$data['NOMOR_IJASAH'],$id_jenis_arsip,$keterangan, $content,$file_name,0);
+            if ($id){
+                $data['id_arsip'] = $id;
+            } else {
+                if (empty($data['id_arsip']))
+                    unset($data['id_arsip']);
+            }
+        } else {
+            if (empty($data['id_arsip'])){
+                $response ['success']= false;
+                $response ['msg']= "<div class='alert alert-block alert-error fade in note note-danger'>
+                <a class='close' data-dismiss='alert'>&times;</a>
+                <h4 class='alert-heading'>
+                Harap lampirkan bukti dukung
+                </h4>
+                </div>";
+                echo json_encode($response);  
+                die;
+            }
+        }
+        $data['NIP'] = $NIP_BARU;
+        
+       
+        $id_data = $this->input->post("id_data");
+        if(empty($id_data)){
+            foreach ($data as $key => $value) {
+                if (empty($data[$key]))
+                    unset($data[$key]);
+            }
+        } else {
+            foreach ($data as $key => $value) {
+                if ($data[$key] == "")
+                    $data[$key] = null;
+            }
+        }
+        if(isset($id_data) && !empty($id_data)){
+            $current = $this->riwayat_pendidikan_model->find($id_data);
+            $perubahan = arrDiff($current,$data, true);
+            if ($perubahan[1] != '[]'){ 
                 $data_update = array();
-                $data_update['PNS_ID']      = $PNS_ID;
+                $data_update['PNS_ID']      = $pegawai_data->PNS_ID;
                 $data_update['KOLOM']       = "RIWAYAT_PENDIDIKAN";
-                $data_update['DARI']        = "-";
-                $data_update['PERUBAHAN']   = "Pendidikan ID : ".$PENDIDIKAN_ID.", Nomor Ijasah".$NOMOR_IJASAH;
-                $data_update['NAMA_KOLOM']  = "RIWAYAT PENDIDIKAN";
-                $data_update['LEVEL_UPDATE']= 1;
+                $data_update['DARI']        = $perubahan[0];
+                $data_update['PERUBAHAN']   = $perubahan[1];
+                $data_update['NAMA_KOLOM']  = "RIWAYAT_PENDIDIKAN";
+                $data_update['LEVEL_UPDATE']= 3;
+                $data_update['ID_TABEL']    = $id_data;
+                $data_update['ID_ARSIP']    = $data['id_arsip'];
                 $data_update['UPDATE_TGL']  = date("Y-m-d");
-                $data_update['ID_TABEL']    = $insert_id;
                 $data_update['UPDATED_BY']  = $this->auth->user_id();
                 $id_update = $this->update_mandiri_model->insert($data_update);
             }
+        }
+        else{
+            $data_update = array();
+            $data_update['PNS_ID']      = $pegawai_data->PNS_ID;
+            $data_update['KOLOM']       = "RIWAYAT_PENDIDIKAN";
+            $data_update['DARI']        = null;
+            $data_update['PERUBAHAN']   = json_encode($data);
+            $data_update['NAMA_KOLOM']  = "RIWAYAT_PENDIDIKAN";
+            $data_update['LEVEL_UPDATE']= 3;
+            $data_update['UPDATE_TGL']  = date("Y-m-d");
+            $data_update['ID_ARSIP']    = $data['id_arsip'];
+            $data_update['UPDATED_BY']  = $this->auth->user_id();
+            $id_update = $this->update_mandiri_model->insert($data_update);
 
         }
         $response ['success']= true;
@@ -470,6 +647,15 @@ class Riwayatpendidikan extends Admin_Controller
     }
     public function delete($record_id){
         $this->auth->restrict($this->permissionDelete);
+        $record = $this->riwayat_pendidikan_model->find($record_id);
+        if ($record){
+            if ($record->STATUS_BIRO == 0){
+                $update = $this->update_mandiri_model->find_by(array ('PNS_ID' => $record->PNS_ID, 'NAMA_KOLOM' => 'RIWAYAT PENDIDIKAN', 'ID_TABEL' => $record_id));
+                if ($update){
+                    $this->update_mandiri_model->update($update->ID, array('STATUS' => 4));
+                }
+            }
+        }
 		if ($this->riwayat_pendidikan_model->delete($record_id)) {
 			 log_activity($this->auth->user_id(), 'delete data Riwayat Diklat Struktural : ' . $record_id . ' : ' . $this->input->ip_address(), 'pegawai');
 			 Template::set_message("Sukses Hapus data", 'success');
@@ -486,14 +672,19 @@ class Riwayatpendidikan extends Admin_Controller
         Template::set('TAB_ID', uniqid("TAB_CONTOH"));
         Template::render();
     }
-    public function viewdoc($id)
+    private function viewdoc($id)
     {
         if (empty($id)) {
             Template::set_message("ID tidak ditemukan", 'error');
         }
         $datadetil = $this->riwayat_pendidikan_model->find($id);
-        $FILE_BASE64 = $datadetil->FILE_BASE64;
-        echo '<embed src="'.$FILE_BASE64.'" width="100%" height="700" alt="pdf">';
+        $this->load->model('arsip_digital/arsip_digital_model');
+        $arsip = $this->arsip_digital_model->find($datadetil->id_arsip);
+        if ($arsip){
+            $this->load->library('Api_s3_aws');
+            $aws = new Api_s3_aws;
+            $aws->viewdoc($arsip->location.$arsip->name);
+        }
         die();
     }
 }

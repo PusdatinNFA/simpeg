@@ -20,8 +20,8 @@
             <div class="control-group<?php echo form_error('NIP') ? ' error' : ''; ?> col-sm-12">
                 <?php echo form_label("Masukan NIP", 'NIP', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                    <input id='nip_bkn' type='text' class="form-control" name='nip_bkn' maxlength='32' value="" />
-                    <span class='help-inline'><?php echo form_error('NIP'); ?></span>
+                    <input id='nip_bkn' type='text' class="form-control" name='nip_bkn' maxlength='1000' value="" />
+                    <span class='help-inline'>Jika NIP lebih dari satu, silahkan pisahkan dengan separator "koma"</span>
                 </div>
             </div>
              
@@ -44,24 +44,63 @@
 		submitdata();
 		return false; 
 	});	
-	function submitdata(){
-		
-		var json_url = "<?php echo base_url() ?>admin/kepegawaian/pegawai/getpegawaibknnew";
-		 $.ajax({    
-		 	type: "POST",
-			url: json_url,
-			data: $("#frm").serialize(),
-            dataType: "json",
-			success: function(data){ 
-                if(data.success){
-                    swal("Pemberitahuan!", data.msg, "success");
-                    
-                }
-                else {
-                	swal("Pemberitahuan!", data.msg, "error");
-                }
-			}});
-		return false; 
-	}
+function submitdata(){
+    
+    var json_url = "<?php echo base_url() ?>pegawai/bkn/getpegawaibknnew";
+     $.ajax({    
+        type: "POST",
+        url: json_url,
+        data: $("#frm").serialize(),
+        dataType: "json",
+        success: function(data){ 
+            if(data.success){
+                swal("Pemberitahuan!", data.msg, "success");
+                
+            }
+            else {
+                swal("Pemberitahuan!", data.msg, "error");
+            }
+        }});
+    return false; 
+}
+$("#frm-excell").submit(function(){
+    submitfile();
+    return false; 
+}); 
+function submitfile(){
+    var the_data = new FormData(document.getElementById("frm-excell"));
+    var json_url = "<?php echo base_url() ?>pegawai/bkn/getdatabyexcell";
+     $.ajax({    
+        type: "POST",
+        url: json_url,
+        data: the_data,
+        dataType: "json",
+        processData: false, // tell jQuery not to process the data
+        contentType: false, // tell jQuery not to set contentType
+        success: function(data){ 
+            if(data.success){
+                swal({
+                    title: "Pemberitahuan!",
+                    text: data.msg,
+                    type: "success",
+                    timer: 4000,
+                    showConfirmButton: true
+                }, function () {
+                    location.reload();
+                });
+                $("#modal-global").modal("hide");
+                $('#btnsinkron').removeClass('disabled');
+                $('#btnsinkron').text('Simpan Data');
+                $table.ajax.reload(null,true);
+            }
+            else {
+                $('#btnsinkron').removeClass('disabled');
+                $('#btnsinkron').text('Simpan Data');
+                $(".messages").empty().append(data.notes);
+                swal("Pemberitahuan!", data.msg, "error");
+            }
+        }});
+    return false; 
+}
  
 </script>

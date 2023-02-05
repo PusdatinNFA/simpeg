@@ -70,7 +70,7 @@ endif;
                                </div>
                                <div class="col-sm-5">
                                   <?php if(isset($pegawai->NIP_BARU)!= ""){ ?>
-                                   <img src="<?php echo base_url(); ?><?php echo $foto_pegawai; ?>" class="img-responsive pic-bordered" id="photopegawai" alt="Photo" width="200px">
+                                   <img src="<?php echo $foto_pegawai; ?>" class="img-responsive pic-bordered" id="photopegawai" alt="Photo" width="200px">
                                   <?php } ?>
                                </div>
                                <div class="col-sm-5">
@@ -101,16 +101,16 @@ endif;
                                </div>
                                <div class="form-group col-sm-5">
                                   <b>
-                                    <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN : ''; ?> 
-                                    <?php echo isset($pegawai->NAMA) ? $pegawai->NAMA : ''; ?>
-                                    <?php echo isset($pegawai->GELAR_BELAKANG) ? $pegawai->GELAR_BELAKANG : ''; ?>
+                                    <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN.' ' : ''; ?> 
+                                    <?php echo isset($pegawai->NAMA) ? trim($pegawai->NAMA) : ''; ?>
+                                    <?php echo isset($pegawai->GELAR_BELAKANG) ? ', '.$pegawai->GELAR_BELAKANG : ''; ?>
                                   </b>
                                </div>
                                <div class="form-group col-sm-5">
                                   <b>
-                                    <?php echo isset($pegawai2->GELAR_DEPAN) ? $pegawai2->GELAR_DEPAN : ''; ?> 
-                                    <?php echo isset($pegawai2->NAMA) ? $pegawai2->NAMA : ''; ?>
-                                    <?php echo isset($pegawai2->GELAR_BELAKANG) ? $pegawai2->GELAR_BELAKANG : ''; ?>    
+                                    <?php echo isset($pegawai2->GELAR_DEPAN) ? $pegawai2->GELAR_DEPAN.' ' : ''; ?> 
+                                    <?php echo isset($pegawai2->NAMA) ? trim($pegawai2->NAMA) : ''; ?>
+                                    <?php echo isset($pegawai2->GELAR_BELAKANG) ? ', '.$pegawai2->GELAR_BELAKANG : ''; ?>    
                                   </b>
                                </div>
                            </div>

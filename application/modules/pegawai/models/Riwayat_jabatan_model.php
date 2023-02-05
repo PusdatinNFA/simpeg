@@ -96,6 +96,8 @@ class Riwayat_jabatan_model extends BF_Model
 		}
 		$this->db->join("hris.unitkerja as unit", "rwt_jabatan.ID_UNOR=unit.KODE_INTERNAL", 'left');
 		$this->db->join("hris.unitkerja as satker", 'unit.UNOR_INDUK=satker.ID', 'left');
+		$this->db->order_by("TMT_JABATAN","ASC");
+		$this->db->order_by('rwt_jabatan."ID"',"ASC");
 		return parent::find_all();
 	}
 	public function update($id = "", $data = "", $posts = null)
@@ -314,7 +316,7 @@ class Riwayat_jabatan_model extends BF_Model
 		$row = $query->first_row();
 		return $row->jml;
 	}
-	public function find_aktif($PNS_NIP = "")
+	public function find_aktif($PNS_NIP = "",$real = false)
 	{
 
 		if (empty($this->selects)) {
@@ -334,7 +336,8 @@ class Riwayat_jabatan_model extends BF_Model
 				TMT_JABATAN "TMT_JABATAN",
 				TRIM("NOMOR_SK") "NOMOR_SK",
 				kawasan_id, tusi_id,
-				rwt_jabatan.status_jabatan
+				rwt_jabatan.status_jabatan,
+				rwt_jabatan.ID_SATKER_PENUGASAN
 				'
 			);
 			//$this->select($this->table_name .'.STATUS_SATKER');
@@ -342,10 +345,38 @@ class Riwayat_jabatan_model extends BF_Model
 		if ($PNS_NIP != "") {
 			$this->db->where('PNS_NIP', $PNS_NIP);
 		}
+		if ($real){
+			$this->db->where('rwt_jabatan."ID_JENIS_JABATAN" NOT IN (\'5\',\'6\',\'7\')');
+			$this->db->group_start();
+			$this->db->where('rwt_jabatan.status_jabatan not like \'%Plt%\' ');
+			$this->db->or_where('rwt_jabatan.status_jabatan is null ');
+			$this->db->group_end();
+			$this->db->where('rwt_jabatan."ID_JABATAN" NOT IN (\'1475\',\'124\')');
+		}
 		$this->db->where('TERMINATED_DATE IS NULL');
 		$this->db->join("hris.unitkerja as unit", "rwt_jabatan.ID_UNOR=unit.KODE_INTERNAL", 'left');
 		$this->db->join("hris.unitkerja as satker", 'unit.UNOR_INDUK=satker.ID', 'left');
 		$this->db->order_by("TMT_JABATAN","DESC");
+		$this->db->order_by("rwt_jabatan.ID","DESC");
+		return parent::find_all();
+	}
+
+	public function last_ak($PNS_NIP = "")
+	{
+
+		if (empty($this->selects)) {
+			$this->select('*');
+			//$this->select($this->table_name .'.STATUS_SATKER');
+		}
+		if ($PNS_NIP != "") {
+			$this->db->where('PNS_NIP', $PNS_NIP);
+		}
+		$this->db->where('rwt_jabatan."ID_JENIS_JABATAN" = \'2\' ');
+		$this->db->where('ANGKA_KREDIT IS NOT NULL');
+		$this->db->join("hris.unitkerja as unit", "rwt_jabatan.ID_UNOR=unit.KODE_INTERNAL", 'left');
+		$this->db->join("hris.unitkerja as satker", 'unit.UNOR_INDUK=satker.ID', 'left');
+		$this->db->order_by("TMT_JABATAN","DESC");
+		$this->db->order_by("rwt_jabatan.ID","DESC");
 		return parent::find_all();
 	}
 }

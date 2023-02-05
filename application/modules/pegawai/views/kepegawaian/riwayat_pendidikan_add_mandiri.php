@@ -5,9 +5,15 @@
     $id = isset($detail_riwayat->ID) ? $detail_riwayat->ID : '';
 ?>
 <div class="callout callout-info">
-   <h4>Perhatian</h4>
-   <p>Data yang anda masukan akan diverifikasi oleh kepegawaian Satker/Upt anda setelah itu data akan diverifikasi ulang oleh Biro SDM</p>
- </div>
+    <h4>Perhatian</h4>
+    <ul>
+        <li>Data yang anda masukan tidak otomatis mengubah data simpeg dan akan diverifikasi terlebih dahulu oleh kepegawaian.<br>
+        Anda dapat mengecek pengajuan perubahan pada menu <b><a href="<?=base_url()?>admin/kepegawaian/pegawai/peremajaan" target="_BLANK">Peremajaan Data</a></b>
+        </li>
+        <li>Jika Anda belum memiliki PGA, dapat mengajukan melalui elawas</li>
+        <li>Maksimal ukuran berkas yang diunggah sebesar 2MB.</li>
+    </ul>
+</div>
 <div class='box box-warning' id="form-pendidikan-add">
 	<div class="box-body">
         <div class="messages">
@@ -107,6 +113,13 @@
                     <span class='help-inline'><?php echo form_error('DIAKUI_BKN'); ?></span>
                 </div>
             </div> 
+            <div class="control-group col-sm-6">
+                <label for="inputNAMA" class="control-label">PENDIDIKAN TERAKHIR?</label>
+                <div class='controls'>
+                    <input id='PENDIDIKAN_TERAKHIR' type='checkbox' name='PENDIDIKAN_TERAKHIR' value="1" <?php echo $detail_riwayat->PENDIDIKAN_TERAKHIR == "1" ? "checked" : ""; ?> />
+                    <span class='help-inline'><?php echo form_error('PENDIDIKAN_TERAKHIR'); ?></span>
+                </div>
+            </div> 
             <div class="control-group<?php echo form_error('TUGAS_BELAJAR') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label("TUGAS BELAJAR", 'TUGAS_BELAJAR', array('class' => 'control-label')); ?>
                 <div class='controls'>
@@ -118,7 +131,7 @@
                     <span class='help-inline'><?php echo form_error('PENDIDIKAN_ID'); ?></span>
                 </div>
             </div>
-            <div class="control-group col-sm-9">
+            <div class="control-group col-sm-8">
                 <label for="inputNAMA" class="control-label">Berkas</label>
                 <div class='controls'>
                     <div id="form_upload">
@@ -127,13 +140,20 @@
                     
                 </div>
             </div> 
-            <div class="control-group col-sm-3">
+            <div class="control-group col-sm-4">
                 <label for="inputNAMA" class="control-label"><br></label>
                 <div class='controls'>
-                    
-                    <?php if(isset($detail_riwayat->FILE_BASE64) && $detail_riwayat->FILE_BASE64 != ""){ ?>
-                        <a href="<?php echo base_url(); ?>pegawai/riwayatpendidikan/viewdoc/<?php echo $detail_riwayat->ID; ?>" class="btn btn-warning show-modal" tooltip="Lihat dokumen <?php echo isset($detail_riwayat->NOMOR_IJASAH) ? $detail_riwayat->NOMOR_IJASAH : ''; ?>" ><span class="fa fa-file-o"></span> Lihat</a>
-                    <?php } ?>  
+                    <div class=" btn-group">
+                    <?php if (!$read_only){ ?>
+                        <?php $kode_arsip = uniqid(); ?>
+                        <a href="#" kode='<?=$kode_arsip?>' class="btn btn-sm btn-success btn-daftar-arsip" data-toggle='tooltip' tooltip="Pilih dokumen" title="Pilih dokumen"><span class="fa fa-search"></span> pilih</a>
+                        <a href="#" id='view_<?=$kode_arsip?>' class="btn btn-sm btn-info show-modal hide" data-toggle='tooltip' tooltip="Lihat dokumen baru" title="Lihat dokumen baru"><span class="fa fa-file-o"></span> lihat</a>
+                    <?php } ?>
+                        <input type="text" name='id_arsip' id='<?=$kode_arsip?>' class="hide" value="<?= $detail_riwayat->id_arsip ?>">
+                        <?php if (isset($detail_riwayat->id_arsip)) { ?>
+                            <a href="<?php echo base_url(); ?>admin/arsip/arsip_digital/viewdoc2/<?php echo $detail_riwayat->id_arsip; ?>" data-toggle='tooltip' class="btn btn-sm btn-warning show-modal" tooltip="Lihat dokumen" title="Lihat dokumen"><span class="fa fa-file-o"></span> Lihat</a>
+                        <?php } ?>
+                    </div>
                 </div>
             </div>
         </div>
@@ -162,7 +182,7 @@
 <script>
     
     $("#SLCPENDIDIKAN_ID").select2({
-        placeholder: 'Cari Jabatan...',
+        placeholder: 'Cari Pendidikan...',
         width: '100%',
         minimumInputLength: 3,
         allowClear: true,
@@ -172,7 +192,8 @@
             data: function(params) {
                 return {
                     term: params.term || '',
-                    page: params.page || 1
+                    page: params.page || 1,
+                    tkpendidikan : $('#TK_PENDIDIKAN').val()
                 }
             },
             cache: true
@@ -180,7 +201,7 @@
     });
 	$("#btnsave_pendidikan_mandiri").click(function(){
         $('#btnsave_pendidikan_mandiri').text('Sedang Mengirim...');
-        $('#btnsave_pendidikan_mandiri').addClass('disabled');
+        $('#btnsave_pendidikan_mandiri').prop('disabled',true);
 		submitdata();
 		return false; 
 	});	
@@ -203,11 +224,11 @@
                     swal("Pemberitahuan!", data.msg, "success");
                     $("#modal-custom-global").trigger("sukses-tambah-riwayat-pendidikan");
 					$("#modal-custom-global").modal("hide");
-                    $('#btnsave_pendidikan_mandiri').removeClass('disabled');
+                    $('#btnsave_pendidikan_mandiri').prop('disabled',false);
                     $('#btnsave_pendidikan_mandiri').text('Kirimkan Data');
                 }
                 else {
-                    $('#btnsave_pendidikan_mandiri').removeClass('disabled');
+                    $('#btnsave_pendidikan_mandiri').prop('disabled',false);
                     $('#btnsave_pendidikan_mandiri').text('Kirimkan Data');
                     $("#form-pendidikan-add .messages").empty().append(data.msg);
                 }

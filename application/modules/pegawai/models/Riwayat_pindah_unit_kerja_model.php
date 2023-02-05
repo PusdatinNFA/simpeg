@@ -62,7 +62,7 @@ class Riwayat_pindah_unit_kerja_model extends BF_Model
 		array(
 			'field' => 'ID_INSTANSI',
 			'label' => 'INSTANSI',
-			'rules' => 'required',
+			'rules' => '',
 		),
 	);
 	protected $insert_validation_rules  = array();
@@ -82,12 +82,59 @@ class Riwayat_pindah_unit_kerja_model extends BF_Model
 		
 		if(empty($this->selects))
 		{
-			$this->select($this->table_name .'.*');
+			$this->select($this->table_name .'.*,satker.NAMA_UNOR,satker_induk."ABBREVIATION"');
 		}
 		if($PNS_ID!=""){
 			$this->db->where('PNS_ID',$PNS_ID);
 		}
+		// $this->db->order_by('SK_TANGGAL',"desc");
+		$this->db->join("hris.unitkerja as satker_induk", 'rwt_pindah_unit_kerja.ID_UNOR_BARU = satker_induk.ID', 'left');
+		$this->db->join("hris.unitkerja as satker", 'rwt_pindah_unit_kerja.ID_SATUAN_KERJA_PANUGASAN = satker.ID', 'left');
 		$this->db->order_by('SK_TANGGAL',"ASC");
+		$this->db->order_by('rwt_pindah_unit_kerja.ID',"ASC");
 		return parent::find_all();
+	}
+	public function find_aktif($PNS_NIP = "")
+	{
+
+		if (empty($this->selects)) {
+			$this->select(
+				'
+				TRIM("ID_UNOR_BARU") "ID_UNOR_BARU",
+				TRIM("NAMA_UNOR_BARU") "NAMA_UNOR_BARU",
+				TRIM("ID_SATUAN_KERJA") "ID_SATUAN_KERJA",
+				TRIM("NAMA_SATUAN_KERJA") "NAMA_SATUAN_KERJA",
+				TRIM("ID_SATUAN_KERJA_PANUGASAN") "ID_SATUAN_KERJA_PANUGASAN",
+				pengelola_sdm_kawasan_id
+				'
+			);
+		}
+		// if ($PNS_NIP != "") {
+			$this->db->where('PNS_NIP', $PNS_NIP);
+		// }
+		
+		$this->db->join("hris.unitkerja as satker", 'rwt_pindah_unit_kerja.ID_SATUAN_KERJA_PANUGASAN = satker.ID', 'left');
+		$this->db->order_by('SK_TANGGAL',"desc");
+		$this->db->order_by('rwt_pindah_unit_kerja.ID',"desc");
+		return parent::find_all();
+	}
+	public function isUniq($PNS_NIP = "",$ID_UNOR_BARU = "",$SK_TANGGAL= "")
+	{
+
+		if (empty($this->selects)) {
+			$this->select(
+				'
+				TRIM("ID_UNOR_BARU") "ID_UNOR_BARU",
+				TRIM("NAMA_UNOR_BARU") "NAMA_UNOR_BARU",
+				TRIM("ID_SATUAN_KERJA") "ID_SATUAN_KERJA",
+				TRIM("NAMA_SATUAN_KERJA") "NAMA_SATUAN_KERJA",
+				TRIM("ID_SATUAN_KERJA_PANUGASAN") "ID_SATUAN_KERJA_PANUGASAN"
+				'
+			);
+		}
+		$this->db->where('PNS_NIP', $PNS_NIP);
+		$this->db->where('ID_UNOR_BARU', $ID_UNOR_BARU);
+		$this->db->where('SK_TANGGAL', $SK_TANGGAL);
+		return parent::count_all()<=0;
 	}
 }

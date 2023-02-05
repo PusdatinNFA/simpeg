@@ -7,7 +7,7 @@
 <div class="tab-pane active" id="<?php echo $TAB_ID;?>">
     <div class="callout callout-info">
        <h4>Perhatian</h4>
-       <p>Jika ada kesalahan data, silahkan laporkan ke bagian kepegawaian kawasan anda</p>
+       <p><?=$attention;?></p>
      </div>
 	<form role="form" action="#" id="frmprofile">
 	<input id='ID' type='hidden' class="form-control" name='ID' maxlength='25' value="<?php echo set_value('ID', isset($pegawai->ID) ? $pegawai->ID : ''); ?>" />
@@ -41,6 +41,7 @@
                          </div>
                      </div>
                  </div>
+                 <?php if ($this->auth->has_permission('Privacy.Kepegawaian.View') || $this->auth->username() == $pegawai->NIP_BARU){ ?>
                  <div class="control-group col-sm-12">
                      <div class="row">
                          <div class="col-sm-4">
@@ -51,6 +52,17 @@
                          </div>
                      </div>
                  </div>
+                 <div class="control-group col-sm-12">
+                     <div class="row">
+                         <div class="col-sm-4">
+                             NO KK
+                         </div>
+                         <div class="form-group col-sm-8">
+                            <b><?php echo isset($pegawai->no_kk) ? $pegawai->no_kk : '-'; ?></b>
+                         </div>
+                     </div>
+                 </div>
+                 <?php } ?>
         			  <div class="form-group col-sm-12">
         				  <div class="row">
         					  <div class="col-sm-4">
@@ -84,29 +96,37 @@
 			 </div>
       </div>
       
-       <div class="control-group col-sm-12">
+        <div class="control-group col-sm-12">
            <div class="row">
                <div class="col-sm-4">
-                   Alamat
+                   Alamat Domisili
                </div>
                <div class="form-group col-sm-8">
                   <?php echo set_value('ALAMAT', isset($pegawai->ALAMAT) ? $pegawai->ALAMAT : '-'); ?>
                </div>
            </div>
        </div>
+       <div class="control-group col-sm-12">
+           <div class="row">
+               <div class="col-sm-4">
+                   Alamat Sesuai KTP
+               </div>
+               <div class="form-group col-sm-8">
+                  <?php echo set_value('ALAMAT_KTP', isset($pegawai->ALAMAT_KTP) ? $pegawai->ALAMAT_KTP : '-'); ?>
+               </div>
+           </div>
+       </div>
 			 
-			 <div class="control-group col-sm-12">
-				 <div class="row">
-					 <div class="col-sm-4">
-						 No HP
-					 </div>
+        <div class="control-group col-sm-12">
+            <div class="row">
+                <div class="col-sm-4">
+                    No HP
+                </div>
             <div class="form-group col-sm-8">
             <?php echo set_value('NOMOR_HP', (isset($pegawai->NOMOR_HP) and $pegawai->NOMOR_HP != "") ? $pegawai->NOMOR_HP : '-'); ?>
-
+            </div>                            
             </div>
-					 
-				 </div>
-			 </div>
+        </div>
         
        <div class="control-group col-sm-6">
            <div class="row">
@@ -159,32 +179,24 @@
                 </div>
             </div>
             <div class="control-group col-sm-12">
-                <div class="row">
-                     <div class="form-group col-sm-6">
-                        <div class="row">
-                            <div class="col-sm-8">
-                                Masa Kerja (Tahun/Bulan)
-                            </div>
-                            <div class="form-group col-sm-4">
-                                <b><?php echo isset($recpns_aktif->masa_kerja_th) ? $recpns_aktif->masa_kerja_th  : ""; ?>/<?php echo isset($recpns_aktif->masa_kerja_bl) ? $recpns_aktif->masa_kerja_bl  : ""; ?></b>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                  <div class="row">
+                      <div class="col-sm-4">
+                          Masa Kerja berdasarkan TMT CPNS (Tahun/Bulan)
+                      </div>
+                      <div class="form-group col-sm-4">
+                          <b><?php echo isset($recpns_aktif->masa_kerja_th) ? $recpns_aktif->masa_kerja_th  : ""; ?>/<?php echo isset($recpns_aktif->masa_kerja_bl) ? $recpns_aktif->masa_kerja_bl  : ""; ?></b>
+                      </div>
+                  </div>
             </div>
 
             <div class="control-group col-sm-12">
                 <div class="row">
-                     <div class="form-group col-sm-6">
-                        <div class="row">
-                            <div class="col-sm-8">
-                                Lokasi Kerja
-                            </div>
-                            <div class="form-group col-sm-4">
-                                <b><?php echo isset($pegawai->LOKASI_KERJA) ? $pegawai->LOKASI_KERJA  : ""; ?></b>
-                            </div>
-                        </div>
-                    </div>
+                      <div class="form-group col-sm-4">
+                          Lokasi Kerja
+                      </div>
+                      <div class="form-group col-sm-8">
+                          <b><?php echo isset($pegawai->LOKASI_KERJA) ? $pegawai->LOKASI_KERJA  : ""; ?></b>
+                      </div>
                 </div>
             </div>
             <div class="control-group col-sm-12">
@@ -213,7 +225,7 @@
          <div class="control-group col-sm-6">
            <div class="row">
                <div class="form-group col-sm-8">
-                   Golongan Ruang Awal
+                   Gol Ruang Awal
                </div>
                <div class="form-group col-sm-4">
                       <b><?php echo isset($GOLONGAN_AWAL) ? $GOLONGAN_AWAL  : "-"; ?></b>
@@ -223,7 +235,7 @@
        <div class="control-group col-sm-6">
            <div class="row">
                <div class="form-group col-sm-4">
-                   Golongan Ruang Terakhir
+                   Gol Ruang Akhir
                </div>
                <div class="form-group  col-sm-8">
                       <b><?php echo isset($GOLONGAN_AKHIR) ? $GOLONGAN_AKHIR  : "-"; ?></b>
@@ -283,14 +295,44 @@
         <div class="form-group col-sm-12">
             <div class="row">
                 <div class="col-sm-4">
-                    Kartu Pegawai
+                    Status Pegawai
                 </div>
                 <div class="col-sm-8">
+                    <b><?php echo isset($pegawai->status_pegawai) ? $pegawai->status_pegawai == 1 ? "PNS" : ($pegawai->status_pegawai == 2 ? "PPPK" : "NON PNS"):""; ?> </b>
+                </div>
+            </div>
+        </div>
+        <div class="form-group col-sm-6">
+            <div class="row">
+                <div class="col-sm-8">
+                    Kartu Pegawai
+                </div>
+                <div class="col-sm-4">
                     <b><?php echo isset($pegawai->KARTU_PEGAWAI) ? $pegawai->KARTU_PEGAWAI != "" ? $pegawai->KARTU_PEGAWAI : "" : ''; ?></b>
                 </div>
             </div>
         </div>
-<div class="control-group col-sm-12">
+        <div class="control-group col-sm-6">
+           <div class="row">
+               <div class="form-group col-sm-4">
+                   Kartu ASN
+               </div>
+               <div class="form-group  col-sm-8">
+                      <b><?php echo isset($pegawai->KARTU_ASN) ? $pegawai->KARTU_ASN != "" ? $pegawai->KARTU_ASN : "" : ''; ?></b>
+               </div>
+           </div>
+       </div>
+        <div class="form-group col-sm-12">
+            <div class="row">
+                <div class="col-sm-4">
+                    Nomor Induk Jabatan Fungsional
+                </div>
+                <div class="col-sm-8">
+                    <b><?php echo isset($pegawai->no_induk_jf) ? $pegawai->no_induk_jf != "" ? $pegawai->no_induk_jf : "" : ''; ?></b>
+                </div>
+            </div>
+        </div>
+        <div class="control-group col-sm-12">
                       <div class="row">
                          <div class="col-sm-4">
                            Status Perkawinan
@@ -448,6 +490,139 @@
                              <div class="form-group  col-sm-4">
                                     <b>
                                     <?php echo set_value('NOMOR_DARURAT', isset($pegawai->NOMOR_DARURAT) ? $pegawai->NOMOR_DARURAT : '-'); ?>
+                                      
+                                    </b>
+                             </div>
+                         </div>
+                     </div>
+                    <div class="control-group col-sm-6">
+                        <div class="row">
+                            <div class="form-group col-sm-4">
+                                Kode Pos (Sesuai KK)
+                            </div>
+                            <div class="col-sm-8">
+                                <b><?php echo isset($pegawai->kode_pos) ? $pegawai->kode_pos : '-'; ?></b>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="control-group col-sm-6">
+                         <div class="row">
+                             <div class="form-group col-sm-8">
+                                 Situs Pribadi
+                             </div>
+                             <div class="form-group  col-sm-4">
+                                    <b>
+                                    <?php echo set_value('situs_pribadi', isset($pegawai->situs_pribadi) ? $pegawai->situs_pribadi : '-'); ?>
+                                      
+                                    </b>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="control-group col-sm-6">
+                         <div class="row">
+                             <div class="form-group col-sm-4">
+                                Facebook
+                             </div>
+                             <div class="col-sm-8">
+                                    <b>
+                                    <?php echo set_value('facebook', isset($pegawai->facebook) ? $pegawai->facebook : '-'); ?>
+                                      
+                                    </b>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="control-group col-sm-6">
+                         <div class="row">
+                             <div class="form-group col-sm-8">
+                                Twitter
+                             </div>
+                             <div class="form-group  col-sm-4">
+                                    <b>
+                                    <?php echo set_value('twitter', isset($pegawai->twitter) ? $pegawai->twitter : '-'); ?>
+                                      
+                                    </b>
+                             </div>
+                         </div>
+                     </div><div class="control-group col-sm-6">
+                         <div class="row">
+                             <div class="form-group col-sm-4">
+                                Google Plus
+                             </div>
+                             <div class="col-sm-8">
+                                    <b>
+                                    <?php echo set_value('google_plus', isset($pegawai->google_plus) ? $pegawai->google_plus : '-'); ?>
+                                      
+                                    </b>
+                             </div>
+                         </div>
+                     </div><div class="control-group col-sm-6">
+                         <div class="row">
+                             <div class="form-group col-sm-8">
+                                Google Scholar
+                             </div>
+                             <div class="form-group  col-sm-4">
+                                    <b>
+                                    <?php echo set_value('google_scholar', isset($pegawai->google_scholar) ? $pegawai->google_scholar : '-'); ?>
+                                      
+                                    </b>
+                             </div>
+                         </div>
+                     </div><div class="control-group col-sm-6">
+                         <div class="row">
+                             <div class="form-group col-sm-4">
+                                LinkedIn
+                             </div>
+                             <div class="col-sm-8">
+                                    <b>
+                                    <?php echo set_value('linkedin', isset($pegawai->linkedin) ? $pegawai->linkedin : '-'); ?>
+                                      
+                                    </b>
+                             </div>
+                         </div>
+                     </div><div class="control-group col-sm-6">
+                         <div class="row">
+                             <div class="form-group col-sm-8">
+                             ORCID
+                             </div>
+                             <div class="form-group  col-sm-4">
+                                    <b>
+                                    <?php echo set_value('orcid', isset($pegawai->orcid) ? $pegawai->orcid : '-'); ?>
+                                      
+                                    </b>
+                             </div>
+                         </div>
+                     </div><div class="control-group col-sm-6">
+                         <div class="row">
+                             <div class="form-group col-sm-4">
+                             ResearchGate
+                             </div>
+                             <div class="col-sm-8">
+                                    <b>
+                                    <?php echo set_value('research_gate', isset($pegawai->research_gate) ? $pegawai->research_gate : '-'); ?>
+                                      
+                                    </b>
+                             </div>
+                         </div>
+                     </div><div class="control-group col-sm-6">
+                         <div class="row">
+                             <div class="form-group col-sm-8">
+                             ResearcherID
+                             </div>
+                             <div class="form-group  col-sm-4">
+                                    <b>
+                                    <?php echo set_value('researcher_id', isset($pegawai->researcher_id) ? $pegawai->researcher_id : '-'); ?>
+                                      
+                                    </b>
+                             </div>
+                         </div>
+                     </div><div class="control-group col-sm-6">
+                         <div class="row">
+                             <div class="form-group col-sm-4">
+                             Scopus
+                             </div>
+                             <div class="col-sm-8">
+                                    <b>
+                                    <?php echo set_value('scopus', isset($pegawai->scopus) ? $pegawai->scopus : '-'); ?>
                                       
                                     </b>
                              </div>

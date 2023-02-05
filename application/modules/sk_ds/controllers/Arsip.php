@@ -115,10 +115,7 @@ class Arsip extends Admin_Controller
         $pegawai_login = $this->pegawai_model->find_by("NIP_BARU",trim($NIP));
         Template::set("pegawai_login",$pegawai_login);
         
-        $foto_pegawai = trim($this->settings_lib->item('site.urlphoto'))."noimage.jpg";
-        if(file_exists(trim($this->settings_lib->item('site.urlphoto')).$pegawai->PHOTO)){
-            $foto_pegawai =  trim($this->settings_lib->item('site.urlphoto')).$pegawai->PHOTO;
-        }
+        $foto_pegawai =  END_POINT_PHOTO.$pegawai->username_intra;
         Template::set('foto_pegawai', $foto_pegawai);
 
 
@@ -179,18 +176,17 @@ class Arsip extends Admin_Controller
         $pegawai_login = $this->pegawai_model->find_by("NIP_BARU",trim($NIP));
         Template::set("pegawai_login",$pegawai_login);
 
-        $foto_pegawai = trim($this->settings_lib->item('site.urlphoto'))."noimage.jpg";
-        if(file_exists(trim($this->settings_lib->item('site.urlphoto')).$pegawai->PHOTO)){
-            $foto_pegawai =  trim($this->settings_lib->item('site.urlphoto')).$pegawai->PHOTO;
-        }
+        $foto_pegawai =  END_POINT_PHOTO.$pegawai->username_intra;
         Template::set('foto_pegawai', $foto_pegawai);
 
         
         Template::set("collapse",true);
         Template::set("data",$data);
         Template::set("b64",$b64_sign);
-         
-        Template::set("url_sk",$url_sk.$file_name);
+        $this->load->library('Api_s3_aws');
+        $aws = new Api_s3_aws;
+        $url = $aws->preSignUrl("simpeg",$data->lokasi_file);
+        Template::set("url_sk",$url);
         Template::set('toolbar_title', "Lihat SK");
         Template::render();
     }
@@ -216,17 +212,16 @@ class Arsip extends Admin_Controller
         $pegawai = $this->pegawai_model->find_by("NIP_BARU",trim($data->nip_sk));
         Template::set("pegawai",$pegawai);
 
-        $foto_pegawai = trim($this->settings_lib->item('site.urlphoto'))."noimage.jpg";
-        if(file_exists(trim($this->settings_lib->item('site.urlphoto')).$pegawai->PHOTO)){
-            $foto_pegawai =  trim($this->settings_lib->item('site.urlphoto')).$pegawai->PHOTO;
-        }
+        $foto_pegawai =  END_POINT_PHOTO.$pegawai->username_intra;
         Template::set('foto_pegawai', $foto_pegawai);
-
+        $this->load->library('Api_s3_aws');
+        $aws = new Api_s3_aws;
+        $url = $aws->preSignUrl("simpeg",$data->lokasi_file);
 
         Template::set("collapse",true);
         Template::set("data",$data);
         Template::set("b64",$b64);
-        Template::set("url_sk",$url_sk.$file_name);
+        Template::set("url_sk",$url);
         Template::set('toolbar_title', "Lihat SK");
         Template::render();
     }
@@ -646,6 +641,77 @@ class Arsip extends Admin_Controller
                 $btn_actions = array();
                 $btn_actions  [] = "<a href='".base_url()."admin/arsip/sk_ds/lihatsk/".$record->id_file."' data-toggle='tooltip' title='Lihat SK' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-eye-open'></i> </a>";
                 $btn_actions  [] = "<a href='".base_url()."admin/arsip/sk_ds/downloadsksigned/".$record->id_file."' data-toggle='tooltip' title='Download SK' class='btn btn-sm btn-warning'><i class='glyphicon glyphicon-download'></i> </a>";
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+
+                $output['data'][] = $row;
+                $nomor_urut++;
+            }
+        endif;
+        echo json_encode($output);
+        
+    }
+    public function ajax_list(){
+        $this->auth->restrict($this->permissionViewPegawai);
+        $PNS_ID = $this->input->post('PNS_ID');
+
+        $this->pegawai_model->where("PNS_ID",$PNS_ID);
+        $pegawai_data = $this->pegawai_model->find_first_row();
+        if (!$this->input->is_ajax_request()) {
+            Template::set_message("Hanya request ajax", 'error');
+            redirect(SITE_AREA . '/sk/sk_ds/viewall');
+        }
+        $draw = $this->input->post('draw');
+        $iSortCol = $this->input->post('iSortCol_1');
+        $sSortCol = $this->input->post('sSortDir_1');
+        
+        $length= $this->input->post('length') != "" ? $this->input->post('length') : 10;
+        $start= $this->input->post('start') != "" ? $this->input->post('start') : 0;
+
+        $this->db->start_cache();
+
+        $this->db->stop_cache();
+        $output=array();
+        $output['draw']=$draw;
+        $total= $this->sk_ds_model->count_all_pegawai_ttd($pegawai_data->NIP_BARU);
+        $orders = $this->input->post('order');
+        foreach($orders as $order){
+            if($order['column']==1){
+                $this->sk_ds_model->order_by("pegawai.NAMA",$order['dir']);
+            }
+            if($order['column']==2){
+                $this->sk_ds_model->order_by("kategori",$order['dir']);
+            }
+            if($order['column']==3){
+                $this->sk_ds_model->order_by("nomor_sk",$order['dir']);
+            }
+            if($order['column']==4){
+                $this->sk_ds_model->order_by("NAMA_UNOR",$order['dir']);
+            }
+        }
+        $output['recordsTotal']= $output['recordsFiltered']=$total;
+        $output['data']=array();
+        
+        $this->sk_ds_model->limit($length,$start);
+        $records=$this->sk_ds_model->find_all_pegawai_ttd($pegawai_data->NIP_BARU);
+        $this->db->flush_cache();
+        $nomor_urut=$start+1;
+        if(isset($records) && is_array($records) && count($records)):
+            foreach ($records as $record) {
+                $row = array();
+                $row []  = $nomor_urut.".";
+                $row []  = "<b>".$record->NAMA."</b><br>".$record->NIP_BARU;
+                $row []  = $record->kategori;
+                $row []  = $record->nomor_sk."<br>".$record->tgl_sk;
+                $row []  = $record->NAMA_UNOR_FULL;
+                if($record->ds_ok == "1"){
+                    $row []  = "DS";    
+                }else{
+                    $row []  = "Manual";
+                }
+                
+                $btn_actions = array();
+                $btn_actions  [] = "<a href='".base_url()."admin/arsip/sk_ds/lihatsk/".$record->id_file."' data-toggle='tooltip' title='Lihat SK' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-eye-open'></i> </a>";
+                $btn_actions  [] = "<a href='".base_url()."admin/sk/sk_ds/downloadsk/".$record->id_file."' data-toggle='tooltip' title='Download SK' class='btn btn-sm btn-warning'><i class='glyphicon glyphicon-download'></i> </a>";
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
 
                 $output['data'][] = $row;

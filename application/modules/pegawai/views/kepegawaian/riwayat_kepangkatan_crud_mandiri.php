@@ -23,7 +23,7 @@
 						<option value="">-- Silahkan Pilih --</option>
 						<?php if (isset($jenis_kps) && is_array($jenis_kps) && count($jenis_kps)):?>
 						<?php foreach($jenis_kps as $record):?>
-							<option value="<?php echo $record->ID?>" <?php if(isset($detail_riwayat->KODE_JENIS_KP))  echo  ($detail_riwayat->KODE_JENIS_KP==$record->ID) ? "selected" : ""; ?>><?php echo $record->ID." | ".$record->NAMA.""; ?></option>
+							<option value="<?php echo $record->ID?>"><?php echo $record->ID." | ".$record->NAMA.""; ?></option>
 							<?php endforeach;?>
 						<?php endif;?>
 					</select>
@@ -159,7 +159,7 @@
 <script>
 	$("#btnsave_kepangkatan_mandiri").click(function(){
         $('#btnsave_kepangkatan_mandiri').text('Sedang Mengirim...');
-        $('#btnsave_kepangkatan_mandiri').addClass('disabled');
+        $('#btnsave_kepangkatan_mandiri').prop('disabled',true);
 		submitdata_kepangkatan_mandiri();
 		return false; 
 	});	
@@ -182,11 +182,11 @@
                     swal("Pemberitahuan!", data.msg, "success");
                     $("#modal-custom-global").trigger("sukses-tambah-riwayat-kepangkatan");
 					 $("#modal-custom-global").modal("hide");
-                     $('#btnsave_kepangkatan_mandiri').removeClass('disabled');
+                     $('#btnsave_kepangkatan_mandiri').prop('disabled',false);
                      $('#btnsave_kepangkatan_mandiri').text('Simpan Data');
                 }
                 else {
-                    $('#btnsave_kepangkatan_mandiri').removeClass('disabled');
+                    $('#btnsave_kepangkatan_mandiri').prop('disabled',false);
                     $('#btnsave_kepangkatan_mandiri').text('Simpan Data');
                     $("#form-kepangkatan-add-mandiri .messages").empty().append(data.msg);
                 }

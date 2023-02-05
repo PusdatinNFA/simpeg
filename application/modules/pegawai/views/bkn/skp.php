@@ -24,14 +24,13 @@
                                 <th>Tahun</th>
                                 <th>Nilai SKP</th>
                                 <th>Orientasi Pelayanan</th>
-                                <th>Integrasi</th>
+                                <th>Integritas</th>
                                 <th>Komitmen</th>
                                 <th>Disiplin</th>
                                 <th>Kerjasama</th>
+                                <th>jumlah</th>
                                 <th>Perilaku Kerja</th>
                                 <th>nilaiPrestasiKerja</th>
-                                <th>jumlah</th>
-                                <th>Nilai rata-rata</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -48,10 +47,9 @@
                               <td><?php echo $row->komitmen; ?></td>
                               <td><?php echo $row->disiplin; ?></td>
                               <td><?php echo $row->kerjasama; ?></td>
-                              <td><?php echo $row->nilaiPerilakuKerja; ?></td>
-                              <td><?php echo $row->nilaiPrestasiKerja; ?></td>
                               <td><?php echo $row->jumlah; ?></td>
                               <td><?php echo $row->nilairatarata; ?></td>
+                              <td><?php echo $row->nilaiPrestasiKerja; ?></td>
                             </tr>
                             <?php  
                             $no++;

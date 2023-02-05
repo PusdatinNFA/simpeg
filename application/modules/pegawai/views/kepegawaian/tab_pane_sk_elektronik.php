@@ -5,7 +5,7 @@
 </style>
 <!--tab-pane-->
  
-<div class="tab-pane active" id="<?php echo $TAB_ID;?>">
+<div class="tab-pane" id="<?php echo $TAB_ID;?>">
     <div class="form-group">
             <div class="box-header">
             <?php echo form_open($this->uri->uri_string(),"id=form_search_pegawai","form"); ?>
@@ -90,13 +90,13 @@
         },
         "columnDefs": [
                         {"className": "dt-center", "targets": [4]},
-                        { "targets": [0,5], "orderable": false }
+                        { "targets": [0], "orderable": false }
                     ],
         ajax: {
-          url: "<?php echo base_url() ?>admin/arsip/sk_ds/getdataall_pegawai",
+          url: "<?php echo base_url() ?>admin/arsip/sk_ds/ajax_list",
           type:'POST',
-          "data": function ( d ) {
-                d.search['advanced_search_filters']=  $("#form_search_pegawai").serializeArray();
+          "data": {
+                PNS_ID:'<?php echo $PNS_ID;?>'
             }
         }
     });

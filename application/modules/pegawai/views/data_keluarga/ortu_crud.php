@@ -105,10 +105,24 @@
                     <span class='help-inline'><?php echo form_error('NO_DOKUMEN_ID'); ?></span>
                 </div>
             </div>
+            <div class="control-group<?php echo form_error('STATUS_HIDUP') ? ' error' : ''; ?> col-sm-9">
+                <?php echo form_label('STATUS HIDUP', 'STATUS_HIDUP', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <select name="STATUS_HIDUP" <?php echo $view ? "":"disabled"; ?> id="STATUS_HIDUP" class="form-control">
+                        <option value="">-- Silahkan Pilih --</option>
+                        <option value="1" <?php if(isset($detail_riwayat->STATUS_HIDUP))  echo  ($detail_riwayat->STATUS_HIDUP=="1") ? "selected" : ""; ?>>HIDUP</option> 
+                        <option value="2" <?php if(isset($detail_riwayat->STATUS_HIDUP))  echo  ($detail_riwayat->STATUS_HIDUP=="2") ? "selected" : ""; ?>>MENINGGAL</option>
+                    </select>
+                    <span class='help-inline'><?php echo form_error('STATUS_HIDUP'); ?></span>
+                </div>
+            </div> 
+            <input type="text" class="hide" name='id_update_mandiri' value="<?=$id_update_mandiri?>">
         </div>
+        <?php if (!$read_only) { ?>
         <div class="box-footer">
             <input type='submit' name='save' id="btnsaveortu" class='btn btn-primary' value="Simpan Data" /> 
         </div>
+        <?php } ?>
     <?php echo form_close(); ?>
 </div>
 <script src="<?php echo base_url(); ?>themes/admin/plugins/datepicker/bootstrap-datepicker.js"></script>
@@ -138,9 +152,10 @@
             success: function(data){ 
                 if(data.success){
                     swal("Pemberitahuan!", data.msg, "success");
-                    $("#modal-global").trigger("sukses-tambah-ortu");
+                    $("#modal-custom-global").trigger("sukses-tambah-ortu");
                     $("#modal-global").modal("hide");
-                    loadkeluargaall();
+                    $("#modal-custom-global").modal("hide");
+                    // loadkeluargaall();
                 }
                 else {
                     $("#form-ortu-add .messages").empty().append(data.msg);

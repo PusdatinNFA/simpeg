@@ -110,7 +110,7 @@ function sinkronisasi_data(){
 		success: function(data){ 
             if(data.success){
                 swal("Pemberitahuan!", data.msg, "success");
-				$('#btn_proses_sinkron').removeClass('disabled');
+				$('#btn_proses_sinkron').prop('disabled',false);
 			    $('#btn_proses_sinkron').text('Sinkron data');
 			    $('#btn_proses_sinkron').append(' <i class="fa fa-gear"></i>');
             }
@@ -122,9 +122,9 @@ function sinkronisasi_data(){
 }
 $("#btn_cari").click(function(){
 	$('#btn_cari').text('load data..');
-    $('#btn_cari').addClass('disabled');
+    $('#btn_cari').prop('disabled',true);
 	$table.ajax.reload(null,true);
-	$('#btn_cari').removeClass('disabled');
+	$('#btn_cari').prop('disabled',false);
     $('#btn_cari').text('Lihat Perubahan data');
     $('#btn_cari').append(' <i class="fa fa-search"></i>');
     
@@ -146,7 +146,7 @@ $("#btn_proses_sinkron").click(function(){
 	function (isConfirm) {
 		if (isConfirm) {
 			$('#btn_proses_sinkron').text('Proses sinkron data..');
-		    $('#btn_proses_sinkron').addClass('disabled');
+		    $('#btn_proses_sinkron').prop('disabled',true);
 			sinkronisasi_data();
 		} else {
 			swal("Batal", "", "error");

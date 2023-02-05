@@ -121,6 +121,35 @@ $has_records	= isset($records) && is_array($records) && count($records);
 					</td>
 				</tr>
 				<tr>
+					<td width="200px"><label for="example-text-input" class="col-form-label">Status Pegawai</label></td>
+					<td colspan=2>
+						<select name="status_pegawai" id="status_pegawai" class="form-control select2">
+	                        <option value="">-- Silahkan Pilih --</option>
+							<option value="1">PNS</option>
+							<option value="2">PPPK</option>
+	                    </select>
+					</td>
+				</tr>
+				<tr class="hide">
+					<td width="200px"><label for="example-text-input" class="col-form-label">Kawasan</label></td>
+					<td colspan=2>
+						<select class="form-control select2" multiple="multiple" name="kawasan[]">
+						<?php
+							if (isset($kawasans) && is_array($kawasans) && count($kawasans)) :
+								foreach ($kawasans as $kawasan) :
+									$selected = '';
+									$bool =  in_array( $kawasan->id, $akawasans );
+									if($bool){
+										$selected = "selected";
+									}
+									echo "<option $selected value='$kawasan->id'>".strtoupper($kawasan->name)."</option>";
+								endforeach;
+							endif;
+							?>
+						</select>
+					</td>
+				</tr>
+				<tr>
 					<td colspan="3">
 						<button type="submit" class="btn btn-success pull-right "><i class="fa fa-search"></i> Cari</button>
 					</td>
@@ -158,7 +187,7 @@ $has_records	= isset($records) && is_array($records) && count($records);
 				<th>NIP</th>
 				<th>Nama Pegawai</th>
 				<th>Golongan</th>
-				<th>Unit Kerja</th>
+				<th>Unit Kerja<br>Kawasan SDM</th>
 				<th width="120px" align="center">#</th></tr>
 			</thead>
 		</table>

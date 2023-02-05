@@ -68,6 +68,7 @@ class Riwayat_assesmen_model extends BF_Model
 			$this->db->where('PNS_ID',$PNS_ID);
 		}
 		$this->db->distinct();
+		$this->db->order_by('TAHUN','ASC');
 		return parent::find_all();
 	}
 	public function count_all($PNS_ID ="")

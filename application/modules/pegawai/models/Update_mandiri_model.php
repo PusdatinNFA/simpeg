@@ -60,18 +60,19 @@ class Update_mandiri_model extends BF_Model
 	
 	public function find_all($PNS_ID = ""){
 		 
-		$this->db->select('NAMA,update_mandiri.*',false);
+		$this->db->select('"NAMA",update_mandiri.*',false);
 		$this->db->join('pegawai', 'pegawai.PNS_ID = update_mandiri.PNS_ID', 'left');
 		$this->db->order_by("update_mandiri.ID","DESC");
 		return parent::find_all();
 	}
 	public function find_notif(){
 		 
-		$this->db->select($this->table_name .'.*,"NIP_BARU","NAMA","NAMA_UNOR_FULL"');
-		$this->db->where("STATUS IS NULL");
+		$this->db->select($this->table_name .'.*,"NIP_BARU","NAMA","NAMA_UNOR_FULL", u.display_name as  verifikator');
+		// $this->db->where("STATUS IS NULL");
 		$this->db->join('pegawai', 'pegawai.PNS_ID = update_mandiri.PNS_ID', 'left');
 		$this->db->join("vw_unit_list as vw","pegawai.\"UNOR_ID\"=vw.\"ID\"", 'left',false);
-		$this->db->order_by("update_mandiri.ID","DESC");
+		$this->db->join('users u', 'u.id = update_mandiri.VERIFIKASI_BY', 'left');
+		$this->db->order_by("update_mandiri.ID","ASC");
 		return parent::find_all();
 	}
 	public function find_notif1($satker_id = ""){
@@ -86,35 +87,37 @@ class Update_mandiri_model extends BF_Model
 			}
 			else $where_clause = 'AND (vw."ESELON_1" = \''.$satker_id.'\' OR vw."ESELON_2" = \''.$satker_id.'\' OR vw."ESELON_3" = \''.$satker_id.'\' OR vw."ESELON_4" = \''.$satker_id.'\')' ;
 		}
-		$this->db->select($this->table_name .'.*,"NIP_BARU","NAMA","NAMA_UNOR_FULL"');
-		$this->db->where("STATUS IS NULL");
+		$this->db->select($this->table_name .'.*,"NIP_BARU","NAMA","NAMA_UNOR_FULL", u.display_name as  verifikator');
+		// $this->db->where("STATUS IS NULL");
 		$this->db->where("LEVEL_UPDATE",3);
 		$this->db->where("(status_pegawai != 3 or status_pegawai is null) ".$where_clause);
 		$this->db->join('pegawai', 'pegawai.PNS_ID = update_mandiri.PNS_ID', 'left');
 		$this->db->join("vw_unit_list as vw","pegawai.\"UNOR_ID\"=vw.\"ID\"", 'left',false);
-		$this->db->order_by("update_mandiri.ID","DESC");
+		$this->db->join('users u', 'u.id = update_mandiri.VERIFIKASI_BY', 'left');
+		$this->db->order_by("update_mandiri.ID","ASC");
 		return parent::find_all();
 	}
 	public function count_notif(){
 		 
 		$this->db->select($this->table_name .'.*,"NAMA"');
-		$this->db->where("STATUS IS NULL");
+		// $this->db->where("STATUS IS NULL");
 		$this->db->join('pegawai', 'pegawai.PNS_ID = update_mandiri.PNS_ID', 'left');
 		$this->db->join("vw_unit_list as vw","pegawai.\"UNOR_ID\"=vw.\"ID\"", 'left',false);
 		return parent::count_all();
 	}
 	public function find_notif_pribadi(){
 		 
-		$this->db->select($this->table_name .'.*,"NIP_BARU","NAMA","NAMA_UNOR_FULL",STATUS');
+		$this->db->select($this->table_name .'.*,"NIP_BARU","NAMA","NAMA_UNOR_FULL",STATUS, u.display_name as  verifikator');
 		// $this->db->where("STATUS IS NULL");
 		$this->db->join('pegawai', 'pegawai.PNS_ID = update_mandiri.PNS_ID', 'left');
 		$this->db->join("vw_unit_list as vw","pegawai.\"UNOR_ID\"=vw.\"ID\"", 'left',false);
+		$this->db->join('users u', 'u.id = update_mandiri.VERIFIKASI_BY', 'left');
 		$this->db->order_by("update_mandiri.ID","DESC");
 		return parent::find_all();
 	}
 	public function count_notif_pribadi(){
 		 
-		$this->db->select($this->table_name .'.*,"NAMA"');
+		$this->db->select($this->table_name .'.*,pegawai."NAMA"');
 		// $this->db->where("STATUS IS NULL");
 		$this->db->join('pegawai', 'pegawai.PNS_ID = update_mandiri.PNS_ID', 'left');
 		$this->db->join("vw_unit_list as vw","pegawai.\"UNOR_ID\"=vw.\"ID\"", 'left',false);
@@ -133,7 +136,7 @@ class Update_mandiri_model extends BF_Model
 			else $where_clause = 'AND (vw."ESELON_1" = \''.$satker_id.'\' OR vw."ESELON_2" = \''.$satker_id.'\' OR vw."ESELON_3" = \''.$satker_id.'\' OR vw."ESELON_4" = \''.$satker_id.'\')' ;
 		}
 		$this->db->select($this->table_name .'.*,"NAMA"');
-		$this->db->where("STATUS IS NULL");
+		// $this->db->where("STATUS IS NULL");
 		$this->db->where("LEVEL_UPDATE",3);
 		$this->db->where("(status_pegawai != 3 or status_pegawai is null) ".$where_clause);
 		$this->db->join('pegawai', 'pegawai.PNS_ID = update_mandiri.PNS_ID', 'left');
@@ -142,11 +145,63 @@ class Update_mandiri_model extends BF_Model
 	}
 	public function find($id = ""){
 		 
-		$this->db->select('NAMA,update_mandiri.*');
+		$this->db->select('NAMA,update_mandiri.*, pegawai.ref, pegawai.NIP_BARU');
 		$this->db->join('pegawai', 'pegawai.PNS_ID = update_mandiri.PNS_ID', 'left');
 		$this->db->order_by("update_mandiri.ID","DESC");
 		return parent::find($id);
 	}
-	
+	public function get_jenis_data($key = ""){		 
+		$this->db->select('distinct("NAMA_KOLOM") as id, "NAMA_KOLOM" as text',false);
+		$this->db->like('lower("NAMA_KOLOM")',strtolower($key),"BOTH");
+		$this->db->order_by("update_mandiri.NAMA_KOLOM","DESC");
+		return parent::find_all();
+	}
+	public function count_rekap_pdm()
+	{
+		return $this->db->from("vw_rekap_pdm")->get()->num_rows();
+	}
+	public function find_rekap_pdm()
+	{
+		$this->db->from("vw_rekap_pdm");
+		$this->db->order_by("NAMA_UNOR","ASC");
+		$this->db->order_by("NAMA","ASC");
+		$data = $this->db->get()->result();
+		return $data;
+	}
+	public function find_prosentase_pdm()
+	{
+		$data = $this->db->from("vw_prosentase_pdm")->get()->result();
+		return $data;
+	}
+	public function count_prosentase_pdm()
+	{
+		return $this->db->from("vw_prosentase_pdm")->get()->num_rows();
+	}
+	public function find_progres_verifikasi()
+	{
+		$data = $this->db->from("vw_progres_verifikasi")->get()->result();
+		return $data;
+	}
+	public function count_progres_verifikasi()
+	{
+		return $this->db->from("vw_progres_verifikasi")->get()->num_rows();
+	}
+	public function find_detail_verifikasi()
+	{
+		$data = $this->db->from("vw_rekap_verifikator_pdm")->get()->result();
+		return $data;
+	}
+	public function count_detail_verifikasi()
+	{
+		return $this->db->from("vw_rekap_verifikator_pdm")->get()->num_rows();
+	}
+	public function find_belum_diverifikasi($pns_id = null)
+	{
+		if ($pns_id){
+			$this->db->where('PNS_ID',$pns_id);
+		}
+		$data = $this->db->from("vw_pdm_belum_diverif")->get()->first_row();;
+		return $data;
+	}
 	
 }

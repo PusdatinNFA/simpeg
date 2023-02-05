@@ -43,6 +43,14 @@ class Riwayat_tugasbelajar_model extends BF_Model
 			'field' => 'NIP',
 			'label' => 'NIP',
 			'rules' => 'max_length[32]|required',
+		), array(
+			'field' => 'NOMOR_SK',
+			'label' => 'NOMOR SK',
+			'rules' => 'max_length[50]|required',
+		),  array(
+			'field' => 'JENIS_TUBEL',
+			'label' => 'JENIS TUBEL',
+			'rules' => 'required',
 		), 
 	);
 	protected $insert_validation_rules  = array();
@@ -70,6 +78,33 @@ class Riwayat_tugasbelajar_model extends BF_Model
 		if($PNS_NIP!=""){
 			$this->db->where('NIP',$PNS_NIP);
 		}
+		$this->db->order_by('TANGGAL_SK',"ASC");
 		return parent::find_all();
+	}
+	public function find_detil()
+	{
+		if(empty($this->selects))
+		{
+			$this->select($this->table_name .'.*, 
+			pegawai.NAMA, pegawai.NIP_BARU, pegawai.username_intra, pegawai.ref, unitkerja.NAMA_UNOR');
+		}
+		$this->db->join('pegawai', 'pegawai.NIP_BARU = rwt_tugas_belajar.NIP', 'inner');
+		$this->db->join('unitkerja', 'unitkerja.ID = pegawai.UNOR_INDUK_ID', 'left');
+		$this->db->order_by('TANGGAL_SK','ASC');
+		return parent::find_all();
+	}
+	public function count_all($PNS_NIP ="")
+	{
+		
+		if(empty($this->selects))
+		{
+			$this->select($this->table_name .'.*');
+		}
+		if($PNS_NIP!=""){
+			$this->db->where('NIP',$PNS_NIP);
+		}
+		$this->db->join('pegawai', 'pegawai.NIP_BARU = rwt_tugas_belajar.NIP', 'inner');
+		$this->db->join('unitkerja', 'unitkerja.ID = pegawai.UNOR_INDUK_ID', 'left');
+		return parent::count_all();
 	}
 }

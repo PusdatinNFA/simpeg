@@ -9,6 +9,7 @@ class Diklatfungsional extends Admin_Controller
     protected $permissionDelete = 'DiklatFungsional.Kepegawaian.Delete';
     protected $permissionEdit   = 'DiklatFungsional.Kepegawaian.Edit';
     protected $permissionView   = 'DiklatFungsional.Kepegawaian.View';
+    protected $permissionUpdateMandiri   = 'DiklatFungsional.Kepegawaian.UpdateMandiri';
 
     /**
      * Constructor
@@ -18,9 +19,56 @@ class Diklatfungsional extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
-         $this->load->model('pegawai/diklat_fungsional_model');
-         $this->load->model('pegawai/jenis_diklat_fungsional_model');
+        $this->load->model('pegawai/diklat_fungsional_model');
+        $this->load->model('pegawai/jenis_diklat_fungsional_model');
         $this->load->model('pegawai/pegawai_model');
+        $this->load->model('pegawai/update_mandiri_model');
+        $this->load->helper('aplikasi');
+    }
+    public function verifikasi($ID,$read_only = false){
+        $data = $this->update_mandiri_model->find($ID);
+        $perubahan = json_decode($data->PERUBAHAN);
+        $PNS_ID = $data->PNS_ID;
+        if (!$read_only)
+            $read_only = $data->STATUS != '' && 
+            ($this->auth->has_permission('Pegawai.Kepegawaian.VerifikasiUpdate') 
+            || $this->auth->has_permission('Pegawai.Kepegawaian.VerifikasiUpdate3'));
+        Template::set('read_only',$read_only);
+        $this->load->model('pegawai/Jenis_kursus_model');
+        $this->Jenis_kursus_model->where(array('jenis' => 'FUNGSIONAL'));
+        Template::set('jenis_diklats', $this->Jenis_kursus_model->find_all());
+        Template::set('id_update_mandiri', $ID);
+        // cek orang lain lihat arsip orang
+        if ($read_only && !($this->auth->has_permission('Pegawai.Kepegawaian.VerifikasiUpdate') 
+        || $this->auth->has_permission('Pegawai.Kepegawaian.VerifikasiUpdate3')) && $this->auth->username()!=$data->NIP_BARU){
+            die();
+        }
+        if(empty($data->DARI)){
+            if (!$read_only)
+                $this->auth->restrict($this->permissionCreate);
+            Template::set_view("kepegawaian/riwayat_diklat_fungsional_add");
+            
+            Template::set('detail_riwayat',$perubahan);    
+            Template::set('PNS_ID', $PNS_ID);
+            Template::set('toolbar_title', "Tambah Riwayat Diklat Fungsional");
+
+            Template::render();
+        }
+        else {
+            $detail_riwayat = $this->diklat_fungsional_model->find($data->ID_TABEL);
+            if (!$detail_riwayat)
+                Template::set_message('Data Tidak Ditemukan/Data Telah Dihapus', 'error');
+            if (!$read_only)
+                $this->auth->restrict($this->permissionEdit);
+            $detail_riwayat = array_replace((array) $detail_riwayat,(array) $perubahan);
+            $detail_riwayat = (object) $detail_riwayat;
+            Template::set_view("kepegawaian/riwayat_diklat_fungsional_add");
+            Template::set('detail_riwayat',$detail_riwayat);    
+            Template::set('PNS_ID', $PNS_ID);
+            Template::set('toolbar_title', "Ubah Riwayat Diklat Fungsional");
+
+            Template::render();
+        }
     }
     public function ajax_list(){
          $this->load->library('convert');
@@ -88,8 +136,12 @@ class Diklatfungsional extends Admin_Controller
                 $btn_actions = array();
                  
                 $btn_actions = array();
-                if($record->KETERANGAN_BERKAS != ""){
-                    $btn_actions  [] = "<a href='".base_url()."pegawai/diklatfungsional/viewdoc/".$record->DIKLAT_FUNGSIONAL_ID."' data-toggle='tooltip' title='Lihat Dokumen' tooltip='Lihat Dokumen ".$record->NOMOR_SERTIPIKAT."' class='btn btn-sm btn-info show-modal'><i class='glyphicon glyphicon-eye-open'></i> </a>";
+                if($record->id_arsip != ""){
+                    $btn_actions  [] = "<a href='".base_url()."admin/arsip/arsip_digital/viewdoc2/".$record->id_arsip."' data-toggle='tooltip' title='Lihat Dokumen' tooltip='Lihat Dokumen' class='btn btn-sm btn-info modal-custom-global'><i class='glyphicon glyphicon-eye-open'></i> </a>";
+                }
+                if($this->auth->has_permission($this->permissionUpdateMandiri))
+                {    
+                    $btn_actions  [] = "<a href='".base_url()."pegawai/diklatfungsional/editmandiri/".$PNS_ID."/".$record->DIKLAT_FUNGSIONAL_ID."' data-toggle='tooltip' title='Ubah data mandiri' tooltip='Ubah data mandiri' class='btn btn-sm btn-warning show-modal-custom'><i class='fa fa-pencil'></i> </a>";
                 }
                 if($this->auth->has_permission($this->permissionEdit))
                 {    
@@ -110,11 +162,16 @@ class Diklatfungsional extends Admin_Controller
 		echo json_encode($output);
 		die();
     }
-    public function show($PNS_ID,$record_id=''){
-        $this->load->model('pegawai/Jenis_diklat_fungsional_model');
-        Template::set('jenis_diklats', $this->Jenis_diklat_fungsional_model->find_all());
+    public function show($PNS_ID,$record_id='',$mandiri = null){
+        // $this->load->model('pegawai/Jenis_diklat_fungsional_model');
+        // Template::set('jenis_diklats', $this->Jenis_diklat_fungsional_model->find_all());
+        $this->load->model('pegawai/Jenis_kursus_model');
+        $this->Jenis_kursus_model->where(array('jenis' => 'FUNGSIONAL'));
+        Template::set('jenis_diklats', $this->Jenis_kursus_model->find_all());
+        Template::set('mandiri', $mandiri);
         if(empty($record_id)){
-            $this->auth->restrict($this->permissionCreate);
+            if (!$mandiri)
+                $this->auth->restrict($this->permissionCreate);
             Template::set_view("kepegawaian/riwayat_diklat_fungsional_add");
             
             Template::set('PNS_ID', $PNS_ID);
@@ -123,7 +180,8 @@ class Diklatfungsional extends Admin_Controller
             Template::render();
         }
         else {
-            $this->auth->restrict($this->permissionEdit);
+            if (!$mandiri)
+                $this->auth->restrict($this->permissionEdit);
             Template::set_view("kepegawaian/riwayat_diklat_fungsional_add");
             Template::set('detail_riwayat', $this->diklat_fungsional_model->find($record_id));    
             Template::set('PNS_ID', $PNS_ID);
@@ -137,6 +195,14 @@ class Diklatfungsional extends Admin_Controller
     }
     public function edit($PNS_ID,$record_id=''){
         $this->show($PNS_ID,$record_id);
+    }
+    public function addmandiri($PNS_ID)
+    {
+        $this->show($PNS_ID,'',1);
+    }
+    public function editmandiri($PNS_ID,$record_id = '')
+    {
+        $this->show($PNS_ID,$record_id,1);
     }
     public function save(){
          // Validate the data
@@ -160,12 +226,16 @@ class Diklatfungsional extends Admin_Controller
         }
 
         $data = $this->diklat_fungsional_model->prep_data($this->input->post());
+        $mandiri = $this->input->post("mandiri");
+        $id_update_mandiri = $this->input->post("id_update_mandiri");
         // Make sure we only pass in the fields we want
         $base64     = "";
         $file_ext   = "";
         $file_size  = "";
         $file_tmp   = "";
         $type       = "";
+        $this->pegawai_model->where("PNS_ID",$this->input->post("PNS_ID"));
+        $pegawai_data = $this->pegawai_model->find_first_row();
         if (isset($_FILES['file_dokumen']) && $_FILES['file_dokumen']['name']) 
         {
             $errors=array();
@@ -178,10 +248,20 @@ class Diklatfungsional extends Admin_Controller
             $file_tmp   = $_FILES['file_dokumen']['tmp_name'];
             $type       = $_FILES['file_dokumen']['type'];
             //echo $file_ext[1];echo "<br>";
-            $data_base64 = file_get_contents($file_tmp);
-            $base64 = 'data:' . $type . ';base64,' . base64_encode($data_base64);
+            $content = file_get_contents($file_tmp);
+            $this->load->library('Api_s3_aws');
+            $aws = new Api_s3_aws;
+            $id_jenis_arsip = 17;
+            $keterangan = "Tanggal ".$data['TANGGAL_KURSUS'];
+            $result_s3 = $aws->insertArsip($pegawai_data->NIP_BARU,$data['NOMOR_SERTIPIKAT'],$id_jenis_arsip,$keterangan,$content,$file_name,!$mandiri);
+            if ($result_s3){
+                $data['id_arsip'] = $result_s3;
+            } else {
+                if (empty($data['id_arsip']))
+                    unset($data['id_arsip']);
+            }
 
-            if(in_array(end($file_ext),$allowed_ext) === false)
+            if(in_array(strtolower(end($file_ext)),$allowed_ext) === false)
             {
                 $errors[]='Extension not allowed';
                 $response['msg'] = "
@@ -211,27 +291,91 @@ class Diklatfungsional extends Admin_Controller
                 echo json_encode($response);
                 exit();
             }
-        }
-        if($base64 == "")
-            unset($data['FILE_BASE64']);
-        else{
-            $data['FILE_BASE64']        = $base64;
-            $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
-        }
-        // end upload berkas
-        $this->pegawai_model->where("PNS_ID",$this->input->post("PNS_ID"));
-        $pegawai_data = $this->pegawai_model->find_first_row();  
+        } else {
+            if ($mandiri && empty($data['id_arsip'])){
+                $response ['success']= false;
+                $response ['msg']= "<div class='alert alert-block alert-error fade in note note-danger'>
+                <a class='close' data-dismiss='alert'>&times;</a>
+                <h4 class='alert-heading'>
+                Harap lampirkan bukti dukung
+                </h4>
+                </div>";
+                echo json_encode($response);
+                die;
+            }
+        } 
+        
+        // end upload berkas  
         $data["NIP_BARU"] = $pegawai_data->NIP_BARU;
         $data["NIP_LAMA"] = $pegawai_data->NIP_LAMA;
-      
-          if(empty($data["TANGGAL_KURSUS"])){
-            unset($data["TANGGAL_KURSUS"]);
-        }
+        
         $id_data = $this->input->post("DIKLAT_FUNGSIONAL_ID");
-        if(isset($id_data) && !empty($id_data)){
-            $this->diklat_fungsional_model->update($id_data,$data);
+        if(empty($id_data)){
+            foreach ($data as $key => $value) {
+                if (empty($data[$key]))
+                    unset($data[$key]);
+            }
+        } else {
+            foreach ($data as $key => $value) {
+                if ($data[$key] == "")
+                    $data[$key] = null;
+            }
         }
-        else $this->diklat_fungsional_model->insert($data);
+        if (!$mandiri){
+            if(isset($id_data) && !empty($id_data)){
+                $current = $this->diklat_fungsional_model->find($id_data);
+                $perubahan = arrDiff($current,$data);
+                $this->diklat_fungsional_model->update($id_data,$data);
+                log_activity($this->auth->user_id(), 'Update data Riwayat Diklat Fungsional : '.$pegawai_data->NIP_BARU.' perubahan : '. json_encode($perubahan) . ' : ' . $this->input->ip_address(), 'pegawai');
+            }
+            else {
+                $this->diklat_fungsional_model->insert($data);
+                log_activity($this->auth->user_id(), 'Insert data Riwayat Diklat Fungsional : '.$pegawai_data->NIP_BARU.' data : '. json_encode($data) . ' : ' . $this->input->ip_address(), 'pegawai');
+            }
+        } else {
+            if (isset($id_data) && !empty($id_data)) {
+                $current = $this->diklat_fungsional_model->find($id_data);
+                $perubahan = arrDiff($current,$data, true);
+                if ($perubahan[1] != '[]'){
+                    $data_update = array();
+                    $data_update['PNS_ID']      = $pegawai_data->PNS_ID;
+                    $data_update['KOLOM']       = "DIKLAT_FUNGSIONAL";
+                    $data_update['DARI']        = $perubahan[0];
+                    $data_update['PERUBAHAN']   = $perubahan[1];
+                    $data_update['NAMA_KOLOM']  = "DIKLAT_FUNGSIONAL";
+                    $data_update['LEVEL_UPDATE']= 3;
+                    $data_update['ID_TABEL']    = $id_data;
+                    $data_update['ID_ARSIP']    = $data['id_arsip'];
+                    $data_update['UPDATE_TGL']  = date("Y-m-d");
+                    $data_update['UPDATED_BY']  = $this->auth->user_id();
+                    $id_update = $this->update_mandiri_model->insert($data_update);
+                }
+            } else {
+                $data_update = array();
+                $data_update['PNS_ID']      = $pegawai_data->PNS_ID;
+                $data_update['KOLOM']       = "DIKLAT_FUNGSIONAL";
+                $data_update['PERUBAHAN']   = json_encode($data);
+                $data_update['NAMA_KOLOM']  = "DIKLAT_FUNGSIONAL";
+                $data_update['LEVEL_UPDATE']= 3;
+                $data_update['ID_ARSIP']    = $data['id_arsip'];
+                $data_update['UPDATE_TGL']  = date("Y-m-d");
+                $data_update['UPDATED_BY']  = $this->auth->user_id();
+                $id_update = $this->update_mandiri_model->insert($data_update);
+            }
+        }
+        if ($id_update_mandiri){
+            $data_update = array();
+            $data_update['VERIFIKASI_BY']	= $this->auth->user_id();
+            $data_update['VERIFIKASI_TGL']	= date("Y-m-d");
+            $data_update['STATUS']			= 1;
+            $this->update_mandiri_model->update($id_update_mandiri,$data_update);
+            log_activity($this->auth->user_id(), 'Verifikasi update mandiri id : ' . $id_update_mandiri . ' STATUS : 1 ' . $this->input->ip_address(), 'pegawai');
+
+            if ($data['id_arsip']){
+                $this->load->model('arsip_digital/arsip_digital_model');
+                $this->arsip_digital_model->update($data['id_arsip'], array('ISVALID'=>1));
+            }
+        }
         $response ['success']= true;
         $response ['msg']= "Transaksi berhasil";
         echo json_encode($response);    
@@ -255,14 +399,19 @@ class Diklatfungsional extends Admin_Controller
         Template::set('TAB_ID', uniqid("TAB_CONTOH"));
         Template::render();
     }
-    public function viewdoc($id)
+    private function viewdoc($id)
     {
         if (empty($id)) {
             Template::set_message("ID tidak ditemukan", 'error');
         }
         $datadetil = $this->diklat_fungsional_model->find($id);
-        $FILE_BASE64 = $datadetil->FILE_BASE64;
-        echo '<embed src="'.$FILE_BASE64.'" width="100%" height="700" alt="pdf">';
+        $this->load->model('arsip_digital/arsip_digital_model');
+        $arsip = $this->arsip_digital_model->find($datadetil->id_arsip);
+        if ($arsip){
+            $this->load->library('Api_s3_aws');
+            $aws = new Api_s3_aws;
+            $aws->viewdoc($arsip->location.$arsip->name);
+        }
         die();
     }
 }

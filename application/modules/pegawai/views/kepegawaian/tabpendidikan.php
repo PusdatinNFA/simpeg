@@ -18,16 +18,16 @@ $PNS_ID = isset($pegawai->PNS_ID) ? $pegawai->PNS_ID : '';
                 <ul id="tab-insides-here" class="nav nav-tabs">
                      
                     <li class="active">
-                        <a href="#<?php echo $tab_pane_pendidikan_id; ?>" data-toggle="tab" aria-expanded="false"> Pendidikan Formal </a>
+                        <a href="#<?php echo $tab_pane_pendidikan_id; ?>" data-toggle="tab" aria-expanded="false"> Pendidikan Formal <label id="riwayat_pendidikan_<?=$PNS_ID?>"></a>
                     </li>
                      <li class="">
-                        <a href="#<?php echo $tab_pane_diklat_struktural_id;?>" data-toggle="tab" aria-expanded="false"> Diklat Struktural </a>
+                        <a href="#<?php echo $tab_pane_diklat_struktural_id;?>" data-toggle="tab" aria-expanded="false"> Diklat Struktural <label id="diklat_struktural_<?=$PNS_ID?>"></a>
                     </li>
                     <li class="">
-                        <a href="#<?php echo $tab_pane_diklat_fungsional_id;?>" data-toggle="tab" aria-expanded="false"> Diklat Fungsional </a>
+                        <a href="#<?php echo $tab_pane_diklat_fungsional_id;?>" data-toggle="tab" aria-expanded="false"> Diklat Fungsional <label id="diklat_fungsional_<?=$PNS_ID?>"></a>
                     </li>
                     <li class="">
-                        <a href="#<?php echo $tab_pane_rwt_kursus;?>" data-toggle="tab" aria-expanded="false"> Kursus </a>
+                        <a href="#<?php echo $tab_pane_rwt_kursus;?>" data-toggle="tab" aria-expanded="false"> Pelatihan Lainnya <label id="riwayat_kursus_<?=$PNS_ID?>"></a>
                     </li>
                 </ul>
                 <div class="tab-content">

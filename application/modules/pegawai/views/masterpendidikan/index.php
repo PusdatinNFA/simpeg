@@ -10,6 +10,7 @@
 				<thead>
 					<tr>
 						<tr><th style="width:10px">No</th>
+						<th width="20px">ID</th>
 						<th>TK. PENDIDIKAN</th>
 						<th>JURUSAN</th>
 						<th width="70px">#</th>
@@ -23,6 +24,9 @@ var grid_daftar = $(".table-datatable").DataTable({
 	ordering: false,
 	processing: true,
 	serverSide: true,
+	"columnDefs": [
+					{"className": "text-center", "targets": [1,4]}
+				],
 	ajax: {
 	  url: "<?php echo base_url() ?>pegawai/masterpendidikan/ajax_list",
 	  type:'POST',

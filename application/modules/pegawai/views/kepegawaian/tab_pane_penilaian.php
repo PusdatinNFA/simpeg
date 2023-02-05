@@ -18,7 +18,7 @@ $PNS_ID = isset($pegawai->PNS_ID) ? $pegawai->PNS_ID : '';
         <ul id="tab-insides-penilaian" class="nav nav-tabs">
             <?php if($this->auth->has_permission("RiwayatPrestasiKerja.Kepegawaian.View")){ ?>
             <li class="active">
-                <a href="#<?php echo $tab_pane_prestasi_kerja;?>" data-toggle="tab" aria-expanded="false"> Prestasi Kerja </a>
+                <a href="#<?php echo $tab_pane_prestasi_kerja;?>" data-toggle="tab" aria-expanded="false"> Prestasi Kerja <label id="riwayat_ppk_<?=$PNS_ID?>"></a>
             </li>
             <?php } ?>
             <?php if($this->auth->has_permission("Riwayatassesmen.Kepegawaian.ViewPegawai")){ ?>
@@ -28,7 +28,7 @@ $PNS_ID = isset($pegawai->PNS_ID) ? $pegawai->PNS_ID : '';
             <?php } ?>
             <?php if($this->auth->has_permission("Riwayatassesmen.Kepegawaian.ViewAdmin")){ ?>
             <li class="">
-                <a href="#<?php echo $tab_pane_rwt_assesmenadmin;?>" data-toggle="tab" aria-expanded="false"> Assesmen Potensi</a>
+                <a href="#<?php echo $tab_pane_rwt_assesmenadmin;?>" data-toggle="tab" aria-expanded="false"> Asesmen</a>
             </li>
             <?php } ?>
             <?php if($this->auth->has_permission("Riwayatassesmen.Kepegawaian.Nine_box")){ ?>

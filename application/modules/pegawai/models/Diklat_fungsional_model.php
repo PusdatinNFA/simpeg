@@ -51,12 +51,12 @@ class Diklat_fungsional_model extends BF_Model
 		),
 		array(
 			'field' => 'TAHUN',
-			'label' => 'TAHUN KURSUS',
+			'label' => 'TAHUN DIKLAT',
 			'rules' => 'required',
 		),
 		array(
 			'field' => 'NAMA_KURSUS',
-			'label' => 'NAMA KURSUS',
+			'label' => 'NAMA DIKLAT',
 			'rules' => 'required',
 		),
 		array(
@@ -87,13 +87,13 @@ class Diklat_fungsional_model extends BF_Model
 		
 		if(empty($this->selects))
 		{
-			$this->select($this->table_name .'.*');
+			$this->select($this->table_name .'.*, initcap(j.nama) as "JENIS_DIKLAT"');
 		}
 		if($PNS_ID!=""){
 			$this->db->where('PNS_ID',$PNS_ID);
 		}
+		$this->db->join('hris.jenis_kursus j', 'j.id::varchar(30) = rwt_diklat_fungsional."JENIS_DIKLAT"', 'left');
 		$this->db->order_by('TAHUN',"ASC");
-		//$this->db->join('tkpendidikan', 'tkpendidikan.ID = rwt_pendidikan.PENDIDIKAN_ID', 'left');
 		return parent::find_all();
 	}
 }

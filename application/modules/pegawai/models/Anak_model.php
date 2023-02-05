@@ -83,6 +83,7 @@ class Anak_model extends BF_Model
 		if($NIP != ""){
 			$this->db->where("NIP",$NIP);
 		}
+		$this->db->order_by('TANGGAL_LAHIR');
 		return parent::find_all();
 	}
 	public function count_all($NIP ="")

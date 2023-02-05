@@ -2,7 +2,17 @@
 <link href="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/themes/explorer/theme.css" media="all" rel="stylesheet" type="text/css"/>
 <?php 
     $id = isset($detail_riwayat->ID) ? $detail_riwayat->ID : '';
-?>
+    if ($mandiri) { ?>
+        <div class="callout callout-info">
+            <h4>Perhatian</h4>
+            <ul>
+                <li>Data yang anda masukan tidak otomatis mengubah data simpeg dan akan diverifikasi terlebih dahulu oleh kepegawaian.<br>
+                                Anda dapat mengecek pengajuan perubahan pada menu <b><a href="<?=base_url()?>admin/kepegawaian/pegawai/peremajaan" target="_BLANK">Peremajaan Data</a></b></li>
+                <li>Maksimal ukuran berkas yang diunggah sebesar 2MB.</li>
+            </ul>
+        </div>
+        </div>
+    <?php } ?>
 <div class='box box-warning' id="form-diklat-fungsional-add">
 	<div class="box-body">
         <div class="messages">
@@ -12,14 +22,14 @@
             <input id='DIKLAT_FUNGSIONAL_ID' type='hidden' class="form-control" name='DIKLAT_FUNGSIONAL_ID' maxlength='32' value="<?php echo set_value('DIKLAT_FUNGSIONAL_ID', isset($detail_riwayat->DIKLAT_FUNGSIONAL_ID) ? trim($detail_riwayat->DIKLAT_FUNGSIONAL_ID) : ''); ?>" />
             <input id='PNS_ID' type='hidden' class="form-control" name='PNS_ID' maxlength='32' value="<?php echo set_value('PNS_ID', isset($PNS_ID) ? trim($PNS_ID) : ''); ?>" />
            
-            <div class="control-group<?php echo form_error('JENIS_DIKLAT') ? ' error' : ''; ?> col-sm-3">
+            <div class="control-group<?php echo form_error('JENIS_DIKLAT') ? ' error' : ''; ?> col-sm-12">
                 <?php echo form_label('NAMA', 'NAMA', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                	<select name="JENIS_DIKLAT" id="JENIS_DIKLAT" class="form-control">
+                	<select name="JENIS_DIKLAT" id="JENIS_DIKLAT" class="form-control select2">
 						<option value="">-- Silahkan Pilih --</option>
 						<?php if (isset($jenis_diklats) && is_array($jenis_diklats) && count($jenis_diklats)):?>
 						<?php foreach($jenis_diklats as $record):?>
-							<option value="<?php echo $record->NAMA?>" <?php if(isset($detail_riwayat->JENIS_DIKLAT))  echo  ($detail_riwayat->JENIS_DIKLAT==$record->NAMA) ? "selected" : ""; ?>><?php echo $record->NAMA; ?></option>
+							<option value="<?php echo $record->id?>" <?php if(isset($detail_riwayat->JENIS_DIKLAT))  echo  ($detail_riwayat->JENIS_DIKLAT==$record->id) ? "selected" : ""; ?>><?php echo $record->nama; ?></option>
 							<?php endforeach;?>
 						<?php endif;?>
 					</select>
@@ -27,13 +37,23 @@
                 </div>
             </div>            
 			<div class="control-group col-sm-3">
-				<label for="inputNAMA" class="control-label">TANGGAL DIKLAT</label>
+				<label for="inputNAMA" class="control-label">TANGGAL MULAI</label>
 				<div class="input-group date">
 				  <div class="input-group-addon">
 					<i class="fa fa-calendar"></i>
 				  </div>
 					<input type='text' class="form-control pull-right datepicker" name='TANGGAL_KURSUS'  value="<?php echo set_value('TANGGAL_KURSUS', isset($detail_riwayat->TANGGAL_KURSUS) ? $detail_riwayat->TANGGAL_KURSUS : ''); ?>" />
 					<span class='help-inline'><?php echo form_error('TANGGAL_KURSUS'); ?></span>
+				</div>
+			</div> 
+            <div class="control-group col-sm-3">
+				<label for="inputNAMA" class="control-label">TANGGAL SELESAI</label>
+				<div class="input-group date">
+				  <div class="input-group-addon">
+					<i class="fa fa-calendar"></i>
+				  </div>
+					<input type='text' class="form-control pull-right datepicker" name='TANGGAL_SELESAI'  value="<?php echo set_value('TANGGAL_SELESAI', isset($detail_riwayat->TANGGAL_SELESAI) ? $detail_riwayat->TANGGAL_SELESAI : ''); ?>" />
+					<span class='help-inline'><?php echo form_error('TANGGAL_SELESAI'); ?></span>
 				</div>
 			</div> 
             <div class="control-group col-sm-3">
@@ -58,7 +78,7 @@
                 </div>
             </div>
             <div class="control-group<?php echo form_error('NOMOR_SERTIPIKAT') ? ' error' : ''; ?> col-sm-12">
-                <?php echo form_label("NOMOR SERTIPIKAT", 'NOMOR SERTIPIKAT', array('class' => 'control-label')); ?>
+                <?php echo form_label("NOMOR SERTIFIKAT", 'NOMOR SERTIPIKAT', array('class' => 'control-label')); ?>
                 <div class='controls'>
                     <input id='NOMOR_SERTIPIKAT' type='text' class="form-control" name='NOMOR_SERTIPIKAT' maxlength='225' value="<?php echo set_value('NOMOR_SERTIPIKAT', isset($detail_riwayat->NOMOR_SERTIPIKAT) ? $detail_riwayat->NOMOR_SERTIPIKAT : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('NOMOR_SERTIPIKAT'); ?></span>
@@ -71,28 +91,39 @@
                     <span class='help-inline'><?php echo form_error('INSTITUSI_PENYELENGGARA'); ?></span>
                 </div>
             </div>
-			<div class="control-group col-sm-9">
+			<div class="control-group col-sm-8">
                 <label for="inputNAMA" class="control-label">Berkas</label>
                 <div class='controls'>
                     <div id="form_upload">
-                      <input id="file_dokumen" name="file_dokumen" class="file" type="file" data-preview-file-type="pdf">
+                      <input id="file_dokumen" name="file_dokumen" class="file" type="file" data-show-upload="false" data-preview-file-type="pdf">
                     </div>
                     
                 </div>
             </div> 
-            <div class="control-group col-sm-3">
+            <div class="control-group col-sm-4">
                 <label for="inputNAMA" class="control-label"><br></label>
                 <div class='controls'>
-                    
-                    <?php if(isset($detail_riwayat->FILE_BASE64) && $detail_riwayat->FILE_BASE64 != ""){ ?>
-                        <a href="<?php echo base_url(); ?>pegawai/diklatfungsional/viewdoc/<?php echo $detail_riwayat->DIKLAT_FUNGSIONAL_ID; ?>" class="btn btn-warning show-modal" tooltip="Lihat dokumen <?php echo isset($detail_riwayat->NOMOR_SERTIPIKAT) ? $detail_riwayat->NOMOR_SERTIPIKAT : ''; ?>" ><span class="fa fa-file-o"></span> Lihat</a>
-                    <?php } ?>  
+                    <div class=" btn-group">
+                    <?php if (!$read_only){ ?>
+                        <?php $kode_arsip = uniqid(); ?>
+                        <a href="#" kode='<?=$kode_arsip?>' class="btn btn-sm btn-success btn-daftar-arsip" data-toggle='tooltip' tooltip="Pilih dokumen" title="Pilih dokumen"><span class="fa fa-search"></span> pilih</a>
+                        <a href="#" id='view_<?=$kode_arsip?>' class="btn btn-sm btn-info show-modal hide" data-toggle='tooltip' tooltip="Lihat dokumen baru" title="Lihat dokumen baru"><span class="fa fa-file-o"></span> lihat</a>
+                    <?php } ?>
+                        <input type="text" name='id_arsip' id='<?=$kode_arsip?>' class="hide" value="<?= $detail_riwayat->id_arsip ?>">
+                        <?php if (isset($detail_riwayat->id_arsip)) { ?>
+                            <a href="<?php echo base_url(); ?>admin/arsip/arsip_digital/viewdoc2/<?php echo $detail_riwayat->id_arsip; ?>" data-toggle='tooltip' class="btn btn-sm btn-warning show-modal" tooltip="Lihat dokumen" title="Lihat dokumen"><span class="fa fa-file-o"></span> Lihat</a>
+                        <?php } ?>
+                    </div>
                 </div>
             </div>
+            <input type="text" class="hide" name='mandiri' value="<?=$mandiri?$mandiri:''?>">
+            <input type="text" class="hide" name='id_update_mandiri' value="<?=$id_update_mandiri?$id_update_mandiri:''?>">
         </div>
+        <?php if (!$read_only){ ?>
   		<div class="box-footer">
             <input type='submit' name='save' id="btnsavefungsional" class='btn btn-primary' value="Simpan Data" /> 
         </div>
+        <?php } ?>
     <?php echo form_close(); ?>
 </div>
 <script src="<?php echo base_url(); ?>themes/admin/plugins/datepicker/bootstrap-datepicker.js"></script>
@@ -100,6 +131,7 @@
 <script src="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/js/fileinput.js" type="text/javascript"></script>
 <script>
     var form = $("#form-diklat-fungsional-add");
+    $(".select2").select2({width: '100%'});
     //Date picker
     $('.datepicker').datepicker({
       autoclose: true,format: 'yyyy-mm-dd'

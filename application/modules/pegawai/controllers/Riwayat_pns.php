@@ -18,6 +18,8 @@ class Riwayat_pns extends Admin_Controller
         parent::__construct();
         $this->load->model('pegawai/Riwayat_pns_cpns_model');
         $this->load->model('pegawai/pegawai_model');
+        $this->load->model('pegawai/update_mandiri_model');
+        $this->load->helper('aplikasi');
     }
      
     
@@ -45,6 +47,7 @@ class Riwayat_pns extends Admin_Controller
 		
         $data = $this->Riwayat_pns_cpns_model->prep_data($this->input->post());
        	$this->pegawai_model->where("PNS_ID",$this->input->post("PNS_ID"));
+        $mandiri = $this->input->post('mandiri');
         $pegawai_data = $this->pegawai_model->find_first_row();  
         $data["PNS_NIP"]    = $pegawai_data->NIP_BARU;
         $data["PNS_ID"]     = $pegawai_data->PNS_ID;
@@ -63,26 +66,126 @@ class Riwayat_pns extends Admin_Controller
         $data['TGL_DOKTER']  = $this->input->post('TGL_DOKTER') ? $this->input->post('TGL_DOKTER') : null;
 
         $id_data = $this->input->post("ID_PNS_CPNS");
-        if(isset($id_data) && !empty($id_data)){
-            $this->Riwayat_pns_cpns_model->update($id_data,$data);
-            $ID = $id_data;
-        }
-        else {
-            $ID = $this->Riwayat_pns_cpns_model->insert($data);
-        }
+        // regular update
+        if (!$mandiri){
+            if(isset($id_data) && !empty($id_data)){
+                $this->Riwayat_pns_cpns_model->update($id_data,$data);
+                $ID = $id_data;
+            }
+            else {
+                $ID = $this->Riwayat_pns_cpns_model->insert($data);
+            }
 
-        if($this->input->post('KARPEG') != ""){
-            $data_pegawai_update       = array();
-            $data_pegawai_update["KARTU_PEGAWAI"] =   $this->input->post('KARPEG');
-            if($this->pegawai_model->update_where("NIP_BARU",$pegawai_data->NIP_BARU, $data_pegawai_update))
-            {
-                log_activity($this->auth->user_id(), 'upload karpeg from rwt pns : ' . $this->input->post('KARPEG') . ' : ' . $this->input->ip_address(), 'pegawai');
-            }   
-        }
-        $response ['success']= true;
-        $response ['kode']= $ID;
-        $response ['msg']= "Berhasil";
-        echo json_encode($response);    
+            if($this->input->post('KARPEG') != ""){
+                $data_pegawai_update       = array();
+                $data_pegawai_update["KARTU_PEGAWAI"] =   $this->input->post('KARPEG');
+                if($this->pegawai_model->update_where("NIP_BARU",$pegawai_data->NIP_BARU, $data_pegawai_update))
+                {
+                    log_activity($this->auth->user_id(), 'update karpeg from rwt pns  nip : '.$pegawai_data->NIP_BARU.' : ' . $this->input->post('KARPEG') . ' : ' . $this->input->ip_address(), 'pegawai');
+                }   
+            }
+            if($this->input->post('KARIS_KARSU') != ""){
+                $data_pegawai_update       = array();
+                $data_pegawai_update["kartu_istri"] =   $this->input->post('KARIS_KARSU');
+                if($this->pegawai_model->update_where("NIP_BARU",$pegawai_data->NIP_BARU, $data_pegawai_update))
+                {
+                    log_activity($this->auth->user_id(), 'update karis/karsu from rwt pns  nip : '.$pegawai_data->NIP_BARU.' : ' . $this->input->post('KARPEG') . ' : ' . $this->input->ip_address(), 'pegawai');
+                }   
+            }
+            if($this->input->post('NO_SK_CPNS') != ""){
+                $data_pegawai_update       = array();
+                $data_pegawai_update["NOMOR_SK_CPNS"] =   $data['NO_SK_CPNS'];
+                if($this->pegawai_model->update_where("NIP_BARU",$pegawai_data->NIP_BARU, $data_pegawai_update))
+                {
+                    log_activity($this->auth->user_id(), 'Update NO_SK_CPNS from rwt pns  nip : '.$pegawai_data->NIP_BARU.' : ' . $data['NO_SK_CPNS'] . ' : ' . $this->input->ip_address(), 'pegawai');
+                }   
+            }
+            if($this->input->post('NO_SK_PNS') != ""){
+                $data_pegawai_update       = array();
+                $data_pegawai_update["NO_SK_PNS"] =   $data['NO_SK_PNS'];
+                if($this->pegawai_model->update_where("NIP_BARU",$pegawai_data->NIP_BARU, $data_pegawai_update))
+                {
+                    log_activity($this->auth->user_id(), 'Update NO_SK_PNS from rwt pns  nip : '.$pegawai_data->NIP_BARU.' : ' . $data['NO_SK_PNS'] . ' : ' . $this->input->ip_address(), 'pegawai');
+                }   
+            }
+            if($this->input->post('TMT_CPNS') != ""){
+                $data_pegawai_update       = array();
+                $data_pegawai_update["TMT_CPNS"] =   $data['TMT_CPNS'];
+                if($this->pegawai_model->update_where("NIP_BARU",$pegawai_data->NIP_BARU, $data_pegawai_update))
+                {
+                    log_activity($this->auth->user_id(), 'Update TMT_CPNS from rwt pns  nip : '.$pegawai_data->NIP_BARU.' : ' . $data['TMT_CPNS'] . ' : ' . $this->input->ip_address(), 'pegawai');
+                }   
+            }
+            if($this->input->post('TMT_PNS') != ""){
+                $data_pegawai_update       = array();
+                $data_pegawai_update["TMT_PNS"] =   $data['TMT_PNS'];
+                if($this->pegawai_model->update_where("NIP_BARU",$pegawai_data->NIP_BARU, $data_pegawai_update))
+                {
+                    log_activity($this->auth->user_id(), 'Update TMT_PNS from rwt pns  nip : '.$pegawai_data->NIP_BARU.' : ' . $data['TMT_PNS'] . ' : ' . $this->input->ip_address(), 'pegawai');
+                }   
+            }
+            if($this->input->post('TGL_SK_CPNS') != ""){
+                $data_pegawai_update       = array();
+                $data_pegawai_update["TGL_SK_CPNS"] =   $data['TGL_SK_CPNS'];
+                if($this->pegawai_model->update_where("NIP_BARU",$pegawai_data->NIP_BARU, $data_pegawai_update))
+                {
+                    log_activity($this->auth->user_id(), 'Update TGL_SK_CPNS from rwt pns  nip : '.$pegawai_data->NIP_BARU.' : ' . $data['TGL_SK_CPNS'] . ' : ' . $this->input->ip_address(), 'pegawai');
+                }   
+            }
+            $response ['success']= true;
+            $response ['kode']= $ID;
+            $response ['msg']= "Berhasil";
+            echo json_encode($response);  
+        } else {
+            // self update
+            if(isset($id_data) && !empty($id_data)){
+                $current = $this->Riwayat_pns_cpns_model->find($id_data);
+                $perubahan = arrDiff($current,$data,true);
+                $data_update = array();
+                if ($perubahan[0] != '[]'){
+                    $data_update['PNS_ID']		= $pegawai_data->PNS_ID;
+                    $data_update['KOLOM']		= 'RIWAYAT_PNS';
+                    $data_update['DARI']		= $perubahan[0];
+                    $data_update['PERUBAHAN']	= $perubahan[1];
+                    $data_update['NAMA_KOLOM']	= 'RIWAYAT_PNS';
+                    $data_update['LEVEL_UPDATE']= 3;
+                    $data_update['UPDATE_TGL']	= date("Y-m-d");
+                    $data_update['ID_TABEL']    = $id_data;
+                    $data_update['UPDATED_BY']	= $this->auth->user_id();
+                    $id_update = $this->update_mandiri_model->insert($data_update);
+                }
+            }
+            else {
+                $data_update = array();
+                $data_update['PNS_ID']		= $pegawai_data->PNS_ID;
+                $data_update['KOLOM']		= 'RIWAYAT_PNS';
+                $data_update['DARI']		= null;
+                $data_update['PERUBAHAN']	= json_encode($data);
+                $data_update['NAMA_KOLOM']	= 'RIWAYAT_PNS';
+                $data_update['LEVEL_UPDATE']= 3;
+                $data_update['UPDATE_TGL']	= date("Y-m-d");
+                $data_update['UPDATED_BY']	= $this->auth->user_id();
+                $id_update = $this->update_mandiri_model->insert($data_update);
+            }
+
+            $perubahan = arrDiff($pegawai_data,$_POST,true);
+            if ($perubahan[0] != '[]'){
+                $data_update = array();
+                $data_update['PNS_ID']		= $pegawai_data->PNS_ID;
+                $data_update['KOLOM']		= 'DATA_PERSONAL';
+                $data_update['DARI']		= $perubahan[0];
+                $data_update['PERUBAHAN']	= $perubahan[1];
+                $data_update['NAMA_KOLOM']	= 'DATA_PERSONAL';
+                $data_update['LEVEL_UPDATE']= 3;
+                $data_update['UPDATE_TGL']	= date("Y-m-d");
+                $data_update['UPDATED_BY']	= $this->auth->user_id();
+                $id_update = $this->update_mandiri_model->insert($data_update);
+            }
+
+            $response ['success']= true;
+            $response ['msg']= "Berhasil";
+            echo json_encode($response); 
+        }  
 
     }
     public function saveimport(){

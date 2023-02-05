@@ -11,11 +11,11 @@ if ($can_delete) {
     $num_columns++;
 }
 ?>
-<div class="admin-box box box-primary expanded-box">
+<div class="admin-box box box-danger expanded-box">
     <div class="box-header">
               <h3 class="box-title">Pencarian Lanjut</h3>
                <div class="box-tools pull-right">
-                    <button type="button" class="btn btn-box-tool btn-default btn-advanced-search" data-widget="collapse">
+                    <button type="button" class="btn btn-box-tool btn-default btn-advanced-search pull-right" data-widget="collapse">
                         <i class="fa fa-minus"></i> Tampilkan
                     </button>
               </div>
@@ -60,6 +60,49 @@ if ($can_delete) {
                 </tr>
                 <tr>
                     <td></td>
+                    <td><label for="example-text-input" class="col-form-label">Pejabat</label></td>
+                    <td colspan=2>
+                        <select id="pejabat" name="pejabat" style="width:100%" class="form-control select2">
+                        <option value="">Silahkan Pilih</option>
+                            <?php 
+                            foreach($pejabats as $row){
+                            ?>
+                                <option <?php echo (isset($data->pejabat) and trim($row->PEMIMPIN_PNS_ID) == trim($data->pejabat)) ? "selected" : ""; ?> value="<?php echo trim($row->PEMIMPIN_PNS_ID); ?>"><?php echo $row->NAMA_PEJABAT; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><label for="example-text-input" class="col-form-label">Satker Induk</label></td>
+                    <td colspan=2>
+                        <select id="satker" name="satker" style="width:100%" class="form-control select2">
+                        <option value="">Silahkan Pilih</option>
+                            <?php 
+                            foreach($satkers as $row){
+                            ?>
+                                <option <?php echo (isset($data->satker) and trim($row->satker) == trim($data->satker)) ? "selected" : ""; ?> value="<?php echo trim($row->ID); ?>"><?php echo $row->NAMA_UNOR; ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><label for="example-text-input" class="col-form-label">Satker?</label></td>
+                    <td colspan=2>
+                        <select id="is_satker" name="is_satker" style="width:100%" class="form-control select2">
+                        <option value="">Silahkan Pilih</option>
+                           <option value="1">Ya</option>
+                           <option value="0">Bukan</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
                     <td><label for="example-text-input" class="col-form-label">Status</label></td>
                     <td colspan=2>
                         <select id="status_active" name="status_active" style="width:100%" class="form-control select2">
@@ -88,9 +131,10 @@ if ($can_delete) {
         ?>
     </div>
 </div>
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
     <div class="box-header box-tools">
             <div class="btn-group pull-right">
+                <a class="btn btn-small btn-success" title="Lihat semua Unit Kerja dibawah kementerian" href="<?php echo base_url(); ?>pegawai/manage_unitkerja/downloadexcellall" tooltip="download excell"><i class="fa fa-download"> </i>  Download Semua</a>
                <?php if ($this->auth->has_permission('Petajabatan.Masters.Create')) : ?>
                     <a class='btn btn-warning show-modal' href="<?php echo $areaUrl . 'createNew'; ?>"><i class="fa fa-plus"></i>Tambah Data</a>
                 <?php endif; ?>
@@ -138,6 +182,7 @@ $("#form_search_pegawai").submit(function(){
     $table.ajax.reload(null,true);
     return false;
 });
+$('.select2').select2();
   
 
 </script>
