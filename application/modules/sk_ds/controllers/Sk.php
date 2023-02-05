@@ -325,10 +325,7 @@ class Sk extends Admin_Controller
         $pegawai_login = $this->pegawai_model->find_by("NIP_BARU",trim($ses_nip));
         Template::set("pegawai_login",$pegawai_login);
         
-        $foto_pegawai = trim($this->settings_lib->item('site.urlphoto'))."noimage.jpg";
-        if(file_exists(trim($this->settings_lib->item('site.pathphoto')).$pegawai->PHOTO) && $pegawai->PHOTO != ""){
-            $foto_pegawai =  trim($this->settings_lib->item('site.urlphoto')).$pegawai->PHOTO;
-        }
+        $foto_pegawai =  END_POINT_PHOTO.$pegawai->username_intra;
         Template::set('foto_pegawai', $foto_pegawai);
         // add log riwayat
         $this->save_riwayat_ds($id,$ses_nip,"Membuka file oleh Penandatanan","");
@@ -336,11 +333,19 @@ class Sk extends Admin_Controller
         // korektor
         $akorektor = $this->sk_ds_korektor_model->find_all_korektor($id);
         Template::set("korektor",$akorektor);
+        $url = $url_sk.$file_name;
+        if ($data->is_signed){
+            $bucket = "simpeg";
+            $key = $data->lokasi_file;
+            $this->load->library('Api_s3_aws');
+            $aws = new Api_s3_aws;
+            $url = $aws->preSignUrl($bucket,$key);
+        }
 
         Template::set("collapse",true);
         Template::set("data",$data);
         Template::set("b64",$b64);
-        Template::set("url_sk",$url_sk.$file_name);
+        Template::set("url_sk",$url);
         Template::set('toolbar_title', "Lihat SK");
         Template::render();
     }
@@ -424,10 +429,7 @@ class Sk extends Admin_Controller
         $pegawai_login = $this->pegawai_model->find_by("NIP_BARU",trim($NIP));
         Template::set("pegawai_login",$pegawai_login);
 
-        $foto_pegawai = trim($this->settings_lib->item('site.urlphoto'))."noimage.jpg";
-        if(file_exists(trim($this->settings_lib->item('site.urlphoto')).$pegawai->PHOTO)){
-            $foto_pegawai =  trim($this->settings_lib->item('site.urlphoto')).$pegawai->PHOTO;
-        }
+        $foto_pegawai =  END_POINT_PHOTO.$pegawai->username_intra;
         Template::set('foto_pegawai', $foto_pegawai);
 
         // korektor
@@ -468,10 +470,7 @@ class Sk extends Admin_Controller
         $pegawai = $this->pegawai_model->find_by("NIP_BARU",trim($data->nip_sk));
         Template::set("pegawai",$pegawai);
 
-        $foto_pegawai = trim($this->settings_lib->item('site.urlphoto'))."noimage.jpg";
-        if(file_exists(trim($this->settings_lib->item('site.urlphoto')).$pegawai->PHOTO)){
-            $foto_pegawai =  trim($this->settings_lib->item('site.urlphoto')).$pegawai->PHOTO;
-        }
+        $foto_pegawai =  END_POINT_PHOTO.$pegawai->username_intra;
         Template::set('foto_pegawai', $foto_pegawai);
 
 
@@ -497,21 +496,10 @@ class Sk extends Admin_Controller
         if (file_exists($direktori.$file_name)) {
             force_download($direktori.$file_name, NULL);
         }else{
-            $decoded = base64_decode($base_64);
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/pdf');
-            header('Content-Disposition: attachment; filename='.$file_name);
-            header('Content-Transfer-Encoding: binary');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . strlen($decoded));
-            ob_clean();
-            flush();
-            echo $decoded;
-            exit;
+            $this->download_aws($id);
         }
     }
+   
     public function downloadsksigned($id)
     {
         $id = $this->uri->segment(5);
@@ -523,19 +511,19 @@ class Sk extends Admin_Controller
         if (file_exists($direktori.$file_name)) {
             force_download($direktori.$file_name, NULL);
         }else{
-            $decoded = base64_decode($data->teks_base64_sign);
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/pdf');
-            header('Content-Disposition: attachment; filename='.$file_name);
-            header('Content-Transfer-Encoding: binary');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . strlen($decoded));
-            ob_clean();
-            flush();
-            echo $decoded;
+            $this->download_aws($id);
+            
         }
+    }
+
+    public function download_aws($id)
+    {
+        $file_ds = $this->sk_ds_model->find_by("id_file",$id);
+        $this->load->library('Api_s3_aws');
+        $aws = new Api_s3_aws;
+        $key = $file_ds->lokasi_file;
+        $file_name = $file_ds->id_file."_signed.pdf";
+        return $aws->downloadFile("simpeg",$key,$file_name);
     }
     
     public function validasisk($id)
@@ -565,10 +553,7 @@ class Sk extends Admin_Controller
         $pegawai = $this->pegawai_model->find_by("NIP_BARU",trim($data->nip_sk));
         Template::set("pegawai",$pegawai);
 
-        $foto_pegawai = trim($this->settings_lib->item('site.urlphoto'))."noimage.jpg";
-        if(file_exists(trim($this->settings_lib->item('site.pathphoto')).$pegawai->PHOTO) && $pegawai->PHOTO != ""){
-            $foto_pegawai =  trim($this->settings_lib->item('site.urlphoto')).$pegawai->PHOTO;
-        }
+        $foto_pegawai =  END_POINT_PHOTO.$pegawai->username_intra;
         Template::set('foto_pegawai', $foto_pegawai);
         # Decode the Base64 string, making sure that it contains only valid characters
         $bin = base64_decode($b64, true);
@@ -949,12 +934,12 @@ class Sk extends Admin_Controller
             if($filters['id_file']){
                 $this->sk_ds_model->where('tbl_file_ds.id_file',$filters['id_file']); 
             }
-            if($filters['is_signed']){
+            if($filters['is_signed'] != ""){
                 //if($filters['is_signed'] == "1" or $filters['is_signed'] == "3"){
                 $this->sk_ds_model->where('tbl_file_ds.is_signed',$filters['is_signed']);     
                 
             }
-            if($filters['is_corrected']){
+            if($filters['is_corrected'] != ""){
                 $this->sk_ds_model->where('tbl_file_ds.is_corrected',$filters['is_corrected']);     
             }
             if($filters['ds_ok']){
@@ -1014,7 +999,8 @@ class Sk extends Admin_Controller
                 }else{
                     $row []  = "<b>".$record->nama_pemilik_sk."</b><br>".$record->nip_sk;
                 }
-                $row []  = $this->tte_model->getKategory($record->kategori)->nama_proses;
+                // $row []  = $this->tte_model->getKategory($record->kategori)->nama_proses;
+                $row []  = $record->kategori;
                 $row []  = $record->nomor_sk."<br>".$record->tgl_sk.$tgl_tandatangan;
                 $row []  = $record->NAMA_UNOR_FULL != "" ? $record->NAMA_UNOR_FULL : $record->unit_kerja_pemilik_sk;
                 if($record->ds_ok == "1"){
@@ -2569,10 +2555,7 @@ class Sk extends Admin_Controller
         $pegawai_login = $this->pegawai_model->find_by("NIP_BARU",trim($NIP));
         Template::set("pegawai_login",$pegawai_login);
         
-        $foto_pegawai = trim($this->settings_lib->item('site.urlphoto'))."noimage.jpg";
-        if($pegawai->PHOTO != ""){
-            $foto_pegawai =  trim($this->settings_lib->item('site.urlphoto')).$pegawai->PHOTO;
-        }
+        $foto_pegawai =  END_POINT_PHOTO.$pegawai->username_intra;
         // korektor
         $akorektor = $this->sk_ds_korektor_model->find_all_korektor($data->id_file);
         Template::set("collapse",true);
@@ -2627,14 +2610,23 @@ class Sk extends Admin_Controller
         }
         $direktori = trim($this->settings_lib->item('site.pathsk'));
         $file_name = $direktori.$id_file."_signed.pdf";
-
-        header('Content-type: application/pdf');
-        header('Content-Disposition: inline; filename="' . $file_name . '"');
-        header('Content-Transfer-Encoding: binary');
-        header('Accept-Ranges: bytes');
-          
-        // Read the file
-        @readfile($file_name);
+        
+        if (file_exists($file_name)){
+            header('Content-type: application/pdf');
+            header('Content-Disposition: inline; filename="' . $file_name . '"');
+            header('Content-Transfer-Encoding: binary');
+            header('Accept-Ranges: bytes');
+            
+            // Read the file
+            @readfile($file_name);
+        } else {
+            $file_ds = $this->sk_ds_model->find_by("id_file",$id_file);
+            $bucket = "simpeg";
+            $key = $file_ds->lokasi_file;
+            $this->load->library('Api_s3_aws');
+            $aws = new Api_s3_aws;
+            $aws->viewdoc($key,$bucket);
+        }
         die();
     }
 }

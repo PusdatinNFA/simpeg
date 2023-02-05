@@ -62,7 +62,7 @@ class Pendidikan_model extends BF_Model
 			'rules' => 'required',
 		),
 	);
-	protected $skip_validation 			= true;
+	protected $skip_validation 			= false;
 
     /**
      * Constructor
@@ -84,8 +84,8 @@ class Pendidikan_model extends BF_Model
 		if($tingkat != ""){
 			$this->pendidikan_model->where("TINGKAT_PENDIDIKAN_ID",$tingkat);
 		}
-		$this->db->order_by("tkpendidikan.ID","DESC");
 		$this->db->order_by($this->table_name .".NAMA","ÄSC");
+		$this->db->order_by("tkpendidikan.ID","DESC");
 		
 		return parent::find_all();
 	}

@@ -17,10 +17,10 @@ $this->load->library('convert');
           <div class="box box-danger">
             <div class="box-body box-profile">
             <center>
-              <img src="<?php echo base_url(); ?><?php echo $foto_pegawai; ?>" class="img-responsive pic-bordered" id="photopegawai" alt="Photo" width="50%">
+              <img src="<?php echo $foto_pegawai; ?>" class="img-responsive pic-bordered" id="photopegawai" alt="Photo" width="50%">
             </center>
                 <h3 class="profile-username text-center">
-                    <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN : ''; ?>  <?php echo isset($pegawai->NAMA) ? $pegawai->NAMA : ''; ?> <?php echo isset($pegawai->GELAR_BELAKANG) ? $pegawai->GELAR_BELAKANG : $data[0]->nama_pemilik_sk; ?>
+                    <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN.' ' : ''; ?>  <?php echo isset($pegawai->NAMA) ? trim($pegawai->NAMA) : ''; ?> <?php echo isset($pegawai->GELAR_BELAKANG) ? ', '.$pegawai->GELAR_BELAKANG : $data[0]->nama_pemilik_sk; ?>
                 </h3>
               <p class="text-muted text-center">
                     <?php if($pegawai->JENIS_JABATAN_ID == "1") {  ?>

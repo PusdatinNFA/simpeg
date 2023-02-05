@@ -8,26 +8,82 @@ function random_color() {
 }
 
 function rupiah($angka){
-	$hasil_rupiah = "Rp " . number_format($angka,2,',','.');
-	return $hasil_rupiah;
+	if ($angka){
+		$hasil_rupiah = "Rp" . number_format($angka,2,',','.');
+		return $hasil_rupiah;
+	}
+	return "";
 }
 
+function format_money($angka){
+	$hasil_rupiah = number_format($angka,2,',','.');
+	return $hasil_rupiah;
+}
+function validateDate($date, $format = 'Y-m-d')
+{
+    $d = DateTime::createFromFormat($format, $date);
+    // The Y ( 4 digits year ) returns TRUE for any integer with any number of digits so changing the comparison from == to === fixes the issue.
+    return $d && $d->format($format) === $date;
+}
 function convertDate($source,$fromFormat,$toFormat){
 	$dt = DateTime::createFromFormat($fromFormat,$source);
 	if($dt){
 		return $dt->format($toFormat);
 	}
 }
+function isDateFormat($date)
+{
+	if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$date)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 function getIndonesiaFormat($date){
-	$dt = DateTime::createFromFormat('Y-m-d',$date);
-	$bulans = array('Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','Nopember','Desember');
-	return $dt->format('d')." ".$bulans[$dt->format('m')-1]." ".$dt->format('Y');
+	if(isDateFormat($date)){
+		$dt = DateTime::createFromFormat('Y-m-j',$date);
+		$bulans = array('Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember');
+		return $dt->format('j')." ".$bulans[$dt->format('m')-1]." ".$dt->format('Y');
+	}
+	return "";
+}
+function getBulanIndonesia($bln){
+	if((int) $bln){
+		$bulans = array('Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember');
+		return $bulans[$bln-1];
+	}
+	return "";
 }
 function getRomawiBulan($bulan){
 	$bulans = array('','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII');
 	return $bulans[$bulan];
 }
 function Terbilang($x) {
+	$result = "";
+	if ($x){
+	$abil = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
+	  if ($x < 12)
+		$result = " " . $abil[$x];
+	  elseif ($x < 20)
+	  	$result = Terbilang($x - 10) . " belas ";
+	  elseif ($x < 100)
+	  	$result = Terbilang($x / 10) . " puluh " . Terbilang($x % 10);
+	  elseif ($x < 200)
+	  	$result = " seratus " . Terbilang($x - 100);
+	  elseif ($x < 1000)
+	  	$result = Terbilang($x / 100) . " ratus " . Terbilang($x % 100);
+	  elseif ($x < 2000)
+	  	$result = " seribu " . Terbilang($x - 1000);
+	  elseif ($x < 1000000)
+	  	$result = Terbilang($x / 1000) . " ribu " . Terbilang($x % 1000);
+	  elseif ($x < 1000000000)
+	  	$result = Terbilang($x / 1000000) . " juta " . Terbilang($x % 1000000);
+	}
+	return trim(preg_replace('!\s+!', ' ', $result));
+}
+function Terbilang2($x) {
+	if ($x){
 	$abil = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
 	  if ($x < 12)
 		return " " . $abil[$x];
@@ -45,8 +101,10 @@ function Terbilang($x) {
 		return Terbilang($x / 1000) . " Ribu" . Terbilang($x % 1000);
 	  elseif ($x < 1000000000)
 		return Terbilang($x / 1000000) . " Juta" . Terbilang($x % 1000000);
-
+	}
+	return "";
 }
+
 
 function getSatkerPegawai($nip){
 	$ci = &get_instance();
@@ -281,3 +339,87 @@ function get_jenis_jabatan($id=null){
 		}
 	}
 }
+function download_excel($records,$filename)
+{
+	$ci = &get_instance();
+	$ci->load->library('Excel');
+	$objPHPExcel = new PHPExcel();
+
+	$objPHPExcel->setActiveSheetIndex(0);
+
+	$type = PHPExcel_Cell_DataType::TYPE_STRING;
+	
+	$column = 0;
+	$array = (array) $records[0];
+	$keys = array_keys($array);
+	if(isset($keys) && is_array($keys) && count($keys)):
+		for ($i=0; $i < count($keys); $i++) { 
+			$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow($i, 1, $keys[$i]);
+		}
+	endif;
+	// die();
+	$row=2;
+	if (isset($records) && is_array($records) && count($records)) :
+		foreach ($records as $record) {
+			$record = (array) $record;
+			for ($i=0; $i < count($keys); $i++) { 
+				$objPHPExcel->getActiveSheet()->getCellByColumnAndRow($i, $row)->setValueExplicit($record[$keys[$i]], $type);                    
+			}
+			$row++;
+		}
+	endif;
+
+	$filename = $filename." ". date('Ymdhi') . '.xls';
+	header('Content-Type: application/vnd.ms-excel');
+	header('Content-Disposition: attachment;filename="' . $filename . '"');
+	header('Cache-Control: max-age=0');
+
+	$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  //downloadable file is in Excel 2003 format (.xls)
+	// $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007'); 
+	ob_end_clean();
+	$objWriter->save('php://output');  //send it to user, of course you can save it to disk also!
+	exit; //done.. exiting!
+}
+
+function arrDiff($object1, $object2, $versi2 = false)
+{
+	$r = array();
+	foreach ($object1 as $k => $v) {
+        if (array_key_exists($k, $object2)) { 
+			if ($v instanceof stdClass) { 
+                $rad = objDiff($v, $object2[$k]); 
+                if (count($rad)) { $r[$k] = $rad; } 
+            }else if (is_array($v)){
+                $rad = arrDiff($v, $object2[$k]);  
+                if (count($rad)) { $r[$k] = $rad; } 
+            // required to avoid rounding errors due to the 
+            // conversion from string representation to double
+            } else if (is_double($v)){ 
+                if (abs($v - $object2[$k]) > 0.000000000001) { 
+                    $r[$k] = array($v, $object2[$k]); 
+                }
+            } else { 
+                if ($v != $object2[$k]) { 
+                    $r[$k] = array($v, $object2[$k]); 
+                }
+            }
+		}
+	}
+	if ($versi2){
+		$old = array();
+		$new = array();
+		foreach ($r as $key => $value) {
+			$old[$key] = $value[0];
+			$new[$key] = empty($value[1])?null:$value[1];
+		}
+		return array(json_encode($old),json_encode($new));
+	}
+	else
+		return $r;
+}
+function objDiff($obj1, $obj2):array { 
+    $a1 = (array)$obj1;
+    $a2 = (array)$obj2;
+    return arrDiff($a1, $a2);
+}
+

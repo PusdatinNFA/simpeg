@@ -9,6 +9,7 @@ class Riwayat_cltn extends Admin_Controller
     protected $permissionDelete = 'Riwayatcltn.Kepegawaian.Delete';
     protected $permissionEdit   = 'Riwayatcltn.Kepegawaian.Edit';
     protected $permissionView   = 'Riwayatcltn.Kepegawaian.View';
+    protected $permissionUpdateMandiri   = 'Riwayatcltn.Kepegawaian.UpdateMandiri';
 
     /**
      * Constructor
@@ -20,7 +21,8 @@ class Riwayat_cltn extends Admin_Controller
         parent::__construct();
         $this->load->model('pegawai/riwayat_cltn_model');
         $this->load->model('pegawai/pegawai_model');
-		
+        $this->load->model('pegawai/update_mandiri_model');
+        $this->load->helper('aplikasi');		
     }
     public function ajax_list(){
         $this->load->library('convert');
@@ -58,10 +60,18 @@ class Riwayat_cltn extends Admin_Controller
 			foreach ($records as $record) {
                 $row = array();
                 $row []  = $nomor_urut;
+                $row []  = $record->jenis== 1?'Cuti':'Cuti Besar';
                 $row []  = $record->nomor_sk."<br><i>TANGGAL : ".$convert->fmtDate($record->tanggal_sk,"dd-mm-yyyy")."</i>";
                 $row []  = $convert->fmtDate($record->tanggal_awal,"dd-mm-yyyy")."-".$convert->fmtDate($record->tanggal_akhir,"dd-mm-yyyy");
-                $row []  = "No BKN".$record->nomor_letter_bkn;
+                $row []  = $record->status? "Masih Cuti":"Selesai Cuti";
                 $btn_actions = array();
+                if($record->id_arsip != ""){
+                    $btn_actions  [] = "<a href='".base_url()."admin/arsip/arsip_digital/viewdoc2/".$record->id_arsip."' data-toggle='tooltip' title='Lihat Dokumen' tooltip='Lihat Dokumen' class='btn btn-sm btn-info modal-custom-global'><i class='glyphicon glyphicon-eye-open'></i> </a>";
+                }
+                if($this->auth->has_permission($this->permissionUpdateMandiri))
+                {    
+                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_cltn/editmandiri/".$NIP_BARU.'/'.$record->id."' data-toggle='tooltip' title='Ubah data mandiri' tooltip='Ubah data' class='btn btn-sm btn-warning show-modal-custom'><i class='fa fa-pencil'></i> </a>";
+                }
                 if($this->auth->has_permission($this->permissionEdit))
                 {    
                     $btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_cltn/edit/".$record->id."' data-toggle='tooltip' title='Ubah data' tooltip='Ubah data' class='btn btn-sm btn-success show-modal-custom'><i class='fa fa-pencil'></i> </a>";
@@ -70,10 +80,7 @@ class Riwayat_cltn extends Admin_Controller
                 if($this->auth->has_permission($this->permissionDelete))
                 {    
                     $btn_actions  [] = "<a href='#' kode='$record->id' data-toggle='tooltip' title='Hapus Data' class='btn btn-sm btn-danger btn-hapus-cltn'><i class='fa fa-trash-o'></i> </a>";
-                }else{
-                    $btn_actions  [] = "<a href='#' kode='$record->id' data-toggle='tooltip' title='Hapus Data' class='btn btn-sm btn-danger btn-hapus-cltn'><i class='fa fa-trash-o'></i> </a>";
                 }
-
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
                 
 
@@ -84,22 +91,25 @@ class Riwayat_cltn extends Admin_Controller
 		echo json_encode($output);
 		die();
     }
-    public function show($NIP_BARU = "",$record_id=''){
+    public function show($NIP_BARU = "",$record_id='', $mandiri = null){
+        Template::set('mandiri', $mandiri);
         if(empty($record_id)){
-            $this->auth->restrict($this->permissionCreate);
-            Template::set_view("kepegawaian/riwayat_tb_crud");
-            Template::set('NIP_BARU', $NIP_BARU);
-            Template::set('toolbar_title', "Tambah Riwayat Tugas Belajar");
+            if (!$mandiri)
+                $this->auth->restrict($this->permissionCreate);
+            Template::set_view("kepegawaian/riwayat_cltn_crud");
+            Template::set('PNS_NIP', $NIP_BARU);
+            Template::set('toolbar_title', "Tambah Riwayat Cuti");
             Template::render();
         }
         else {
     		$datadetil = $this->riwayat_cltn_model->find($record_id); 
-            $this->auth->restrict($this->permissionEdit);
-            Template::set_view("kepegawaian/riwayat_tb_crud");
+            if (!$mandiri)
+                $this->auth->restrict($this->permissionEdit);
+            Template::set_view("kepegawaian/riwayat_cltn_crud");
            
             Template::set('detail_riwayat', $datadetil);    
-            Template::set('NIP_BARU', $NIP_BARU);
-            Template::set('toolbar_title', "Ubah Riwayat Tugas Belajar");
+            Template::set('PNS_NIP', $NIP_BARU);
+            Template::set('toolbar_title', "Ubah Riwayat Cuti");
 
             Template::render();
         }
@@ -108,26 +118,76 @@ class Riwayat_cltn extends Admin_Controller
     public function add($NIP_BARU = ""){
         $this->show($NIP_BARU);
     }
+    public function addmandiri($NIP_BARU = ""){
+        $this->show($NIP_BARU,'',1);
+    }
+    public function editmandiri($NIP_BARU = "", $record_id = ''){
+        $this->show($NIP_BARU,$record_id,1);
+    }
     public function edit($ID=''){
-        $this->riwayat_cltn_model->where("ID",$ID);
+        $this->riwayat_cltn_model->where("id",$ID);
         $tb_data = $this->riwayat_cltn_model->first_row();  
 
-        Template::set_view("kepegawaian/riwayat_tb_crud");
+        Template::set_view("kepegawaian/riwayat_cltn_crud");
         Template::set('detail_riwayat', $tb_data);    
-        Template::set('NIP_BARU', $tb_data->NIP);
-        Template::set('toolbar_title', "Ubah Riwayat Tugas Belajar"); 
+        Template::set('PNS_NIP', $tb_data->pns_nip);
+        Template::set('toolbar_title', "Ubah Riwayat Cuti"); 
         Template::render();
+    }
+    public function verifikasi($ID,$read_only=false)
+    {
+        $data = $this->update_mandiri_model->find($ID);
+        $perubahan = json_decode($data->PERUBAHAN);
+        $PNS_ID = $data->PNS_ID;
+        if (!$read_only)
+                $read_only = $data->STATUS != '' && 
+            ($this->auth->has_permission('Pegawai.Kepegawaian.VerifikasiUpdate') 
+            || $this->auth->has_permission('Pegawai.Kepegawaian.VerifikasiUpdate3'));
+        Template::set('read_only',$read_only);
+        $this->pegawai_model->where("PNS_ID",$PNS_ID);
+        $pegawai_data = $this->pegawai_model->find_first_row();
+        $NIP_BARU = $pegawai_data->NIP_BARU;
+        Template::set('id_update_mandiri', $ID);
+        // cek orang lain lihat arsip orang
+        if ($read_only && !($this->auth->has_permission('Pegawai.Kepegawaian.VerifikasiUpdate') 
+        || $this->auth->has_permission('Pegawai.Kepegawaian.VerifikasiUpdate3')) && $this->auth->username()!=$data->NIP_BARU){
+            die();
+        }
+        if(empty($data->DARI)){
+            if (!$read_only)
+                $this->auth->restrict($this->permissionCreate);
+            Template::set_view("kepegawaian/riwayat_cltn_crud");
+            Template::set('detail_riwayat', $perubahan); 
+            Template::set('PNS_NIP', $NIP_BARU);
+            Template::set('toolbar_title', "Tambah Riwayat Cuti");
+            Template::render();
+        }
+        else {
+            $datadetil = $this->riwayat_cltn_model->find($data->ID_TABEL);
+            if (!$datadetil)
+                Template::set_message('Data Tidak Ditemukan/Data Telah Dihapus', 'error'); 
+            if (!$read_only)
+                $this->auth->restrict($this->permissionEdit);
+            Template::set_view("kepegawaian/riwayat_cltn_crud");
+            $datadetil = array_replace((array) $datadetil,(array) $perubahan);
+            $datadetil = (object) $datadetil;
+            Template::set('detail_riwayat', $datadetil);    
+            Template::set('PNS_NIP', $NIP_BARU);
+            Template::set('toolbar_title', "Ubah Riwayat Cuti");
+
+            Template::render();
+        }
     }
     public function detil($ID=''){
         
-        $this->riwayat_cltn_model->where("ID",$ID);
+        $this->riwayat_cltn_model->where("id",$ID);
         $tb_data = $this->riwayat_cltn_model->first_row();  
         $this->pegawai_model->where("NIP_BARU",$tb_data->NIP);
         $pegawai_data = $this->pegawai_model->find_first_row();  
-        Template::set_view("kepegawaian/riwayat_tb_view");
+        Template::set_view("kepegawaian/riwayat_cltn_view");
         Template::set('detail_riwayat', $tb_data);    
         Template::set('NIP_BARU', $pegawai_data->NIP_BARU);
-        Template::set('toolbar_title', "Lihat Riwayat Tugas Belajar"); 
+        Template::set('toolbar_title', "Lihat Riwayat Cuti"); 
 		Template::render();
     }
     public function save(){
@@ -153,6 +213,8 @@ class Riwayat_cltn extends Admin_Controller
 		
 		
         $data = $this->riwayat_cltn_model->prep_data($this->input->post());
+        $mandiri = $this->input->post("mandiri");
+        $id_update_mandiri = $this->input->post("id_update_mandiri");
         // Make sure we only pass in the fields we want
         $base64     = "";
         $file_ext   = "";
@@ -171,10 +233,24 @@ class Riwayat_cltn extends Admin_Controller
             $file_tmp   = $_FILES['file_dokumen']['tmp_name'];
             $type       = $_FILES['file_dokumen']['type'];
             //echo $file_ext[1];echo "<br>";
-            $data_base64 = file_get_contents($file_tmp);
-            $base64 = 'data:' . $type . ';base64,' . base64_encode($data_base64);
+            $content = file_get_contents($file_tmp);
+            // $base64 = 'data:' . $type . ';base64,' . base64_encode($data_base64);
 
-            if(in_array(end($file_ext),$allowed_ext) === false)
+            $keterangan = "TMT ".$this->input->post('tanggal_awal');
+            $jenis_arsip = 57;
+            if ($data->jenis == 2);
+                $jenis_arsip = 161;
+            $this->load->library('Api_s3_aws');
+            $aws = new Api_s3_aws;
+            $id = $aws->insertArsip($data['pns_nip'],$data['nomor_sk'],$jenis_arsip,$keterangan, $content,$file_name,!$mandiri);
+            if ($id){
+                $data['id_arsip'] = $id;
+            } else {
+                if (empty($data['id_arsip']))
+                    unset($data['id_arsip']);
+            }
+
+            if(in_array(strtolower(end($file_ext)),$allowed_ext) === false)
             {
                 $errors[]='Extension not allowed';
                 $response['msg'] = "
@@ -204,47 +280,115 @@ class Riwayat_cltn extends Admin_Controller
                 echo json_encode($response);
                 exit();
             }
-        }
-        if($base64 == "")
-            unset($data['FILE_BASE64']);
-        else{
-            $data['FILE_BASE64']        = $base64;
-            $data['KETERANGAN_BERKAS']  = isset($file_ext[$jmltitik-1]) ? $file_ext[$jmltitik-1]."  ".$type. " ".$file_size." KB" : null;
-        }
-        // end upload berkas
-       	$this->pegawai_model->where("NIP_BARU",$this->input->post("NIP"));
-        $pegawai_data = $this->pegawai_model->find_first_row();  
-        
-        if(empty($data["TANGGAL_SK"])){
-            unset($data["TANGGAL_SK"]);
-        }
-        if(empty($data["MULAI_BELAJAR"])){
-            unset($data["MULAI_BELAJAR"]);
-        }
-        if(empty($data["AKHIR_BELAJAR"])){
-            unset($data["AKHIR_BELAJAR"]);
-        }
-        $id_data = $this->input->post("id");
-        if(isset($id_data) && !empty($id_data)){
-            $this->riwayat_cltn_model->update($id_data,$data);
-        }
-        else $this->riwayat_cltn_model->insert($data);
-        $msgtb = "";
-        // Aktif Kembali
-        if($this->input->post("STATUS_TB") == "1"){
-            $datapegawai['KEDUDUKAN_HUKUM_ID'] = "01";
-            $result = $this->pegawai_model->update($pegawai_data->ID, $datapegawai);
-            if($result){
-                $msgtb = "Status Pegawai menjadi aktif Kembali";
+        } else {
+            if ($mandiri && empty($data['id_arsip'])){
+                $response ['success']= false;
+                $response ['msg']= "<div class='alert alert-block alert-error fade in note note-danger'>
+                <a class='close' data-dismiss='alert'>&times;</a>
+                <h4 class='alert-heading'>
+                Harap lampirkan bukti dukung
+                </h4>
+                </div>";
+                echo json_encode($response);
+                die;
             }
         }
-        // Aktif Tugas Belajar
-        if($this->input->post("STATUS_TB") == "2"){
-            $datapegawai['KEDUDUKAN_HUKUM_ID'] = "03";
-            $result = $this->pegawai_model->update($pegawai_data->ID, $datapegawai);  
-            if($result){
-                $msgtb = "Status Pegawai menjadi tugas belajar";
-            }          
+        
+        // end upload berkas
+       	$this->pegawai_model->where("NIP_BARU",$data['pns_nip']);
+        $pegawai_data = $this->pegawai_model->find_first_row();  
+        
+        $id_data = $this->input->post("id");
+        if(empty($id_data)){
+            foreach ($data as $key => $value) {
+                if (empty($data[$key]))
+                    unset($data[$key]);
+            }
+        } else {
+            foreach ($data as $key => $value) {
+                if ($data[$key] == "")
+                    $data[$key] = null;
+            }
+        }
+        if (!$mandiri){
+            if(isset($id_data) && !empty($id_data)){
+                $current = $this->riwayat_cltn_model->find($id_data);
+                $perubahan = arrDiff($current,$data);
+                $this->riwayat_cltn_model->update($id_data,$data);
+                log_activity($this->auth->user_id(), 'Update data Riwayat Cuti : '.$pegawai_data->NIP_BARU.' perubahan : '. json_encode($perubahan) . ' : ' . $this->input->ip_address(), 'pegawai');
+            }
+            else {
+                $this->riwayat_cltn_model->insert($data);
+                log_activity($this->auth->user_id(), 'Insert data Riwayat Cuti : '.$pegawai_data->NIP_BARU.' data : '. json_encode($data) . ' : ' . $this->input->ip_address(), 'pegawai');
+            } 
+            $msgtb = "";
+            // Aktif Kembali
+            if($this->input->post("jenis") == '1'){
+                if($this->input->post("status") != 1){
+                    $datapegawai['KEDUDUKAN_HUKUM_ID'] = "01";
+                    $result = $this->pegawai_model->update($pegawai_data->ID, $datapegawai);
+                    if($result){
+                        $msgtb = "Status Pegawai menjadi aktif Kembali";
+                    }
+                }else {
+                    $datapegawai['KEDUDUKAN_HUKUM_ID'] = "02";
+                    if ($this->input->post("cltn_id") == '03'){
+                        $datapegawai['KEDUDUKAN_HUKUM_ID'] = "13";
+                    }
+                    $result = $this->pegawai_model->update($pegawai_data->ID, $datapegawai);  
+                    if($result){
+                        $msgtb = "Status Pegawai menjadi cltn";
+                    }          
+                }
+            }
+        } else {
+            if(isset($id_data) && !empty($id_data)){
+                $current = $this->riwayat_cltn_model->find($id_data);
+                $perubahan = arrDiff($current,$data, true);
+                if ($perubahan[1] != '[]'){
+                    $data_update = array();
+                    $data_update['PNS_ID']      = $pegawai_data->PNS_ID;
+                    $data_update['KOLOM']       = "RIWAYAT_CUTI";
+                    $data_update['DARI']        = $perubahan[0];
+                    $data_update['PERUBAHAN']   = $perubahan[1];
+                    $data_update['NAMA_KOLOM']  = "RIWAYAT_CUTI";
+                    $data_update['LEVEL_UPDATE']= 3;
+                    $data_update['ID_TABEL']    = $id_data;
+                    $data_update['ID_ARSIP']    = $data['id_arsip'];
+                    $data_update['UPDATE_TGL']  = date("Y-m-d");
+                    $data_update['UPDATED_BY']  = $this->auth->user_id();
+                    $id_update = $this->update_mandiri_model->insert($data_update);
+                }
+            }
+            else{
+                foreach ($data as $key => $value) {
+                    if (empty($data[$key]))
+                        unset($data[$key]);
+                }
+                $data_update = array();
+                $data_update['PNS_ID']      = $pegawai_data->PNS_ID;
+                $data_update['KOLOM']       = "RIWAYAT_CUTI";
+                $data_update['PERUBAHAN']   = json_encode($data);
+                $data_update['NAMA_KOLOM']  = "RIWAYAT_CUTI";
+                $data_update['LEVEL_UPDATE']= 3;
+                $data_update['ID_ARSIP']    = $data['id_arsip'];
+                $data_update['UPDATE_TGL']  = date("Y-m-d");
+                $data_update['UPDATED_BY']  = $this->auth->user_id();
+                $id_update = $this->update_mandiri_model->insert($data_update);
+            }
+        }
+        if ($id_update_mandiri){
+            $data_update = array();
+            $data_update['VERIFIKASI_BY']	= $this->auth->user_id();
+            $data_update['VERIFIKASI_TGL']	= date("Y-m-d");
+            $data_update['STATUS']			= 1;
+            $this->update_mandiri_model->update($id_update_mandiri,$data_update);
+            log_activity($this->auth->user_id(), 'Verifikasi update mandiri id : ' . $id_update_mandiri . ' STATUS : 1 ' . $this->input->ip_address(), 'pegawai');
+
+            if ($data['id_arsip']){
+                $this->load->model('arsip_digital/arsip_digital_model');
+                $this->arsip_digital_model->update($data['id_arsip'], array('ISVALID'=>1));
+            }
         }
         $response ['success']= true;
         $response ['msg']= "Berhasil ".$msgtb;
@@ -254,7 +398,7 @@ class Riwayat_cltn extends Admin_Controller
     public function delete($record_id = null){
         $this->auth->restrict($this->permissionDelete);
 		if ($this->riwayat_cltn_model->delete($record_id)) {
-			 log_activity($this->auth->user_id(), 'delete data Riwayat Tugas Belajar : ' . $record_id . ' : ' . $this->input->ip_address(), 'pegawai');
+			 log_activity($this->auth->user_id(), 'delete data Riwayat Cuti : ' . $record_id . ' : ' . $this->input->ip_address(), 'pegawai');
 			 Template::set_message("Sukses Hapus data", 'success');
 			 echo "Sukses";
 		}else{
@@ -264,19 +408,24 @@ class Riwayat_cltn extends Admin_Controller
 		exit();
     }
     public function index($NIP_BARU=''){
-        Template::set_view("kepegawaian/tab_pane_tugasbelajar");
+        Template::set_view("kepegawaian/tab_pane_riwayat_cltn");
         Template::set('NIP_BARU', $NIP_BARU);
         Template::set('TAB_ID', uniqid("TAB_CONTOH"));
         Template::render();
     }
-    public function viewdoc($id)
+    private function viewdoc($id)
     {
         if (empty($id)) {
             Template::set_message("ID tidak ditemukan", 'error');
         }
         $datadetil = $this->riwayat_cltn_model->find($id);
-        $FILE_BASE64 = $datadetil->FILE_BASE64;
-        echo '<embed src="'.$FILE_BASE64.'" width="100%" height="700" alt="pdf">';
+        $this->load->model('arsip_digital/arsip_digital_model');
+        $arsip = $this->arsip_digital_model->find($datadetil->id_arsip);
+        if ($arsip){
+            $this->load->library('Api_s3_aws');
+            $aws = new Api_s3_aws;
+            $aws->viewdoc($arsip->location.$arsip->name);
+        }
         die();
     }
 }

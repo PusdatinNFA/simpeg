@@ -105,7 +105,7 @@ class Unitkerja_model extends BF_Model
 	{
 
 		if (empty($this->selects)) {
-			$this->select('"KODE_INTERNAL",unitkerja."ID","NAMA_UNOR","ESELON_ID","NAMA_JABATAN","GELAR_DEPAN","NAMA","GELAR_BELAKANG",NIP_BARU,WAKTU,JENIS_SATKER,EXPIRED_DATE');
+			$this->select('"unitkerja.KODE_INTERNAL",unitkerja."ID","NAMA_UNOR","ESELON_ID","NAMA_JABATAN","GELAR_DEPAN","NAMA","GELAR_BELAKANG",NIP_BARU,WAKTU,JENIS_SATKER,EXPIRED_DATE,IS_SATKER, p.username_intra as username_pejabat,"ABBREVIATION"');
 		}
 		if ($satker != "") {
 			$this->unitkerja_model->where('UNOR_INDUK', $satker);
@@ -114,6 +114,8 @@ class Unitkerja_model extends BF_Model
 			$this->unitkerja_model->where('EXPIRED_DATE IS NULL');
 
 		$this->db->join("pegawai p", "unitkerja.PEMIMPIN_PNS_ID=p.PNS_ID", "LEFT");
+		// $this->db->join("unitkerja u", "unitkerja.UNOR_INDUK=u.ID", "LEFT");
+		$this->db->order_by('CAST(unitkerja."KODE_INTERNAL" AS DECIMAL(10,6)) ASC');
 		return parent::find_all();
 	}
 	public function count_all_pimpinan($satker = "",$non_aktif = false)
@@ -465,6 +467,7 @@ class Unitkerja_model extends BF_Model
 			$this->select($this->table_name . '.*');
 		}
 		$this->unitkerja_model->where('IS_SATKER', 1);
+		$this->unitkerja_model->where("EXPIRED_DATE IS NULL");
 		return parent::find_all();
 	}
 	public function findnamajabatan($UNOR = "")
@@ -482,6 +485,13 @@ class Unitkerja_model extends BF_Model
 			$this->select($this->table_name . '.*');
 		}
 		return parent::find_by('ID', $ID);
+	}
+
+	public function findsatkerpenugasan($ID = "")
+	{
+		$this->select('*');
+		$this->db->join("hris.unitkerja u", "unitkerja.ID_SATKER_PENUGASAN=u.ID", "LEFT");
+		return parent::find_by('unitkerja.ID', $ID);
 	}
 	// update yanarazor
 	public function get_unit_by_unorinduk($unor_induk = "")
@@ -503,12 +513,15 @@ class Unitkerja_model extends BF_Model
 		if (empty($this->selects)) {
 			$this->select('unitkerja."ID","NAMA_UNOR",
 				"ESELON_ID",
-				"NAMA_JABATAN",
+				unitkerja."NAMA_JABATAN",
+				p."PNS_ID" as PEMIMPIN_PNS_ID,
 				NIP_BARU as NIP_PEJABAT,
 				"GELAR_DEPAN","NAMA" AS NAMA_PEJABAT,"GELAR_BELAKANG",
 				TRIM("NOMOR_HP") "NOMOR_HP",
 				TRIM("EMAIL") "EMAIL",
-				TRIM("ALAMAT") "ALAMAT"
+				TRIM("ALAMAT") "ALAMAT",
+				j.status_jabatan,
+				j."NAMA_JABATAN" as JABATAN_PEJABAT
 				');
 		}
 		if ($unor_induk != "" and $unor_induk != ROOT_UNOR_ID) {
@@ -527,6 +540,41 @@ class Unitkerja_model extends BF_Model
 		}
 		$this->db->where("EXPIRED_DATE IS NULL");
 		$this->db->join("pegawai p", "unitkerja.PEMIMPIN_PNS_ID=p.PNS_ID", "LEFT");
+		$this->db->join("rwt_jabatan j", "j.PNS_NIP=p.NIP_BARU and j.ID_UNOR = unitkerja.ID", "LEFT");
+		$this->db->where("p.NAMA IS NOT NULL");
+		$this->db->where("j.ID_JENIS_JABATAN",'1');
+		$this->db->order_by("KODE_INTERNAL", "ASC");
+		return parent::find_all();
+	}
+
+	public function get_pejabat_lite($unor_induk = "")
+	{
+
+		if (empty($this->selects)) {
+			$this->select('unitkerja."ID","NAMA_UNOR",
+				"ESELON_ID",
+				"NAMA_JABATAN",
+				p."PNS_ID" as PEMIMPIN_PNS_ID,
+				NIP_BARU as NIP_PEJABAT, "NAMA" AS NAMA_PEJABAT
+				');
+		}
+		if ($unor_induk != "" and $unor_induk != ROOT_UNOR_ID) {
+			$this->db->group_start();
+			$this->db->where("unitkerja.ID", $unor_induk);
+			$this->db->or_where("ESELON_1", $unor_induk);
+			$this->db->or_where("ESELON_2", $unor_induk);
+			$this->db->or_where("ESELON_3", $unor_induk);
+			$this->db->or_where("ESELON_4", $unor_induk);
+			$this->db->or_where("UNOR_INDUK", $unor_induk);
+			$this->db->or_where("DIATASAN_ID", $unor_induk);
+			$this->db->group_end();
+		}
+		if ($unor_induk != "" and $unor_induk != ROOT_UNOR_ID) {
+			// $this->unitkerja_model->or_where('("UNOR_INDUK" LIKE \'' . strtoupper($unor_induk) . '%\' or unitkerja."ID" LIKE \'' . strtoupper($unor_induk) . '%\')');
+		}
+		$this->db->where("EXPIRED_DATE IS NULL");
+		$this->db->join("pegawai p", "unitkerja.PEMIMPIN_PNS_ID=p.PNS_ID", "LEFT");
+		$this->db->where("p.NAMA IS NOT NULL");
 		$this->db->order_by("KODE_INTERNAL", "ASC");
 		return parent::find_all();
 	}

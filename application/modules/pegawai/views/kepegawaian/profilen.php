@@ -8,7 +8,9 @@
     $tab_pane_penilaian = "tab_pane_penilaian";//uniqid("tab_pane_kepangkatan");
     $tab_pane_riwayat = "tab_pane_riwayat";//uniqid("tab_pane_pindah_unit_kerja");
     $tab_pane_keluarga = "tab_pane_keluarga";//uniqid("tab_pane_pindah_unit_kerja");
+    $tab_pane_ilmiah = "tab_pane_ilmiah";
     $tab_pane_arsip = "tab_pane_arsip";
+    $tab_pane_karir = "tab_pane_karir";
     
     
 ?>
@@ -48,9 +50,19 @@ endif;
                     <li class="">
                         <a href="#<?php echo $tab_pane_riwayat; ?>" data-toggle="tab" aria-expanded="false"> Riwayat </a>
                     </li>
+                    <?php if ($this->auth->has_permission('RiwayatAktivitasIlmiah.Kepegawaian.View') || $this->auth->has_permission('RiwayatKaryatulisIlmiah.Kepegawaian.View')) : ?>
+                    <li class="">
+                        <a href="#<?php echo $tab_pane_ilmiah; ?>" data-toggle="tab" aria-expanded="false"> Aktivitas Ilmiah </a>
+                    </li>
+                    <?php endif; ?>
                     <?php if ($this->auth->has_permission('Arsip_digital.Arsip.View')) : ?>
                     <li class="">
                         <a href="#<?php echo $tab_pane_arsip; ?>" data-toggle="tab" aria-expanded="false"> Arsip </a>
+                    </li>
+                    <?php endif; ?>
+                    <?php if ($this->auth->has_permission('Karir.Kepegawaian.View')) : ?>
+                    <li class="">
+                        <a href="#<?php echo $tab_pane_karir; ?>" data-toggle="tab" aria-expanded="false"> Karir </a>
                     </li>
                     <?php endif; ?>
                 </ul>
@@ -65,9 +77,17 @@ endif;
                         $this->load->view('kepegawaian/tabpendidikan',array('TAB_ID'=>$tab_pendidikan));
                         $this->load->view('kepegawaian/tab_pane_penilaian',array('TAB_ID'=>$tab_pane_penilaian));
                         $this->load->view('kepegawaian/tab_pane_riwayat',array('TAB_ID'=>$tab_pane_riwayat));
+                        if ($this->auth->has_permission('RiwayatAktivitasIlmiah.Kepegawaian.View') || $this->auth->has_permission('RiwayatKaryatulisIlmiah.Kepegawaian.View')){
+                            $this->load->view('kepegawaian/tab_pane_ilmiah',array('TAB_ID'=>$tab_pane_ilmiah));
+                        }
+                    
                         if ($this->auth->has_permission('Arsip_digital.Arsip.View')) :
                           $this->load->view('kepegawaian/tab_pane_arsip',array('TAB_ID'=>$tab_pane_arsip));
                         endif;
+
+                       if ($this->auth->has_permission('Karir.Kepegawaian.View')) :
+                        $this->load->view('kepegawaian/tab_pane_karir',array('TAB_ID'=>$tab_pane_karir));
+                      endif;
                     ?>
                 </div>
             </div>
@@ -78,42 +98,52 @@ endif;
           <!-- Profile Image -->
           <div class="box box-danger">
             <div class="box-body box-profile">
-              <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/uploadfoto/<?php echo $PNS_ID; ?>" tooltip="Upload Foto" class="show-modal">
-              <img src="<?php echo $foto_pegawai; ?>" class="img-responsive pic-bordered img-rounded" id="photopegawai" alt="Photo" width="100%">
-              </a>
-                <h3 class="profile-username text-center">
-                    <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN : ''; ?>  <?php echo isset($pegawai->NAMA) ? $pegawai->NAMA : ''; ?> <?php echo isset($pegawai->GELAR_BELAKANG) ? $pegawai->GELAR_BELAKANG : ''; ?>
-                </h3>
-              <p class="text-muted text-center">
-                    <?php if($pegawai->JENIS_JABATAN_ID == "1") {  ?>
-                       <b><?php if($pegawai->JENIS_JABATAN_ID == "1") { echo isset($NAMA_JABATAN_REAL) ? $NAMA_JABATAN_REAL  : ""; } ?></b>
-                       <br>(<?php echo $JENIS_JABATAN; ?>)<br>
-                       <b>TMT <?php if($pegawai->JENIS_JABATAN_ID == "1") { echo isset($pegawai->TMT_JABATAN) ? $convert->fmtDate($pegawai->TMT_JABATAN,"dd month yyyy")  : ""; } ?></b>           
-                    <?php } ?>
-                    <?php if($pegawai->JENIS_JABATAN_ID == "2") {  ?>
-                        <b><?php if($pegawai->JENIS_JABATAN_ID == "2") { echo isset($NAMA_JABATAN_REAL) ? $NAMA_JABATAN_REAL  : ""; } ?></b>
-                        <br>(<?php echo $JENIS_JABATAN; ?>)<br>
-                        <b>TMT <?php if($pegawai->JENIS_JABATAN_ID == "2") { echo isset($pegawai->TMT_JABATAN) ? $convert->fmtDate($pegawai->TMT_JABATAN,"dd month yyyy")  : ""; } ?></b>
-                    <?php } ?>
-                    <?php if($pegawai->JENIS_JABATAN_ID == "4") { ?>
-                        <b><?php if($pegawai->JENIS_JABATAN_ID == "4") { echo isset($NAMA_JABATAN_REAL) ? $NAMA_JABATAN_REAL  : ""; }?></b>
-                        <br>(<?php echo $JENIS_JABATAN; ?>)<br>
-                        <b>TMT <?php if($pegawai->JENIS_JABATAN_ID == "4") { echo isset($pegawai->TMT_JABATAN) ? $convert->fmtDate($pegawai->TMT_JABATAN,"dd month yyyy")  : ""; } ?></b>    
-                    <?php } ?>
+              <!-- <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/uploadfoto/<?php echo $PNS_ID; ?>" tooltip="Upload Foto" class="show-modal"> -->
+              <img src="<?php  echo END_POINT_PHOTO.$pegawai->PHOTO;  ?>" class="img-responsive pic-bordered img-rounded" id="photopegawai" alt="Photo" width="100%">
 
+              <!-- </a> -->
+                <h3 class="profile-username text-center">
+                    <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN.' ' : ''; ?><?php echo isset($pegawai->NAMA) ? trim($pegawai->NAMA) : ''; ?><?php echo isset($pegawai->GELAR_BELAKANG) ? ', '.$pegawai->GELAR_BELAKANG : ''; ?>
+                </h3>
+              <p class="text-muted text-center"><strong>
+                        <?php
+                        $jabatan = $JABATAN_PROFIL;
+                        if($pegawai->JENIS_JABATAN_ID == "1"){
+                            echo !empty($parent_path_array_unor[0]->NAMA_JABATAN)?$parent_path_array_unor[0]->NAMA_JABATAN:$pegawai->JABATAN_NAMA." ".$parent_path_array_unor[0]->NAMA_UNOR;      
+                        }else{
+                          echo $pegawai->JABATAN_NAMA;        
+                        }
+                          echo "<br>";
+                          echo "TMT :".$convert->fmtDate($pegawai->TMT_JABATAN,"dd month yyyy");
+                        ?>
+              </strong>
               </p>
 
                 <?php if($model!="update"){ ?>
-                <?php if ($this->auth->has_permission('Pegawai.Kepegawaian.Updatemandiri')) : ?>
+                <?php if ($this->auth->has_permission('Pegawai.UpdateSimple.View')) : ?>
                     <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/profilen/<?php echo $pegawai->ref; ?>/update" tooltip="Upload Foto" class="btn btn-danger btn-block"><i class="fa fa-edit"></i> Edit Profile </a>
+                <?PHP endif; ?>
+                <?php if ($this->auth->has_permission('Pegawai.UpdateMandiri.View')) : ?>
+                  <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/edit_mandiri/<?php echo $pegawai->ref; ?>" tooltip="Update Mandiri" class="btn btn-danger btn-block"><i class="fa fa-edit"></i> Edit Mandiri </a>
+                <?PHP endif; ?>
+                <?php if ($this->auth->has_permission('Pegawai.UpdateDetil.View')) : ?>
+                    <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/edit/<?php echo $pegawai->ID; ?>" tooltip="Update Detil" class="btn btn-warning btn-block"><i class="fa fa-edit"></i> Edit Detil </a>
                 <?PHP endif; ?>
                 <?PHP }else{
                 ?>
                     <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/profilen/<?php echo $pegawai->ref; ?>" class="btn btn-danger btn-block"><i class="fa fa-user"></i> Kembali Ke Profile </a>
                 <?php
                 } ?>
+                <?php if ($this->auth->has_permission('Pegawai.Downloaddrhsingkat.View')) : ?>
+                  <a href="<?php echo base_url();?>data_nominatif/slks/cetakdrh/<?php echo $pegawai->PNS_ID; ?>" class="btn btn-info btn-block" target="_BLANK"><i class="fa fa-download"></i> Download DRH Singkat</a>
+                <?php endif; ?>
                 <?php if ($this->auth->has_permission('Pegawai.Downloaddrh.View')) : ?>
-                    <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/download_drh/<?php echo $pegawai->ref; ?>" class="btn btn-warning btn-block"><i class="fa fa-download"></i> Download DRH </a>
+                <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/download_drh/<?php echo $pegawai->PNS_ID; ?>" class="btn btn-success btn-block" target="_BLANK"><i class="fa fa-download"></i> Download DRH Lengkap</a>
+                <?php endif; ?>
+                <br>
+                <?php if ($this->auth->has_permission('Pegawai.Pindahprofile.View')) : ?>
+                <p>Ke Profile Pegawai Lain :</p>
+                <select id="pindah_pegawai" name="pindah_pegawai" width="100%" class="form-control pindah_pegawai"></select>
                 <?PHP endif; ?>
             </div>
             <!-- /.box-body -->
@@ -127,17 +157,49 @@ endif;
             </div>
             <!-- /.box-header -->
             <div class="box-body">
+            <strong><i class="fa fa-user margin-r-5"></i> Kedudukan Hukum</strong>
+              <p class="text-muted">
+                <?php echo $pegawai->KEDUDUKAN_HUKUM ? $pegawai->KEDUDUKAN_HUKUM : "-"; ?>
+              </p>
+            <hr>
               <strong><i class="fa fa-user margin-r-5"></i> Jabatan Aktif</strong>
               <p class="text-muted">
                   <ul>
                   <?php 
                       foreach($jabatan_aktifs as $jabatan){
                           if($jabatan->JENIS_JABATAN == "Struktural"){
-                            $status_jabatan = $jabatan->status_jabatan == "Plt." ? "Plt." : "";
-                            echo "<li><strong>".$status_jabatan.$jabatan->NAMA_JABATAN." ".$jabatan->NAMA_UNOR."</strong></li>";        
+                            $status_jabatan = $jabatan->status_jabatan == "Plt." ? "Plt. " : "";
+                            $nama_unit = $jabatan->UNOR == $jabatan->NAMA_UNOR? $jabatan->UNOR : $jabatan->UNOR." - ".$jabatan->NAMA_UNOR;
+                            echo "<li><strong>".$status_jabatan.$jabatan->NAMA_JABATAN." ".$nama_unit."</strong></li>";        
                           }else{
                             echo "<li><strong>".$jabatan->NAMA_JABATAN."</strong></li>";        
                           }
+                      }
+                  ?>
+                </ul>
+              </p>
+              <hr>
+              <strong><i class="fa fa-user margin-r-5"></i> Bidang Kepakaran</strong>
+              <p class="text-muted">
+                  <ul>
+                  <?php 
+                      foreach($kepakarans as $kepakaran){
+                        if ($kepakaran->kode){
+                          echo "<li><strong>".$kepakaran->namaid.' (<i>'.$kepakaran->namaen.'</i>)</strong></li>';
+                        }
+                      }
+                  ?>
+                </ul>
+              </p>
+              <hr>
+              <strong><i class="fa fa-user margin-r-5"></i> Bidang Penelitian</strong>
+              <p class="text-muted">
+                  <ul>
+                  <?php 
+                      foreach($penelitians as $penelitian){
+                        if ($penelitian->kode){
+                          echo "<li><strong>".$penelitian->namaid.' (<i>'.$penelitian->namaen.'</i></strong></li>)';
+                        }
                       }
                   ?>
                 </ul>
@@ -171,12 +233,12 @@ endif;
               <p class="text-muted"><?php echo set_value('ALAMAT', isset($pegawai->ALAMAT) ? $pegawai->ALAMAT : ''); ?></p>
 
               <hr>
-              <strong><i class="fa fa-users margin-r-5"></i> Masa Kerja</strong>
+              <strong><i class="fa fa-users margin-r-5"></i> Masa Kerja berdasarkan KP Terakhir</strong>
               <p class="text-muted">
                   <?php 
-                    echo isset($recpns_aktif->masa_kerja_th) ? $recpns_aktif->masa_kerja_th  : ""; ?> 
+                    echo isset($masa_kerja_kp->mk_tahun_baru) ? $masa_kerja_kp->mk_tahun_baru  : ""; ?> 
                     Tahun 
-                    <?php echo isset($recpns_aktif->masa_kerja_bl) ? $recpns_aktif->masa_kerja_bl  : ""; ?> Bulan
+                    <?php echo isset($masa_kerja_kp->mk_bulan_baru) ? $masa_kerja_kp->mk_bulan_baru  : ""; ?> Bulan
               </p>
               <hr>
               <strong><i class="fa fa-home margin-r-5"></i> Unit Organisasi</strong>
@@ -194,6 +256,11 @@ endif;
               <p> 
                   <?php echo isset($satker_penempatan_ids->NAMA_UNOR) ? $satker_penempatan_ids->NAMA_UNOR : ""; ?>
                 </p>
+            <hr>
+              <strong><i class="fa fa-home margin-r-5"></i> Pengelola Kawasan SDM</strong>
+              <p> 
+                  <?php echo isset($pengelolasdm) ? $pengelolasdm->nama : ""; ?>
+                </p>
             </div>
             <!-- /.box-body -->
           </div>
@@ -201,3 +268,58 @@ endif;
         </div>
         <!-- /.col -->
       </div>
+      <script>
+        $(document).ready(function(){
+        reset_pindah_profile();
+
+        function reset_pindah_profile(){
+          jQuery('span.select2-container').each(function (i, obj) {
+            if (jQuery(obj).hasClass("select2-hidden-accessible")) {                
+                jQuery(obj).remove();
+            }
+            if (jQuery(obj).hasClass("select2-container--default")) {                
+                jQuery(obj).remove();
+            }
+          });
+          $(".pindah_pegawai").html('').select2({
+            placeholder: 'Cari Pegawai.....',
+            width: '100%',
+            minimumInputLength: 3,
+            allowClear: true,
+            ajax: {
+                url: '<?php echo site_url("pegawai/kepegawaian/ajaxref");?>',
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        term: params.term || '',
+                        page: params.page || 1
+                    }
+                },
+                cache: false
+              }
+          });          
+        }
+      $("#pindah_pegawai").change(function(){
+        var ref = $("#pindah_pegawai").val();
+        if (ref)
+          window.location.replace("<?=base_url()?>admin/kepegawaian/pegawai/profilen/"+ref);
+      });
+
+      $('#modal-global').on('hidden.bs.modal', function () {
+        reset_pindah_profile();
+      });
+      $('#modal-custom-global').on('hidden.bs.modal', function () {
+        reset_pindah_profile();
+      });
+      $('.show-modal-custom').on('hidden.bs.modal', function () {
+        reset_pindah_profile();
+      });
+      $('.modal-open').on('hidden.bs.modal', function () {
+        reset_pindah_profile();
+      });
+      // $('body').on('click','.show-modal-custom',function(event){
+      //   reset_pindah_profile();
+      //   event.preventDefault();
+      // });
+    });
+    </script>

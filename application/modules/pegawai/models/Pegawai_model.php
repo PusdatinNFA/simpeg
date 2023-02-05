@@ -152,7 +152,7 @@ class Pegawai_model extends BF_Model
 		array(
 			'field' => 'NOMOR_SK_CPNS',
 			'label' => 'lang:pegawai_field_NOMOR_SK_CPNS',
-			'rules' => 'max_length[30]',
+			'rules' => 'max_length[100]',
 		),
 		array(
 			'field' => 'TGL_SK_CPNS',
@@ -267,29 +267,15 @@ class Pegawai_model extends BF_Model
 	);
 	protected $insert_validation_rules  = array();
 	protected $skip_validation 			= true;
-	protected $STATUS_NON_ACTIVE 		= array('14','52','66','67','77','78','98','99');
+	// protected $STATUS_NON_ACTIVE 		= array('14','52','66','67','77','88','98','99');
+	protected $STATUS_NON_ACTIVE 		= STATUS_NON_ACTIVE;
 
 	public function find_first_row()
 	{
 		return $this->db->get($this->db->schema . "." . $this->table_name)->first_row();
 	}
 
-	public function count_all_ppnpn($satker_id = "")
-	{
-
-		$where_clause = '';
-		if ($satker_id) {
-			$where_clause = 'AND (vw."ESELON_1" = \'' . $satker_id . '\' OR vw."ESELON_2" = \'' . $satker_id . '\' OR vw."ESELON_3" = \'' . $satker_id . '\' OR vw."ESELON_4" = \'' . $satker_id . '\')';
-		}
-		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
-		$this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "LEFT");
-		$this->db->where('pa."ID" is not null', NULL, FALSE);
-		$this->db->where_not_in("pegawai.KEDUDUKAN_HUKUM_ID",$this->STATUS_NON_ACTIVE);
-
-		$this->db->where("status_pegawai = 3 " . $where_clause);
-
-		return parent::count_all();
-	}
+	
 	public function count_list($satker_id, $strict_in_satker = false)
 	{
 		$this->db->from('hris.pegawai pegawai');
@@ -331,11 +317,13 @@ class Pegawai_model extends BF_Model
 			} else $where_clause = 'AND (vw."ESELON_1" = \'' . $satker_id . '\' OR vw."ESELON_2" = \'' . $satker_id . '\' OR vw."ESELON_3" = \'' . $satker_id . '\' OR vw."ESELON_4" = \'' . $satker_id . '\')';
 		}
 		$this->db->select('pegawai."ID",pegawai."PNS_ID",pegawai."NIP_BARU",pegawai."NAMA",vw."NAMA_UNOR_FULL",
-			golongan."NAMA" AS "NAMA_GOLONGAN","NAMA_PANGKAT","NAMA_UNOR_ESELON_4","NAMA_UNOR_ESELON_3","NAMA_UNOR_ESELON_2","NAMA_UNOR_ESELON_1","KATEGORI_JABATAN","PHOTO",ref', false);
+			jabatan."NAMA_JABATAN",
+			golongan."NAMA" AS "NAMA_GOLONGAN","NAMA_PANGKAT","NAMA_UNOR_ESELON_4","NAMA_UNOR_ESELON_3",
+			"NAMA_UNOR_ESELON_2","NAMA_UNOR_ESELON_1","KATEGORI_JABATAN","PHOTO",ref,username_intra,pengelola_sdm_kawasan_id', false);
 		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
 		$this->db->join('golongan', 'pegawai.GOL_ID = golongan.ID', 'left');
 		$this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "LEFT");
-		$this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_ID = jabatan.KODE_JABATAN', 'left');
+		$this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_REAL_ID = jabatan.KODE_JABATAN', 'left');
 		if ($strict_in_satker) {
 			$this->db->where('vw."ID" is not null');
 		}
@@ -453,7 +441,7 @@ class Pegawai_model extends BF_Model
 			lokasi."NAMA" as "TEMPAT_LAHIR_NAMA",
 			pendidikan."NAMA" AS "NAMA_PENDIDIKAN",
 			kedudukan_hukum."NAMA" AS "KEDUDUKAN_HUKUM_NAMA",
-			,vw."NAMA_UNOR_FULL",golongan."NAMA" AS "NAMA_GOLONGAN","NAMA_PANGKAT","NAMA_UNOR_ESELON_4","NAMA_UNOR_ESELON_3","NAMA_UNOR_ESELON_2","NAMA_UNOR_ESELON_1","KATEGORI_JABATAN"', false);
+			,vw."NAMA_UNOR_FULL",golongan."NAMA" AS "NAMA_GOLONGAN","NAMA_PANGKAT","NAMA_UNOR_ESELON_4","NAMA_UNOR_ESELON_3","NAMA_UNOR_ESELON_2","NAMA_UNOR_ESELON_1","KATEGORI_JABATAN","IS_DOSEN","MK_TAHUN_SWASTA","MK_BULAN_SWASTA", username_intra,kartu_istri,hobi,panggol_terakhir_text,pendidikan_terakhir_text,kawasan_id,satker_penempatan_id,tusi_id,no_induk_jf,situs_pribadi,facebook,twitter,google_plus,google_scholar,linkedin,orcid,research_gate,researcher_id,scopus,"JENIS_PEMBERHENTIAN",pengelola_sdm_kawasan_id,detail_kepakaran,no_kk,kode_pos,"ALAMAT_KTP"', false);
 		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
 		$this->db->join('golongan', 'pegawai.GOL_ID = golongan.ID', 'left');
 		$this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "LEFT");
@@ -470,7 +458,7 @@ class Pegawai_model extends BF_Model
 		$this->db->order_by("NAMA", "ASC");
 		return parent::find_all();
 	}
-	public function find_pensiun_all($satker_id, $strict_in_satker = false)
+	public function find_pensiun_all($satker_id = null, $strict_in_satker = false)
 	{
 
 		$where_clause = '';
@@ -484,12 +472,17 @@ class Pegawai_model extends BF_Model
 			} else $where_clause = 'AND (vw."ESELON_1" = \'' . $satker_id . '\' OR vw."ESELON_2" = \'' . $satker_id . '\' OR vw."ESELON_3" = \'' . $satker_id . '\' OR vw."ESELON_4" = \'' . $satker_id . '\')';
 		}
 		$this->db->select('pegawai."ID",pegawai."PNS_ID",pegawai."NIP_BARU",pegawai."NAMA",vw."NAMA_UNOR_FULL",
-			golongan."NAMA" AS "NAMA_GOLONGAN","NAMA_PANGKAT","NAMA_UNOR_ESELON_4","NAMA_UNOR_ESELON_3","NAMA_UNOR_ESELON_2","NAMA_UNOR_ESELON_1","KATEGORI_JABATAN","PHOTO",ref', false);
+			golongan."NAMA" AS "NAMA_GOLONGAN","NAMA_PANGKAT","NAMA_UNOR_ESELON_4","NAMA_UNOR_ESELON_3","NAMA_UNOR_ESELON_2",
+			"NAMA_UNOR_ESELON_1","KATEGORI_JABATAN","PHOTO",ref,terminated_date,"TMT_PENSIUN", username_intra,
+			k."NAMA" as kedudukan_hukum, j.nama as jenis_pemberhentian,"EMAIL"', false);
 		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
 		$this->db->join('golongan', 'pegawai.GOL_ID = golongan.ID', 'left');
 		$this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_ID = jabatan.KODE_JABATAN', 'left');
+		$this->db->join('kedudukan_hukum k', 'pegawai.KEDUDUKAN_HUKUM_ID = k.ID', 'left');
+		$this->db->join('jenis_pemberhentian j', 'pegawai.JENIS_PEMBERHENTIAN = j.id', 'left');
 		$this->db->where('pegawai."ID" is not null ' . $where_clause);
-		$this->db->where("(\"pegawai\".\"KEDUDUKAN_HUKUM_ID\" = '99' or \"pegawai\".\"status_pegawai\" = '3')");
+		// $this->db->where("(\"pegawai\".\"KEDUDUKAN_HUKUM_ID\" = '99' or \"pegawai\".\"status_pegawai\" = '3')");
+		$this->db->where_in('pegawai."KEDUDUKAN_HUKUM_ID"',STATUS_PENSIUN);
 		//$this->db->where("(TMT_PENSIUN IS NOT NULL)");
 		$this->db->order_by("NAMA", "ASC");
 		return parent::find_all();
@@ -535,8 +528,8 @@ class Pegawai_model extends BF_Model
 		$this->db->join('golongan', 'pegawai.GOL_ID = golongan.ID', 'left');
 		$this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_ID = jabatan.KODE_JABATAN', 'left');
 		$this->db->where('pegawai."ID" is not null ' . $where_clause);
-
-		$this->db->where("(\"pegawai\".\"KEDUDUKAN_HUKUM_ID\" = '99' or \"pegawai\".\"status_pegawai\" = '3')");
+		// $this->db->where("(\"pegawai\".\"KEDUDUKAN_HUKUM_ID\" = '99' or \"pegawai\".\"status_pegawai\" = '3')");
+		$this->db->where_in('pegawai."KEDUDUKAN_HUKUM_ID"',STATUS_PENSIUN);
 
 		return parent::count_all();
 	}
@@ -712,7 +705,7 @@ class Pegawai_model extends BF_Model
 		return parent::find_all();
 	}
 
-	public function find_download($satker_id, $strict_in_satker = false)
+	public function find_download($satker_id, $strict_in_satker = false, $kedudukan_hukum="")
 	{
 
 		$where_clause = '';
@@ -726,19 +719,20 @@ class Pegawai_model extends BF_Model
 			} else $where_clause = 'AND (vw."ESELON_1" = \'' . $satker_id . '\' OR vw."ESELON_2" = \'' . $satker_id . '\' OR vw."ESELON_3" = \'' . $satker_id . '\' OR vw."ESELON_4" = \'' . $satker_id . '\')';
 		}
 		$this->db->select('pegawai.*,
-			jabatan."PENSIUN",
-			date("TGL_LAHIR"::DATE + interval  \'1 YEAR\' * "PENSIUN") AS estimasi_pensiun,
-			EXTRACT(YEAR from AGE("TGL_LAHIR")) as "age",
+			mv_pensiun.bup as "PENSIUN",
+			mv_pensiun.umur as "age",
 			vw."NAMA_UNOR_FULL",golongan."NAMA" AS "NAMA_GOLONGAN","NAMA_PANGKAT",
 			vw."JENIS_SATKER",vw."ESELON_ID",
 			"NAMA_UNOR_ESELON_4","NAMA_UNOR_ESELON_3","NAMA_UNOR_ESELON_2","NAMA_UNOR_ESELON_1",
 			lokasi."NAMA" as "TEMPAT_LAHIR_NAMA","TEMPAT_LAHIR_ID",
 			pendidikan."NAMA" AS "NAMA_PENDIDIKAN",
+			pegawai.nama_sekolah_terakhir,
 			kedudukan_hukum."NAMA" AS "KEDUDUKAN_HUKUM_NAMA",
-			jabatan."NAMA_JABATAN" AS "NAMA_JABATAN","KELAS",jenis_jabatan."NAMA" AS "JENIS_JABATAN",
+			mv_pensiun."NAMA_JABATAN" AS "NAMA_JABATAN","KELAS",jenis_jabatan."NAMA" AS "JENIS_JABATAN",
 			uk."NAMA_UNOR" AS nama_satker,
-			"NOMOR_SK_CPNS","TGL_SK_CPNS",
-			agama."NAMA" AS "NAMA_AGAMA"', false);
+			agama."NAMA" AS "NAMA_AGAMA", mv_pensiun.estimasi_pensiun, vw_kgb_terakhir_final.tmt_sk as kgb_terakhir,
+			concat(vw_kgb_terakhir_final.masa_kerja_thn, \' tahun \',vw_kgb_terakhir_final.masa_kerja_bln,\' bulan\') as mk_kgb,
+			vw_ak_terakhir.ak_akhir_total as ak_terakhir, pengelola_sdm_kawasan_id', false);
 		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
 		$this->db->join("pns_aktif as pa", 'pegawai.ID=pa.ID', 'left');
 		$this->db->join("unitkerja as uk", 'uk.ID=vw.UNOR_INDUK', 'left');
@@ -748,13 +742,20 @@ class Pegawai_model extends BF_Model
 		$this->db->join('agama', 'agama.ID = pegawai.AGAMA_ID', 'left');
 		$this->db->join('kedudukan_hukum', 'kedudukan_hukum.ID = pegawai.KEDUDUKAN_HUKUM_ID', 'left');
 		//$this->db->join('ref_jabatan', 'pegawai.JABATAN_INSTANSI_ID = CAST ("ref_jabatan"."ID_JABATAN" AS TEXT) ', 'left');
-		$this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_REAL_ID = jabatan.KODE_JABATAN', 'left');
-		$this->db->join('jenis_jabatan', 'jenis_jabatan.ID = jabatan.JENIS_JABATAN', 'left');
+		// $this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_REAL_ID = jabatan.KODE_JABATAN', 'left');
+		$this->db->join('mv_pensiun', 'mv_pensiun.nip = pegawai.NIP_BARU', 'left');
+		$this->db->join('jenis_jabatan', 'jenis_jabatan.ID = mv_pensiun.JENIS_JABATAN', 'left');
+		$this->db->join('vw_kgb_terakhir_final', 'vw_kgb_terakhir_final.pegawai_nip = pegawai.NIP_BARU', 'left');
+		$this->db->join('vw_ak_terakhir', 'vw_ak_terakhir.nip = pegawai.NIP_BARU', 'left');
 		if ($strict_in_satker) {
 			$this->db->where('vw."ID" is not null');
 		}
 		$this->db->where('pa."ID" is not null');
-		$this->db->where_not_in("pegawai.KEDUDUKAN_HUKUM_ID",$this->STATUS_NON_ACTIVE);
+		if (empty($kedudukan_hukum)){
+			$this->db->where_not_in("pegawai.KEDUDUKAN_HUKUM_ID",$this->STATUS_NON_ACTIVE);
+		} else {
+			$this->db->where("pegawai.KEDUDUKAN_HUKUM_ID", $kedudukan_hukum);
+		}
 		// $this->db->where('pegawai."KEDUDUKAN_HUKUM_ID" <> \'99\'');
 		// $this->db->where('pegawai."KEDUDUKAN_HUKUM_ID" <> \'66\'');
 		// $this->db->where('pegawai."KEDUDUKAN_HUKUM_ID" <> \'52\'');
@@ -808,7 +809,20 @@ class Pegawai_model extends BF_Model
 		$this->db->where('pegawai."KEDUDUKAN_HUKUM_ID" NOT IN (\'14\',\'52\',\'66\',\'67\',\'77\',\'78\',\'98\',\'99\') '.$where_clause .'');
 		return parent::count_all();
 	}
+	public function count_all_ppnpn($satker_id = "")
+	{
 
+		$where_clause = '';
+		if ($satker_id) {
+			$where_clause = 'AND (vw."ESELON_1" = \'' . $satker_id . '\' OR vw."ESELON_2" = \'' . $satker_id . '\' OR vw."ESELON_3" = \'' . $satker_id . '\' OR vw."ESELON_4" = \'' . $satker_id . '\')';
+		}
+		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
+		$this->db->join('golongan', 'pegawai.GOL_ID = golongan.ID', 'left');
+		$this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_REAL_ID = jabatan.KODE_JABATAN', 'left');
+		$this->db->where("status_pegawai = 3 " . $where_clause);
+
+		return parent::count_all();
+	}
 	public function find_all_ppnpn($satker_id, $strict_in_satker = false)
 	{
 
@@ -822,11 +836,16 @@ class Pegawai_model extends BF_Model
 				$where_clause .= ')';
 			} else $where_clause = 'AND (vw."ESELON_1" = \'' . $satker_id . '\' OR vw."ESELON_2" = \'' . $satker_id . '\' OR vw."ESELON_3" = \'' . $satker_id . '\' OR vw."ESELON_4" = \'' . $satker_id . '\')';
 		}
-		$this->db->select('pegawai.*,vw."NAMA_UNOR_FULL"', false);
-		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
+		$this->db->select('pegawai."ID",pegawai."PNS_ID",pegawai."NIP_BARU",pegawai."NAMA",vw."NAMA_UNOR_FULL",
+			jabatan."NAMA_JABATAN",
+			golongan."NAMA" AS "NAMA_GOLONGAN","NAMA_PANGKAT","NAMA_UNOR_ESELON_4","NAMA_UNOR_ESELON_3",
+			"NAMA_UNOR_ESELON_2","NAMA_UNOR_ESELON_1","KATEGORI_JABATAN","PHOTO",ref,username_intra', false);
 		if ($strict_in_satker) {
 			$this->db->where('vw."ID" is not null');
 		}
+		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
+		$this->db->join('golongan', 'pegawai.GOL_ID = golongan.ID', 'left');
+		$this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_REAL_ID = jabatan.KODE_JABATAN', 'left');
 		$this->db->where("status_pegawai = 3 " . $where_clause);
 		$this->db->order_by("NAMA", "ASC");
 		return parent::find_all();
@@ -853,7 +872,7 @@ class Pegawai_model extends BF_Model
 	{
 
 		if (empty($this->selects)) {
-			$this->select('
+			$this->select('pegawai.*,
 			pegawai."ID",
 			TRIM(pegawai."PNS_ID") "PNS_ID",
 			TRIM(pegawai."NIP_LAMA") "NIP_LAMA",
@@ -1462,6 +1481,69 @@ class Pegawai_model extends BF_Model
 		$this->db->order_by('tahunpensiun', "asc");
 		return parent::find_all();
 	}
+
+	public function find_estimasi_pensiun($unor_id = '')
+	{
+		if ($unor_id != '') {
+			$this->db->where("(vw.ID = '" . $unor_id . "' or vw.ESELON_1 = '" . $unor_id . "' or vw.ESELON_2 = '" . $unor_id . "' or vw.ESELON_3 = '" . $unor_id . "' or vw.ESELON_4 = '" . $unor_id . "')");
+		}
+		$this->db->select('pegawai.NIP_BARU,pegawai.ID,NAMA,
+			TGL_LAHIR,vw."NAMA_UNOR_FULL" AS NAMA_UNOR,
+			EXTRACT(YEAR FROM age(cast("TGL_LAHIR" as date))) as umur,
+			to_char("TGL_LAHIR" + "PENSIUN"*interval \'1 years\' + interval \'1 month\', \'YYYY-MM-01\') tahunpensiun,
+			jabatan."NAMA_JABATAN",jabatan."PENSIUN",PHOTO,ref');
+		$this->db->where("(status_pegawai != 3 or status_pegawai is null)");
+		$this->db->where("(TMT_PENSIUN IS NULL)");
+		$this->db->join("vw_unit_list as vw", "pegawai.UNOR_ID=vw.ID", 'left');
+		$this->db->join("hris.jabatan ", "pegawai.JABATAN_INSTANSI_REAL_ID=jabatan.KODE_JABATAN", 'left');
+		$this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "inner");
+		$this->db->order_by('tahunpensiun', "asc");
+		return parent::find_all();
+	}
+
+	public function find_estimasi_pensiun_perbulan($unor_id = '',$tgl)
+	{
+		if ($unor_id != '') {
+			$this->db->where("(vw.ID = '" . $unor_id . "' or vw.ESELON_1 = '" . $unor_id . "' or vw.ESELON_2 = '" . $unor_id . "' or vw.ESELON_3 = '" . $unor_id . "' or vw.ESELON_4 = '" . $unor_id . "')");
+		}
+		$this->db->select('pegawai.NIP_BARU,pegawai.ID,pegawai.NAMA,
+			TGL_LAHIR,vw."NAMA_UNOR_FULL" AS NAMA_UNOR,
+			EXTRACT(YEAR FROM age(cast("TGL_LAHIR" as date))) as umur,
+			to_char("TGL_LAHIR" + "PENSIUN"*interval \'1 years\' + interval \'1 month\', \'YYYY-MM-01\') tahunpensiun,
+			jabatan."NAMA_JABATAN",jabatan."PENSIUN",PHOTO,ref, golongan.NAMA golongan, golongan.NAMA_PANGKAT pangkat');
+		$this->db->group_start();
+		$this->db->where('to_char("TGL_LAHIR" + "PENSIUN"*interval \'1 years\' + interval \'1 month\', \'YYYY-MM-01\') = \'' . $tgl . '\'');
+		$this->db->group_end();
+		$this->db->where("(status_pegawai != 3 or status_pegawai is null)");
+		$this->db->where("(TMT_PENSIUN IS NULL)");
+		$this->db->join("vw_unit_list as vw", "pegawai.UNOR_ID=vw.ID", 'left');
+		$this->db->join("hris.jabatan ", "pegawai.JABATAN_INSTANSI_REAL_ID=jabatan.KODE_JABATAN", 'left');
+		$this->db->join("hris.golongan ", "pegawai.GOL_ID=golongan.ID", 'left');
+		$this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "inner");
+		$this->db->order_by('tahunpensiun', "asc");
+		return parent::find_all();
+	}
+	public function count_estimasi_pensiun_perbulan($unor_id = '',$tgl)
+	{
+		if ($unor_id != '') {
+			$this->db->where("(vw.ID = '" . $unor_id . "' or vw.ESELON_1 = '" . $unor_id . "' or vw.ESELON_2 = '" . $unor_id . "' or vw.ESELON_3 = '" . $unor_id . "' or vw.ESELON_4 = '" . $unor_id . "')");
+		}
+		$this->db->select('pegawai.NIP_BARU,pegawai.ID,NAMA,
+			TGL_LAHIR,vw."NAMA_UNOR_FULL" AS NAMA_UNOR,
+			EXTRACT(YEAR FROM age(cast("TGL_LAHIR" as date))) as umur,
+			to_char("TGL_LAHIR" + "PENSIUN"*interval \'1 years\' + interval \'1 month\', \'YYYY-MM-01\') tahunpensiun,
+			jabatan."NAMA_JABATAN",jabatan."PENSIUN",PHOTO,ref');
+		$this->db->group_start();
+		$this->db->where('to_char("TGL_LAHIR" + "PENSIUN"*interval \'1 years\' + interval \'1 month\', \'YYYY-MM-01\') = \'' . $tgl . '\'');
+		$this->db->group_end();
+		$this->db->where("(status_pegawai != 3 or status_pegawai is null)");
+		$this->db->where("(TMT_PENSIUN IS NULL)");
+		$this->db->join("vw_unit_list as vw", "pegawai.UNOR_ID=vw.ID", 'left');
+		$this->db->join("hris.jabatan ", "pegawai.JABATAN_INSTANSI_REAL_ID=jabatan.KODE_JABATAN", 'left');
+		$this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "inner");
+		return parent::count_all();
+	}
+
 	public function find_all_pensiunall($unor_id = '')
 	{
 		if ($unor_id != '') {
@@ -1492,18 +1574,22 @@ class Pegawai_model extends BF_Model
 		if ($unor_id != '') {
 			$this->db->where("(unitkerja.ID = '" . $unor_id . "' or unitkerja.ESELON_1 = '" . $unor_id . "' or unitkerja.ESELON_2 = '" . $unor_id . "' or unitkerja.ESELON_3 = '" . $unor_id . "' or unitkerja.ESELON_4 = '" . $unor_id . "')");
 		}
-		$this->db->select('pegawai.NIP_BARU,pegawai.ID,NAMA,
+		$this->db->select('pegawai.NIP_BARU,pegawai.ID,pegawai.NAMA,
 			TGL_LAHIR,vw."NAMA_UNOR_FULL" AS NAMA_UNOR,
 			EXTRACT(YEAR FROM age(cast("TGL_LAHIR" as date))) as umur,
 			date_part(\'year\',"TGL_LAHIR")+"PENSIUN" AS tahunpensiun,
-			jabatan."NAMA_JABATAN",jabatan."PENSIUN"');
+			to_char("TGL_LAHIR" + "PENSIUN"*interval \'1 years\' + interval \'1 month\', \'YYYY-MM-01\') AS tgl_pensiun,
+			jabatan."NAMA_JABATAN",jabatan."PENSIUN",pegawai.ref, golongan.NAMA golongan, golongan.NAMA_PANGKAT pangkat
+			');
 		$this->db->where('date_part(\'year\',"TGL_LAHIR")+"PENSIUN" = ' . $tahun . '');
 		$this->db->where("(status_pegawai != 3 or status_pegawai is null)");
 		//$this->db->where("(TMT_PENSIUN IS NULL)");
 		$this->db->join("vw_unit_list as vw", "pegawai.UNOR_ID=vw.ID", 'left');
 		$this->db->join("hris.jabatan ", "pegawai.JABATAN_INSTANSI_REAL_ID=jabatan.KODE_JABATAN", 'left');
 		$this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "inner");
-		$this->db->order_by('vw."NAMA_UNOR_FULL"', "asc");
+		$this->db->join("hris.golongan ", "pegawai.GOL_ID=golongan.ID", 'left');
+		$this->db->order_by('to_char("TGL_LAHIR" + "PENSIUN"*interval \'1 years\' + interval \'1 month\', \'YYYY-MM-01\')');
+		// $this->db->order_by('vw."NAMA_UNOR_FULL"', "asc");
 		return parent::find_all();
 	}
 	public function find_all_pensiun_tahun_jjabatan($tahun = "", $jenis_jabatan = "", $unor_id = '')
@@ -1515,7 +1601,8 @@ class Pegawai_model extends BF_Model
 			TGL_LAHIR,vw."NAMA_UNOR_FULL" AS NAMA_UNOR,
 			EXTRACT(YEAR FROM age(cast("TGL_LAHIR" as date))) as umur,
 			date_part(\'year\',"TGL_LAHIR")+"PENSIUN" AS tahunpensiun,
-			jabatan."NAMA_JABATAN",jabatan."PENSIUN"');
+			to_char("TGL_LAHIR" + "PENSIUN"*interval \'1 years\' + interval \'1 month\', \'YYYY-MM-01\') AS tgl_pensiun,
+			jabatan."NAMA_JABATAN",jabatan."PENSIUN", golongan.NAMA golongan, golongan.NAMA_PANGKAT pangkat');
 		$this->db->where('date_part(\'year\',"TGL_LAHIR")+"PENSIUN" = ' . $tahun . '');
 		$this->db->where("(status_pegawai != 3 or status_pegawai is null)");
 		$this->db->where('jenis_jabatan."ID', $jenis_jabatan);
@@ -1524,7 +1611,9 @@ class Pegawai_model extends BF_Model
 		$this->db->join("hris.jabatan ", "pegawai.JABATAN_INSTANSI_REAL_ID=jabatan.KODE_JABATAN", 'left');
 		$this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "inner");
 		$this->db->join("hris.jenis_jabatan ", "jenis_jabatan.ID=jabatan.JENIS_JABATAN", 'left');
-		$this->db->order_by('vw."NAMA_UNOR_FULL"', "asc");
+		$this->db->join("hris.golongan ", "pegawai.GOL_ID=golongan.ID", 'left');
+		$this->db->order_by('to_char("TGL_LAHIR" + "PENSIUN"*interval \'1 years\' + interval \'1 month\', \'YYYY-MM-01\')');
+		// $this->db->order_by('vw."NAMA_UNOR_FULL"', "asc");
 		return parent::find_all();
 	}
 	public function count_all_pensiun_tahun_jjabatan($tahun = "", $jenis_jabatan = "", $unor_id = '')
@@ -1556,7 +1645,8 @@ class Pegawai_model extends BF_Model
 			TGL_LAHIR,vw."NAMA_UNOR_FULL" AS NAMA_UNOR,
 			EXTRACT(YEAR FROM age(cast("TGL_LAHIR" as date))) as umur,
 			date_part(\'year\',"TGL_LAHIR")+"PENSIUN" AS tahunpensiun,
-			jabatan."NAMA_JABATAN",jabatan."PENSIUN"');
+			to_char("TGL_LAHIR" + "PENSIUN"*interval \'1 years\' + interval \'1 month\', \'YYYY-MM-01\') AS tgl_pensiun,
+			jabatan."NAMA_JABATAN",jabatan."PENSIUN", golongan.NAMA golongan, golongan.NAMA_PANGKAT pangkat');
 		$this->db->where('date_part(\'year\',"TGL_LAHIR")+"PENSIUN" = ' . $tahun . '');
 		$this->db->where("(status_pegawai != 3 or status_pegawai is null)");
 		$this->db->where('jabatan."KODE_JABATAN', $jabatan);
@@ -1565,6 +1655,8 @@ class Pegawai_model extends BF_Model
 		$this->db->join("hris.jabatan ", "pegawai.JABATAN_INSTANSI_REAL_ID=jabatan.KODE_JABATAN", 'left');
 		$this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "inner");
 		$this->db->join("hris.jenis_jabatan ", "jenis_jabatan.ID=jabatan.JENIS_JABATAN", 'left');
+		$this->db->join("hris.golongan ", "pegawai.GOL_ID=golongan.ID", 'left');
+		$this->db->order_by('to_char("TGL_LAHIR" + "PENSIUN"*interval \'1 years\' + interval \'1 month\', \'YYYY-MM-01\')');
 		$this->db->order_by('vw."NAMA_UNOR_FULL"', "asc");
 		return parent::find_all();
 	}
@@ -1593,7 +1685,8 @@ class Pegawai_model extends BF_Model
 		if ($unor_id != '') {
 			$this->db->where("(unitkerja.ID = '" . $unor_id . "' or unitkerja.ESELON_1 = '" . $unor_id . "' or unitkerja.ESELON_2 = '" . $unor_id . "' or unitkerja.ESELON_3 = '" . $unor_id . "' or unitkerja.ESELON_4 = '" . $unor_id . "')");
 		}
-		$this->db->select('pegawai.NIP_BARU,NAMA,TGL_LAHIR,vw."NAMA_UNOR_FULL" AS NAMA_UNOR,EXTRACT(YEAR FROM age(cast("TGL_LAHIR" as date))) as umur,jabatan."NAMA_JABATAN",jabatan."PENSIUN"');
+		$this->db->select('pegawai.NIP_BARU,NAMA,TGL_LAHIR,vw."NAMA_UNOR_FULL" AS NAMA_UNOR,EXTRACT(YEAR FROM age(cast("TGL_LAHIR" as date))) as umur,jabatan."NAMA_JABATAN",jabatan."PENSIUN",
+			pegawai.ref');
 		$this->db->where('date_part(\'year\',"TGL_LAHIR")+"PENSIUN" = ' . $tahun . '');
 		$this->db->where("(status_pegawai != 3 or status_pegawai is null)");
 		//$this->db->where("(TMT_PENSIUN IS NULL)");
@@ -2369,5 +2462,207 @@ class Pegawai_model extends BF_Model
 			$akawasan[] = $row->kawasan_id;
 		}
 		return $akawasan;
+	}
+
+	public function getEstimasiSlksCount($tgl,$filters)
+	{
+		
+		$where_clause = '';$where_clause2 = '';
+		if ($filters['filter_unit_kerja']) {
+			$where_clause = 'AND (vw."ESELON_1" = \'' . $filters['filter_unit_kerja'] . '\' OR vw."ESELON_2" = \'' . $filters['filter_unit_kerja'] . '\' OR vw."ESELON_3" = \'' . $filters['filter_unit_kerja'] . '\' OR vw."ESELON_4" = \'' . $filters['filter_unit_kerja'] . '\')';
+		}			
+		if ($filters['filter_jenis']){
+			$jenis = $filters['filter_jenis'];
+			if ($jenis == '10'){
+				$where_clause2 .= "DATE_PART('year' ,age('".$tgl."' :: TEXT :: DATE,pegawai.\"TMT_CPNS\")) BETWEEN '10' AND '19' ";
+				// $where_clause2 .= "EXTRACT(YEAR from AGE(\"TMT_CPNS\")) between '10' and '19'";
+				$this->db->join('rwt_penghargaan r1', 'pegawai.NIP_BARU = r1.PNS_NIP and r1.ID_JENIS_PENGHARGAAN = \'201\' ', 'left');
+				$this->db->where('r1.ID is null');
+				$satya_tahun = '\'X\'';
+			} else if ($jenis == '20'){
+				$where_clause2 .= "DATE_PART('year' ,age('".$tgl."' :: TEXT :: DATE,pegawai.\"TMT_CPNS\")) BETWEEN '20' AND '29' ";
+				// $where_clause2 .= " pa.masa_kerja_th between '20' and '29'";
+				$this->db->join('rwt_penghargaan r2', 'pegawai.NIP_BARU = r2.PNS_NIP and r2.ID_JENIS_PENGHARGAAN = \'202\' ', 'left');
+				$this->db->where('r2.ID is null');
+				$satya_tahun = '\'XX\'';
+			} if ($jenis == '30'){
+				$where_clause2 .= "DATE_PART('year' ,age('".$tgl."' :: TEXT :: DATE,pegawai.\"TMT_CPNS\")) >= '30' ";
+				// $where_clause2 .= " pa.masa_kerja_th >= '30' ";
+				$this->db->join('rwt_penghargaan r3', 'pegawai.NIP_BARU = r3.PNS_NIP and r3.ID_JENIS_PENGHARGAAN = \'203\' ', 'left');
+				$this->db->where('r3.ID is null');
+				$satya_tahun = '\'XXX\'';
+			}
+		}
+		$this->db->select('pegawai.ref,
+			pegawai."PNS_ID",
+			pegawai."NIP_BARU",
+			pegawai."NAMA",vw."NAMA_UNOR_FULL",
+			golongan."NAMA" AS "NAMA_GOLONGAN",
+			"NAMA_PANGKAT", 
+			"TMT_CPNS",
+			jabatan."NAMA_JABATAN",'.$satya_tahun.' as satya_tahun,
+			pa.masa_kerja_th1 as masa_kerja, pegawai.kawasan_id	
+			');
+		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
+		$this->db->join('golongan', 'pegawai.GOL_ID = golongan.ID', 'left');
+		// $this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "LEFT");
+		$this->db->join('hris.jabatan', 'pegawai.JABATAN_INSTANSI_REAL_ID = jabatan.KODE_JABATAN', 'left');
+		$this->db->where_not_in("pegawai.KEDUDUKAN_HUKUM_ID",$this->STATUS_NON_ACTIVE);
+		$this->db->where($where_clause2);
+		return parent::count_all();
+	}
+	public function getEstimasiSlksCount2($tgl,$filters)
+	{
+		
+		$where_clause = '';$where_clause2 = '';
+		if ($filters['filter_unit_kerja']) {
+			$where_clause = 'AND (vw."ESELON_1" = \'' . $filters['filter_unit_kerja'] . '\' OR vw."ESELON_2" = \'' . $filters['filter_unit_kerja'] . '\' OR vw."ESELON_3" = \'' . $filters['filter_unit_kerja'] . '\' OR vw."ESELON_4" = \'' . $filters['filter_unit_kerja'] . '\')';
+		}
+		$this->db->join('(SELECT extract(\'year\' from age(\''.$tgl.'\',"TMT_CPNS"))::int as masa_kerja, p."NIP_BARU" as nip from pegawai p )  as s','s.nip = pegawai."NIP_BARU"');				
+		if ($filters['filter_jenis']){
+			$jenis = $filters['filter_jenis'];
+			if ($jenis == '10'){
+				$where_clause2 = ' and r1."ID_JENIS_PENGHARGAAN" = \'201\'';
+				$this->db->where("s.masa_kerja between 10 and 19");
+			} else if ($jenis == '20'){
+				$where_clause2 = ' and r1."ID_JENIS_PENGHARGAAN" = \'202\'';
+				$this->db->where("s.masa_kerja between 20 and 29");
+			} if ($jenis == '30'){
+				$where_clause2 = ' and r1."ID_JENIS_PENGHARGAAN" = \'203\'';
+				$this->db->where("s.masa_kerja >= 30");
+			}
+		}
+		$this->db->select('count("NIP_BARU") jml',false);
+		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
+		$this->db->join('rwt_penghargaan r1', 'pegawai."NIP_BARU" = r1."PNS_NIP"  '.$where_clause2, 'left', false);
+		$this->db->where('r1.ID is null');
+		// $this->db->where('s.masa_kerja > \'9\' '.$where_clause2);
+		return parent::find_all();
+	}
+
+	public function getEstimasiSlks($tgl,$filters)
+	{
+		
+		$where_clause = '';$where_clause2 = '';
+		if ($filters['filter_unit_kerja']) {
+			$where_clause = 'AND (vw."ESELON_1" = \'' . $filters['filter_unit_kerja'] . '\' OR vw."ESELON_2" = \'' . $filters['filter_unit_kerja'] . '\' OR vw."ESELON_3" = \'' . $filters['filter_unit_kerja'] . '\' OR vw."ESELON_4" = \'' . $filters['filter_unit_kerja'] . '\')';
+		}			
+		if ($filters['filter_jenis']){
+			$jenis = $filters['filter_jenis'];
+			if ($jenis == '10'){
+				$where_clause2 .= "DATE_PART('year' ,age('".$tgl."' :: TEXT :: DATE,pegawai.\"TMT_CPNS\")) BETWEEN '10' AND '19' ";
+				// $where_clause2 .= "EXTRACT(YEAR from AGE(\"TMT_CPNS\")) between '10' and '19'";
+				$this->db->join('rwt_penghargaan r1', 'pegawai.NIP_BARU = r1.PNS_NIP and r1.ID_JENIS_PENGHARGAAN = \'201\' ', 'left');
+				$this->db->where('r1.ID is null');
+				$satya_tahun = '\'X\'';
+			} else if ($jenis == '20'){
+				$where_clause2 .= "DATE_PART('year' ,age('".$tgl."' :: TEXT :: DATE,pegawai.\"TMT_CPNS\")) BETWEEN '20' AND '29' ";
+				// $where_clause2 .= " pa.masa_kerja_th between '20' and '29'";
+				$this->db->join('rwt_penghargaan r2', 'pegawai.NIP_BARU = r2.PNS_NIP and r2.ID_JENIS_PENGHARGAAN = \'202\' ', 'left');
+				$this->db->where('r2.ID is null');
+				$satya_tahun = '\'XX\'';
+			} if ($jenis == '30'){
+				$where_clause2 .= "DATE_PART('year' ,age('".$tgl."' :: TEXT :: DATE,pegawai.\"TMT_CPNS\")) >= '30' ";
+				// $where_clause2 .= " pa.masa_kerja_th >= '30' ";
+				$this->db->join('rwt_penghargaan r3', 'pegawai.NIP_BARU = r3.PNS_NIP and r3.ID_JENIS_PENGHARGAAN = \'203\' ', 'left');
+				$this->db->where('r3.ID is null');
+				$satya_tahun = '\'XXX\'';
+			}
+		}
+		$this->db->select('pegawai.ref,
+			pegawai."PNS_ID",
+			pegawai."NIP_BARU",
+			pegawai."NAMA",vw."NAMA_UNOR_FULL",
+			golongan."NAMA" AS "NAMA_GOLONGAN",
+			"NAMA_PANGKAT", 
+			jabatan."NAMA_JABATAN",'.$satya_tahun.' as satya_tahun,
+			"TMT_CPNS",
+			DATE_PART(\'year\' ,age(\''.$tgl.'\' :: TEXT :: DATE,pegawai."TMT_CPNS")) as masa_kerja, k.name kawasan
+			');
+		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
+		$this->db->join('golongan', 'pegawai.GOL_ID = golongan.ID', 'left');
+		// $this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "LEFT");
+		$this->db->join('hris.jabatan', 'pegawai.JABATAN_INSTANSI_REAL_ID = jabatan.KODE_JABATAN', 'left');
+		$this->db->join('hris.kawasan k', 'pegawai.kawasan_id = k.id', 'left');
+		$this->db->where_not_in("pegawai.KEDUDUKAN_HUKUM_ID",$this->STATUS_NON_ACTIVE);
+		$this->db->where($where_clause2);
+		$this->db->order_by('TMT_CPNS','desc');
+		return parent::find_all();
+	}
+	public function find_detil_pegawai($kolom,$val)
+	{
+
+		if (empty($this->selects)) {
+			$this->select('
+			pegawai.*,jenis_pegawai.NAMA as JENIS_PEGAWAI,
+			kedudukan_hukum.NAMA AS KEDUDUKAN_HUKUM,
+			pa.masa_kerja_th,
+			pa.masa_kerja_bl,
+			ref,
+			username_intra,
+			kawasan_id,
+			tusi_id,
+			satker_penempatan_id,
+			lokasi."NAMA" as "TEMPAT_LAHIR_NAMA",
+			golongan."NAMA" AS "NAMA_GOLONGAN","NAMA_PANGKAT",
+			pendidikan."NAMA" AS "NAMA_PENDIDIKAN"
+			');
+		}
+		$this->db->join('jenis_pegawai', 'pegawai.JENIS_PEGAWAI_ID = jenis_pegawai.ID', 'left');
+		$this->db->join('pns_aktif pa', 'pa.ID = pegawai.ID', 'left');
+		$this->db->join('kedudukan_hukum', 'pegawai.KEDUDUKAN_HUKUM_ID = kedudukan_hukum.ID', 'left');
+		$this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_REAL_ID = jabatan.KODE_JABATAN', 'left');
+		$this->db->join('golongan', 'pegawai.GOL_ID = golongan.ID', 'left');
+		$this->db->join('lokasi', 'lokasi.ID = pegawai.TEMPAT_LAHIR_ID', 'left');
+		$this->db->join('pendidikan', 'pendidikan.ID = pegawai.PENDIDIKAN_ID', 'left');
+		return parent::find_by($kolom,$val);
+	}
+	public function grupby_status_pegawai($unor_id = '')
+	{
+		$where_clause = '';
+		if ($unor_id != '') {
+			$where_clause = 'AND (vw."ESELON_1" = \'' . $unor_id . '\' OR vw."ESELON_2" = \'' . $unor_id . '\' OR vw."ESELON_3" = \'' . $unor_id . '\' OR vw."ESELON_4" = \'' . $unor_id . '\')';
+		}
+
+		if (empty($this->selects)) {
+			$this->select('case when status_pegawai = 1  then \'PNS\'
+					when
+					 status_pegawai = 2  then \'P3K\' else \'Honorer\' END AS status_pegawai,
+				sum(1) as jumlah');
+		}
+		$this->db->join("vw_unit_list as vw", "pegawai.UNOR_ID=vw.ID", 'left');
+		// $this->db->join("hris.jabatan ", "pegawai.JABATAN_INSTANSI_REAL_ID=jabatan.KODE_JABATAN", 'left');
+		// $this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "left");
+		// $this->db->where('pa."ID" is not null', NULL, FALSE);
+		$this->db->where_not_in("pegawai.KEDUDUKAN_HUKUM_ID",$this->STATUS_NON_ACTIVE);
+		$this->db->group_by('status_pegawai');
+		$this->db->order_by('status_pegawai', "ASC");
+		return parent::find_all();
+	}
+	public function getAKTerakhir($nip)
+	{
+		return $this->db->from('vw_ak_terakhir')->where('nip', $nip)->get()->first_row();
+	}
+	public function count_belum_pdm()
+	{
+		$this->db->select('b.*, pegawai.ref',false);
+		$this->db->join('users u', 'u.username = pegawai.NIP_BARU', 'left');
+		$this->db->join('vw_belum_pdm b', 'pegawai.PNS_ID = b.PNS_ID', 'inner');
+		return parent::count_all();
+	}
+	public function find_belum_pdm()
+	{
+		$this->db->select('b.*, pegawai.ref, u.id',false);
+		$this->db->join('users u', 'u.username = pegawai.NIP_BARU', 'left');
+		$this->db->join('vw_belum_pdm b', 'pegawai.PNS_ID = b.PNS_ID', 'inner');
+		return parent::find_all();
+	}
+
+	public function get_masa_kerja_kp($nip)
+	{
+		if ($nip){
+			$this->db->where('NIP_BARU',$nip);
+			return $this->db->from('hris.vw_masa_kerja_kp')->get()->first_row();
+		}		
 	}
 }

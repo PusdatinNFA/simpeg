@@ -51,7 +51,13 @@
 			<div class="control-group<?php echo form_error('JENIS_PENGADAAN') ? ' error' : ''; ?> col-sm-3">
                 <?php echo form_label("JENIS PENGADAAN", 'JENIS_PENGADAAN', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                    <input id='JENIS_PENGADAAN' type='text' class="form-control" name='JENIS_PENGADAAN' maxlength='225' value="<?php echo set_value('JENIS_PENGADAAN', isset($riwayat_pns_cpns->JENIS_PENGADAAN) ? $riwayat_pns_cpns->JENIS_PENGADAAN : ''); ?>" />
+					<select class="form-control" name="JENIS_PENGADAAN" id="JENIS_PENGADAAN">
+						<option value=""></option>
+						<?php foreach ($pengadaans as $record) { ?>
+							<option value="<?=$record->id?>" <?=$riwayat_pns_cpns->JENIS_PENGADAAN == $record->id?'selected':'' ?>><?=$record->nama?></option>
+						<?php } ?>
+					</select>
+                    <!-- <input id='' type='text' class="form-control" name='JENIS_PENGADAAN' maxlength='225' value="<?php echo set_value('JENIS_PENGADAAN', isset($riwayat_pns_cpns->JENIS_PENGADAAN) ? $riwayat_pns_cpns->JENIS_PENGADAAN : ''); ?>" /> -->
                     <span class='help-inline'><?php echo form_error('JENIS_PENGADAAN'); ?></span>
                 </div>
             </div>
@@ -205,13 +211,20 @@
 					<span class='help-inline'><?php echo form_error('NAMA_JABATAN_ANGKAT_CPNS'); ?></span>
 				</div>
 			</div>
-			
         </div>
   		<div class="box-footer">
+		  <?php if ($this->auth->has_permission('Riwayatpns.Kepegawaian.Edit') ) : ?>
   			<a href="javascript:;" id="btnsave_pns"  class="btn green btn-primary button-submit"> 
   				<i class="fa fa-save"></i> 
   				Simpan
             </a>
+			<?php endif; ?>
+			<?php if ($this->auth->has_permission('Pegawai.UpdateMandiri.View')) : ?>
+			<a href="javascript:;" id="btnsave_pns_mandiri"  class="btn btn-info button-submit"> 
+  				<i class="fa fa-save"></i> 
+  				Update Mandiri 
+            </a>
+			<?php endif; ?>
         </div>
     <?php echo form_close(); ?>
 </div>
@@ -223,23 +236,70 @@
     });
 </script>
 <script>
-	$("#btnsave_pns").click(function(){
-		submitdatariwayatpns();
+	$("#btnsave_pns").click(function(event){
+		event.preventDefault();
+			var kode =$(this).attr("kode");
+				swal({
+					title: "Anda Yakin?",
+					text: "Update riwayat CPNS/PNS!",
+					type: "warning",
+					showCancelButton: true,
+					confirmButtonClass: 'btn-success',
+					confirmButtonText: 'Ya, Simpan!',
+					cancelButtonText: "Tidak, Batalkan!",
+					closeOnConfirm: false,
+					closeOnCancel: false
+				},
+				function (isConfirm) {
+					if (isConfirm) {						
+						submitdatariwayatpns();						
+					} else {
+						swal("Batal", "", "error");
+					}
+				});
+		return false;  
+	});
+	$("#btnsave_pns_mandiri").click(function(event){
+		event.preventDefault();
+			var kode =$(this).attr("kode");
+				swal({
+					title: "Anda Yakin?",
+					text: "Update riwayat CPNS/PNS Mandiri!",
+					type: "warning",
+					showCancelButton: true,
+					confirmButtonClass: 'btn-success',
+					confirmButtonText: 'Ya, Simpan!',
+					cancelButtonText: "Tidak, Batalkan!",
+					closeOnConfirm: false,
+					closeOnCancel: false
+				},
+				function (isConfirm) {
+					if (isConfirm) {						
+						submitdatariwayatpns(true);						
+					} else {
+						swal("Batal", "", "error");
+					}
+				});
 		return false; 
 	});	
-	function submitdatariwayatpns(){
-		$('#btnsave_pns').addClass('disabled');
+	function submitdatariwayatpns(mandiri = false){
+		$('#btnsave_pns').prop('disabled',true);
 		var json_url = "<?php echo base_url() ?>pegawai/riwayat_pns/save";
+		var data = $("#frm").serializeArray();
+		if (mandiri){
+			data.push({name: "mandiri", value: true});
+		}
 		 $.ajax({    
 		 	type: "POST",
 			url: json_url,
-			data: $("#frm").serialize(),
+			data: $.param(data),
             dataType: "json",
 			success: function(data){ 
                 if(data.success){
                     swal("Pemberitahuan!", data.msg, "success");
                     $("#ID_PNS_CPNS").val(data.kode);
-                    $('#btnsave_pns').removeClass('disabled');
+                    $('#btnsave_pns').prop('disabled',false);
+                    $('#btnsave_pns_mandiri').prop('disabled',false);
                 }
                 else {
                     $("#form-riwayat_pns_cpns .messages").empty().append(data.msg);

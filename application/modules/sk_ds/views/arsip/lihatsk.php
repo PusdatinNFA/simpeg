@@ -8,8 +8,8 @@ $this->load->library('convert');
         <input type="hidden" name="id_file" value="<?php echo $data->id_file; ?>">
         
         <div class="col-md-9">     
-            <!-- <embed src="<?php echo $url_sk; ?>" width="100%" height="700" alt="pdf"> -->
-              <embed src="data:application/pdf;base64,<?php echo $b64; ?>" width="100%" height="700" alt="pdf">
+            <embed src="<?php echo $url_sk; ?>" width="100%" height="700" alt="pdf">
+              <!-- <embed src="data:application/pdf;base64,<?php echo $b64; ?>" width="100%" height="700" alt="pdf"> -->
               
         </div>
         <!-- /.col -->
@@ -19,10 +19,10 @@ $this->load->library('convert');
           <div class="box box-warning">
             <div class="box-body box-profile">
             <center>
-              <img src="<?php echo base_url(); ?><?php echo $foto_pegawai; ?>" class="img-responsive pic-bordered" id="photopegawai" alt="Photo" width="50%">
+              <img src="<?php echo $foto_pegawai; ?>" class="img-responsive pic-bordered" id="photopegawai" alt="Photo" width="50%">
             </center>
                 <h3 class="profile-username text-center">
-                    <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN : ''; ?>  <?php echo isset($pegawai->NAMA) ? $pegawai->NAMA : ''; ?> <?php echo isset($pegawai->GELAR_BELAKANG) ? $pegawai->GELAR_BELAKANG : ''; ?>
+                    <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN.' ' : ''; ?><?php echo isset($pegawai->NAMA) ? trim($pegawai->NAMA) : ''; ?><?php echo isset($pegawai->GELAR_BELAKANG) ? ', '.$pegawai->GELAR_BELAKANG : ''; ?>
                 </h3>
               <p class="text-muted text-center">
                     <?php if($pegawai->JENIS_JABATAN_ID == "1") {  ?>

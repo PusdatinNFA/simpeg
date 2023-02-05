@@ -4,14 +4,21 @@
  	$convert = new convert();
 ?>
 <div class="tab-pane active" id="<?php echo $TAB_ID;?>">
+<?php if ($mandiri){ ?>
     <div class="callout callout-success">
        <h4>Perhatian</h4>
-       <P>Silahkan lakukan perubahan data, jika ada kesalahan atau ada perubahan</P>
-       <p>Perubahan data yang anda lakukan akan diverifikasi oleh kepegawaian Satker/Upt anda, setelah itu data akan diverifikasi ulang oleh Biro SDM</p>
+       <ul>
+        <li>Silahkan lakukan perubahan data, jika ada kesalahan atau ada perubahan. Perubahan data yang anda lakukan akan diverifikasi oleh kepegawaian Kawasan</li>
+        <li>
+            Jika ada kesalahan Nama/NIP silahkan mengajukan perubahan melalui e-lawas.
+        </li>
+       </ul>
      </div>
+<?php } ?>
 	<form role="form" action="#" id="frmprofile">
-	<input id='ID' type='hidden' class="form-control" name='ID' maxlength='25' value="<?php echo set_value('ID', isset($pegawai->ID) ? $pegawai->ID : ''); ?>" />
-	<div class="box box-info">
+	<input id='ID' type='hidden' class="form-control" name='ID' value="<?php echo set_value('ID', isset($pegawai->ID) ? $pegawai->ID : ''); ?>" />
+	<input id='mandiri' type='hidden' class="form-control" name='mandiri' value="<?php echo set_value('mandiri', isset($mandiri) ? $mandiri : ''); ?>" />
+	<div class="box box-danger">
             <div class="box-header no-border">
               <h3 class="box-title">Data Pribadi</h3>
 
@@ -39,7 +46,7 @@
 						  Tempat/Tanggal Lahir
 					  </div>
 					  <div class="control-group col-sm-4">
-                        <select name="TEMPAT_LAHIR_ID" id="TEMPAT_LAHIR_ID" required="" class="form-control select2">
+                        <select name="TEMPAT_LAHIR_ID1" disabled id="TEMPAT_LAHIR_ID" required="" class="form-control select2">
                             <?php 
                                 if($selectedTempatLahirPegawai){
                                     echo "<option selected value='".$selectedTempatLahirPegawai->ID."'>".$selectedTempatLahirPegawai->NAMA."</option>";
@@ -52,13 +59,15 @@
                           <div class="input-group-addon">
                             <i class="fa fa-calendar"></i>
                           </div>
-                            <input id='TGL_LAHIRUP' type='text' class="form-control pull-right" disabled="" name='TGL_LAHIRUP' maxlength='25' value="<?php echo isset($pegawai->TGL_LAHIR) ? $convert->fmtDate($pegawai->TGL_LAHIR,"dd month yyyy") : 'TGL_LAHIR'; ?>" />
+                            <input id='TGL_LAHIRUP' type='text' class="form-control pull-right" disabled="" name='TGL_LAHIRUP' value="<?php echo isset($pegawai->TGL_LAHIR) ? $convert->fmtDate($pegawai->TGL_LAHIR,"dd month yyyy") : 'TGL_LAHIR'; ?>" />
                             <span class='help-inline'><?php echo form_error('TGL_LAHIR'); ?></span>
                         </div>
                     </div> 
                       
 				  </div>
 			  </div>
+        
+        <?php if ($this->auth->has_permission('Privacy.Kepegawaian.View') || $this->auth->username() == $pegawai->NIP_BARU){ ?>
         <div class="control-group col-sm-12">
          <div class="row">
            <div class="col-sm-4">
@@ -67,11 +76,12 @@
            <div class="form-group col-sm-8">
              <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                <input id='NIK' type='text' class="form-control" name='NIK' maxlength='200' value="<?php echo set_value('NIK', isset($pegawai->NIK) ? $pegawai->NIK : ''); ?>" />
+                <input id='NIK' type='text' class="form-control" <?=$this->auth->has_permission('Privacy.NIK.Edit')?'': 'readonly'?> name='NIK' maxlength='200' value="<?php echo set_value('NIK', isset($pegawai->NIK) ? $pegawai->NIK : ''); ?>" />
              </div>
           </div>
          </div>
       </div>
+        <?php } ?>
       <div class="control-group col-sm-12">
          <div class="row">
            <div class="col-sm-4">
@@ -93,20 +103,31 @@
 					 <div class="form-group col-sm-8">
 					   <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                <input id='EMAIL' type='text' class="form-control" name='EMAIL' maxlength='200' value="<?php echo set_value('EMAIL', isset($pegawai->EMAIL) ? $pegawai->EMAIL : ''); ?>" />
+                <input id='EMAIL' type='text' class="form-control" readonly name='EMAIL' maxlength='200' value="<?php echo set_value('EMAIL', isset($pegawai->EMAIL) ? $pegawai->EMAIL : ''); ?>" />
 					   </div>
           </div>
 				 </div>
 			 </div>
        
-       
+            
+             <?php if ($this->auth->has_permission('Privacy.Kepegawaian.View') || $this->auth->username() == $pegawai->NIP_BARU){ ?>
              <div class="form-group col-sm-12">
                  <div class="row">
                      <div class="col-sm-4">
-                         ALAMAT
+                         ALAMAT DOMISILI
                      </div>
                      <div class="col-sm-8">
                         <textarea name="ALAMAT" cols="40" rows="3" id="ALAMAT" style="width:100%"><?php echo set_value('ALAMAT', isset($pegawai->ALAMAT) ? $pegawai->ALAMAT : ''); ?></textarea>
+                     </div>
+                 </div>
+             </div>
+             <div class="form-group col-sm-12">
+                 <div class="row">
+                     <div class="col-sm-4">
+                         ALAMAT SESUAI KTP
+                     </div>
+                     <div class="col-sm-8">
+                        <textarea name="ALAMAT_KTP" cols="40" rows="3" id="ALAMAT_KTP" style="width:100%"><?php echo set_value('ALAMAT_KTP', isset($pegawai->ALAMAT_KTP) ? $pegawai->ALAMAT_KTP : ''); ?></textarea>
                      </div>
                  </div>
              </div>
@@ -129,6 +150,7 @@
 				 </div>
 			 </div>
         
+             <?php } ?>
        <div class="control-group col-sm-12">
            <div class="row">
                <div class="form-group col-sm-4">
@@ -147,7 +169,7 @@
            </div>
        </div>
        <div class="control-group col-sm-12">
-           <div class="row">
+            <div class="row">
                <div class="form-group col-sm-4">
                    Tingkat Pendidikan
                </div>
@@ -173,11 +195,11 @@
                          
                     </select>
                 </div>
-           </div>
-      </div>
+            </div>
+       </div>
               <div class="control-group col-sm-12">
                  <div class="row">
-                     <div class="control-group col-sm-4">
+                     <div class="form-group col-sm-4">
                          Status PNS/CPNS
                      </div>
                      <div class="form-group col-sm-2">
@@ -190,13 +212,15 @@
                      <div class="form-group col-sm-2">
                          TMT PNS
                      </div>
-                     <div class="input-group date col-sm-4">
+                     <div class="form-group col-sm-4">
+                     <div class="input-group date col-sm-12">
                         <div class="input-group-addon">
                         <i class="fa fa-calendar"></i>
                         </div>
-                          <input id='TMT_PNS' readonly type='text' class="form-control pull-right datepicker" name='TMT_PNS'  value="<?php echo set_value('TMT_PNS', isset($pegawai->TMT_PNS) ? $pegawai->TMT_PNS : ''); ?>" />
+                          <input id='TMT_PNS' disabled type='text' class="form-control pull-right datepicker" name='TMT_PNS1'  value="<?php echo set_value('TMT_PNS', isset($pegawai->TMT_PNS) ? $pegawai->TMT_PNS : ''); ?>" />
                         <span class='help-inline'><?php echo form_error('TMT_PNS'); ?></span>
                       </div>
+                     </div>
                  </div>
             </div>
             <div class="control-group col-sm-12">
@@ -204,21 +228,43 @@
                      <div class="form-group col-sm-4">
                          Golongan
                      </div>
-                     <div class="form-group col-sm-2">
-                        <select name="GOL_ID" id="GOL_ID" class="form-control select2">
+                     <div class="form-group col-sm-4">
+                        <select name="GOL_ID1" disabled id="GOL_ID" class="form-control select2">
                             <option value="">-- Silahkan Pilih --</option>
                             <?php if (isset($golongans) && is_array($golongans) && count($golongans)):?>
                             <?php foreach($golongans as $record):?>
-                              <option value="<?php echo $record->ID?>" <?php if(isset($pegawai->GOL_ID))  echo  ($pegawai->GOL_ID==$record->ID) ? "selected" : ""; ?>><?php echo $record->NAMA; ?> | <?php echo $record->NAMA_PANGKAT; ?></option>
+                              <option value="<?php echo $record->ID?>" <?php if(isset($pegawai->GOL_ID))  echo  ($pegawai->GOL_ID==$record->ID) ? "selected" : "disabled"; ?>><?php echo $record->NAMA; ?> | <?php echo $record->NAMA_PANGKAT; ?></option>
                               <?php endforeach;?>
                             <?php endif;?>
                           </select>
                      </div>
-                     <div class="form-group col-sm-2">
+                     
+                 </div>
+            </div>
+            <div class="control-group col-sm-12">
+                 <div class="row">
+                     <div class="form-group col-sm-4">
                          Kartu Pegawai
                      </div>
+                     <div class="form-group col-sm-2">
+                         <input id='KARTU_PEGAWAI' type='text' class="form-control" name='KARTU_PEGAWAI' maxlength='20' value="<?php echo set_value('KARTU_PEGAWAI', isset($pegawai->KARTU_PEGAWAI) ? $pegawai->KARTU_PEGAWAI : ''); ?>" />
+                      </div>
+                      <div class="form-group col-sm-2">
+                         Kartu ASN
+                     </div>
                      <div class="form-group col-sm-4">
-                         <input id='KARTU_PEGAWAI' type='text' class="form-control" name='KARTU_PEGAWAI' maxlength='11' value="<?php echo set_value('KARTU_PEGAWAI', isset($pegawai->KARTU_PEGAWAI) ? $pegawai->KARTU_PEGAWAI : ''); ?>" />
+                         <input id='KARTU_ASN' type='text' class="form-control" name='KARTU_ASN' maxlength='20' value="<?php echo set_value('KARTU_ASN', isset($pegawai->KARTU_ASN) ? $pegawai->KARTU_ASN : ''); ?>" />
+                      </div>
+                 </div>
+            </div>
+            <div class="control-group col-sm-12">
+                 <div class="row">
+                      <div class="form-group col-sm-4">
+                         Nomor Induk JF
+                     </div>
+                     <div class="form-group col-sm-8">
+                         <input id='no_induk_jf' type='text' class="form-control" name='no_induk_jf' maxlength='32' value="<?php echo set_value('no_induk_jf', isset($pegawai->no_induk_jf) ? $pegawai->no_induk_jf : ''); ?>" />
+                        <span><b>*bagi yang memiliki</b></span> 
                       </div>
                  </div>
             </div>
@@ -228,7 +274,7 @@
                          Lokasi Kerja
                      </div>
                      <div class="form-group col-sm-8">
-                        <select name="LOKASI_KERJA_ID" id="LOKASI_KERJA_ID" class="form-control select2">
+                        <select name="LOKASI_KERJA_ID1" disabled id="LOKASI_KERJA_ID" class="form-control select2">
                                 <?php 
                                     if($selectedLokasiPegawai){
                                         echo "<option selected value='".$selectedLokasiPegawai->ID."'>".$selectedLokasiPegawai->NAMA."</option>";
@@ -236,37 +282,225 @@
                                 ?>
                           </select>
                      </div>
-                     <div class="form-group col-sm-2">
-                         
-                     </div>
-                     <div class="form-group col-sm-4">
-                         
-                      </div>
                  </div>
             </div>
-            
+            <div class="control-group col-sm-12">
+                <div class="row">
+                    <div class="form-group col-sm-4">
+                        Satker
+                    </div>
+                    <div class="form-group col-sm-8">
+                        <select name="UNOR_INDUK_ID1" disabled id="UNOR_INDUK_ID" class="form-control select2">
+                                <?php 
+                                    if($selectedUnorindukid){
+                                        echo "<option selected value='".$selectedUnorindukid->ID."'>".$selectedUnorindukid->NAMA_UNOR."</option>";
+                                    }
+                                ?>
+                            </select>
+                    </div>                
+                </div>
+            </div>
+            <div class="control-group col-sm-12">
+                <div class="row">
+                    <div class="form-group col-sm-4">
+                        Unit
+                    </div>
+                    <div class="form-group col-sm-8">
+                        <select name="UNOR_ID1" disabled id="Unor_ID" class="form-control select2">
+                                <?php 
+                                    if($selectedUnorid){
+                                        echo "<option selected value='".$selectedUnorid->ID."'>".$selectedUnorid->NAMA_UNOR."</option>";
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                </div>
+            </div>
+            <!-- <div class="control-group col-sm-12">
+                <div class="row">
+                    <div class="form-group col-sm-4">
+                        Kepakaran
+                    </div>
+                    <div class="form-group col-sm-8">
+                        <select name="kepakaran[]" id="kepakaran" multiple="multiple" class="form-control select2">
+                                <?php 
+                                    if (isset($kepakarans) && is_array($kepakarans) && count($kepakarans)) :
+                                        foreach ($kepakarans as $kepakaran) :
+                                            if ($kepakaran->kode){
+                                                $selected = 'selected';
+                                                echo "<option $selected value='$kepakaran->kode'>" . $kepakaran->namaid.' ('.$kepakaran->namaen.')' . "</option>";
+                                            }
+                                        endforeach;
+                                    endif;
+                                ?>
+                            </select>
+                        <span><b>*khusus Peneliti</b></span>   
+                        </div>
+                </div>
+            </div> -->
+            <div class="control-group col-sm-12">
+                <div class="row">
+                    <div class="form-group col-sm-4">
+                        Bidang Kepakaran
+                    </div>
+                    <div class="form-group col-sm-8">
+                        <select name="penelitian[]" id="bidangpenelitian" multiple="multiple" class="form-control select2">
+                                <?php 
+                                    if (isset($penelitians) && is_array($penelitians) && count($penelitians)) :
+                                        foreach ($penelitians as $penelitian) :
+                                            if ($penelitian->kode){
+                                                $selected = 'selected';
+                                                echo "<option $selected value='$penelitian->kode'>" . $penelitian->namaid.' ('.$penelitian->namaen.')' . "</option>";
+                                            }
+                                        endforeach;
+                                    endif;
+                                ?>
+                            </select>
+                        <span><b>*Khusus SDM IPTEK</b></span> 
+                        </div>
+                </div>
+            </div>
+            <div class="control-group col-sm-12">
+                 <div class="row">
+                     <div class="form-group col-sm-4">
+                         Detail Kepakaran
+                     </div>
+                     <div class="form-group col-sm-8">
+                         <textarea id='detail_kepakaran' rows="15" type='text' class="form-control" name='detail_kepakaran' placeholder="Tuliskan detail kepakaran secara rinci, jelas dan lengkap terkait keahlian atau kepakaran Anda. Detail kepakaran ini nantinya akan digunakan sebagai media informasi terkait bidang keahlian SDM IPTEK BRIN secara perorangan/individu." style="width:100%"><?php echo set_value('detail_kepakaran', isset($pegawai->detail_kepakaran) ? trim($pegawai->detail_kepakaran) : ''); ?></textarea>
+                      </div>                     
+                 </div>
+            </div>
             </fieldset>
             <fieldset>
                 <legend>Lainnya</legend>
                     <div class="control-group<?php echo form_error('JENIS_KAWIN_ID') ? ' error' : ''; ?> col-sm-12">
-                       <?php echo form_label("STATUS PERKAWINAN", 'JENIS_KAWIN_ID', array('class' => 'control-label')); ?>
+                       <?php echo form_label("STATUS PERKAWINAN", 'JENIS_KAWIN_ID', array('class' => 'control-label')); ?><br>
+                       <span>(Untuk update status perkawinan dapat dilakukan dengan melengkapi data pasangan pada data keluarga.)</span>
                        <div class='controls'>
-                           <select name="JENIS_KAWIN_ID" id="JENIS_KAWIN_ID" class="form-control select2">
+                           <select name="JENIS_KAWIN_ID1" disabled id="JENIS_KAWIN_ID" class="form-control select2">
                                <option value="">-- Silahkan Pilih --</option>
                                <?php if (isset($jenis_kawins) && is_array($jenis_kawins) && count($jenis_kawins)):?>
                                <?php foreach($jenis_kawins as $record):?>
-                                   <option value="<?php echo $record->ID?>" <?php if(isset($pegawai->JENIS_KAWIN_ID))  echo  ($pegawai->JENIS_KAWIN_ID==$record->ID) ? "selected" : ""; ?>><?php echo $record->NAMA; ?></option>
+                                   <option value="<?php echo $record->ID?>" <?php if(isset($pegawai->JENIS_KAWIN_ID))  echo  ($pegawai->JENIS_KAWIN_ID==$record->ID) ? "selected" : "disabled"; ?>><?php echo $record->NAMA; ?></option>
                                    <?php endforeach;?>
                                <?php endif;?>
                            </select>
                            <span class='help-inline'><?php echo form_error('JENIS_KAWIN_ID'); ?></span>
                        </div>
                     </div>
-                   <div class="control-group<?php echo form_error('NO_SURAT_DOKTER') ? ' error' : ''; ?> col-sm-6">
+                   <div class="control-group<?php echo form_error('AKTE_KELAHIRAN') ? ' error' : ''; ?> col-sm-12">
+                       <?php echo form_label("AKTE KELAHIRAN", 'AKTE_KELAHIRAN', array('class' => 'control-label')); ?>
+                       <div class='controls'>
+                           <input id='AKTE_KELAHIRAN' type='text' class="form-control" name='AKTE_KELAHIRAN' value="<?php echo set_value('AKTE_KELAHIRAN', isset($pegawai->AKTE_KELAHIRAN) ? trim($pegawai->AKTE_KELAHIRAN) : ''); ?>" />
+                           <span class='help-inline'><?php echo form_error('AKTE_KELAHIRAN'); ?></span>
+                       </div>
+                   </div>
+                    
+                    <div class="control-group col-sm-6">
+                       <?php echo form_label("NO BPJS", 'BPJS', array('class' => 'control-label')); ?>
+                       <div class='controls'>
+                           <input id='BPJS' type='text' class="form-control" name='BPJS' value="<?php echo set_value('BPJS', isset($pegawai->BPJS) ? trim($pegawai->BPJS) : ''); ?>" />
+                       </div>
+                   </div>
+                   <div class="control-group<?php echo form_error('NO_TASPEN') ? ' error' : ''; ?> col-sm-6">
+                       <?php echo form_label("NO TASPEN", 'NO_TASPEN', array('class' => 'control-label')); ?>
+                       <div class='controls'>
+                           <input id='NO_TASPEN' type='text' class="form-control" name='NO_TASPEN' maxlength='50' value="<?php echo set_value('NO_TASPEN', isset($pegawai->NO_TASPEN) ? trim($pegawai->NO_TASPEN) : ''); ?>" />
+                           <span class='help-inline'><?php echo form_error('NO_TASPEN'); ?></span>
+                       </div>
+                   </div>
+                   <div class="control-group<?php echo form_error('NPWP') ? ' error' : ''; ?> col-sm-6">
+                       <?php echo form_label(lang('pegawai_field_NPWP'), 'NPWP', array('class' => 'control-label')); ?>
+                       <div class='controls'>
+                           <input id='NPWP' type='text' class="form-control" name='NPWP' value="<?php echo set_value('NPWP', isset($pegawai->NPWP) ? $pegawai->NPWP : ''); ?>" />
+                           <span class='help-inline'><?php echo form_error('NPWP'); ?></span>
+                       </div>
+                   </div>
+                   <div class="control-group col-sm-6">
+                       <label for="inputNAMA" class="control-label">TGL NPWP</label>
+                       <div class="input-group date">
+                         <div class="input-group-addon">
+                           <i class="fa fa-calendar"></i>
+                         </div>
+                           <input id='TGL_NPWP' type='text' class="form-control pull-right datepicker" name='TGL_NPWP' value="<?php echo set_value('TGL_NPWP', isset($pegawai->TGL_NPWP) ? $pegawai->TGL_NPWP : ''); ?>" />
+                           <span class='help-inline'><?php echo form_error('TGL_NPWP'); ?></span>
+                       </div>
+                   </div> 
+                   <div class="control-group<?php echo form_error('NPWP') ? ' error' : ''; ?> col-sm-9">
+                       <?php echo form_label("NOMOR DARURAT", 'NOMOR_DARURAT', array('class' => 'control-label')); ?>
+                        <span class='help-inline'>(No telepon keluarga satu rumah)</span>
+                       <div class='controls'>
+                           <div class="input-group">
+                            <div class="input-group-addon">
+                              <i class="fa fa-phone"></i>
+                            </div>
+                            
+                            <input id='NOMOR_DARURAT' type='text' class="form-control" name='NOMOR_DARURAT' maxlength='32' value="<?php echo set_value('NOMOR_DARURAT', isset($pegawai->NOMOR_DARURAT) ? $pegawai->NOMOR_DARURAT : ''); ?>" />
+                            
+                          </div>
+                       </div>
+                   </div>  
+                   <?php if ($this->auth->has_permission('Privacy.Kepegawaian.View') || $this->auth->username() == $pegawai->NIP_BARU){ ?>                      
+                    <div class="control-group<?php echo form_error('no_kk') ? ' error' : ''; ?> col-sm-6">
+                        <label for="inputNAMA" class="control-label">Nomor KK</label>
+                            <div class='controls'>
+                                <input id='no_kk' type='text' required class="form-control" name='no_kk' maxlength='32' value="<?php echo set_value('no_kk', isset($pegawai->no_kk) ? $pegawai->no_kk : ''); ?>" />
+                                <span class='help-inline'><?php echo form_error('no_kk'); ?></span>
+                            </div>
+                        </div>
+                    <div class="control-group col-sm-6">
+                        <label class="control-label">Kode Pos (Sesuai KK) </label>
+                        <input type="text" required class="form-control" name="kode_pos" value="<?=$pegawai->kode_pos?>" />
+                    </div>
+                    <?php } ?>
+                   <div class="control-group col-sm-6">
+                        <label class="control-label">Situs Pribadi </label>
+                        <input type="text" class="form-control" name="situs_pribadi" value="<?=$pegawai->situs_pribadi?>" />
+                    </div>
+                    <div class="control-group col-sm-6">
+                        <label class="control-label">Facebook </label>
+                        <input type="text" class="form-control" name="facebook" value="<?=$pegawai->facebook?>" />
+                    </div>
+                    <div class="control-group col-sm-6">
+                        <label class="control-label">Twitter </label>
+                        <input type="text" class="form-control" name="twitter" value="<?=$pegawai->twitter?>" />
+                    </div>
+                    <div class="control-group col-sm-6">
+                        <label class="control-label">Google Plus </label>
+                        <input type="text" class="form-control" name="google_plus" value="<?=$pegawai->google_plus?>" />
+                    </div>
+                    <div class="control-group col-sm-6">
+                        <label class="control-label">Google Scholar </label>
+                        <input type="text" class="form-control" name="google_scholar" value="<?=$pegawai->google_scholar?>" />
+                    </div>
+                    <div class="control-group col-sm-6">
+                        <label class="control-label">LinkedIn </label>
+                        <input type="text" class="form-control" name="linkedin" value="<?=$pegawai->linkedin?>" />
+                    </div>
+                    <div class="control-group col-sm-6">
+                        <label class="control-label">ORCID </label>
+                        <input type="text" class="form-control" name="orcid" value="<?=$pegawai->orcid?>" />
+                    </div>
+                    <div class="control-group col-sm-6">
+                        <label class="control-label">ResearchGate </label>
+                        <input type="text" class="form-control" name="research_gate" value="<?=$pegawai->research_gate?>" />
+                    </div>
+                    <div class="control-group col-sm-6">
+                        <label class="control-label">ResearcherID </label>
+                        <input type="text" class="form-control" name="researcher_id" value="<?=$pegawai->researcher_id?>" />
+                    </div>
+                    <div class="control-group col-sm-6">
+                        <label class="control-label">Scopus </label>
+                        <input type="text" class="form-control" name="scopus" value="<?=$pegawai->scopus?>" />
+                    </div>
+            </fieldset>
+            <fieldset>
+            <legend>Surat Keterangan CPNS</legend>
+            <div class="control-group<?php echo form_error('NO_SURAT_DOKTER') ? ' error' : ''; ?> col-sm-6">
                        <?php echo form_label("NO SURAT KETERANGAN SEHAT DOKTER", 'NO_SURAT_DOKTER', array('class' => 'control-label')); ?>
                        <div class='controls'>
                            <input id='NO_SURAT_DOKTER' type='text' class="form-control" name='NO_SURAT_DOKTER' maxlength='100' value="<?php echo set_value('NO_SURAT_DOKTER', isset($pegawai->NO_SURAT_DOKTER) ? trim($pegawai->NO_SURAT_DOKTER) : ''); ?>" />
-                           <span class='help-inline'> (CPNS)</span>
+                           <!-- <span class='help-inline'> (CPNS)</span> -->
                        </div>
                    </div>
                    <div class="control-group col-sm-6">
@@ -275,15 +509,15 @@
                          <div class="input-group-addon">
                            <i class="fa fa-calendar"></i>
                          </div>
-                           <input id='TGL_SURAT_DOKTER' type='text' class="form-control pull-right datepicker" name='TGL_SURAT_DOKTER' maxlength='25' value="<?php echo set_value('TGL_SURAT_DOKTER', isset($pegawai->TGL_SURAT_DOKTER) ? trim($pegawai->TGL_SURAT_DOKTER) : ''); ?>" />
+                           <input id='TGL_SURAT_DOKTER' type='text' class="form-control pull-right datepicker" name='TGL_SURAT_DOKTER' value="<?php echo set_value('TGL_SURAT_DOKTER', isset($pegawai->TGL_SURAT_DOKTER) ? trim($pegawai->TGL_SURAT_DOKTER) : ''); ?>" />
                            <span class='help-inline'><?php echo form_error('TGL_SURAT_DOKTER'); ?></span>
                        </div>
                    </div> 
                    <div class="control-group <?php echo form_error('NO_BEBAS_NARKOBA') ? ' error' : ''; ?> col-sm-6">
                        <?php echo form_label("NO SURAT BEBAS NARKOBA", 'NO_BEBAS_NARKOBA', array('class' => 'control-label')); ?>
                        <div class='controls'>
-                           <input id='NO_BEBAS_NARKOBA' type='text' class="form-control" name='NO_BEBAS_NARKOBA' maxlength='25' value="<?php echo set_value('NO_BEBAS_NARKOBA', isset($pegawai->NO_BEBAS_NARKOBA) ? trim($pegawai->NO_BEBAS_NARKOBA) : ''); ?>" />
-                           <span class='help-inline'> (CPNS)</span>
+                           <input id='NO_BEBAS_NARKOBA' type='text' class="form-control" name='NO_BEBAS_NARKOBA' value="<?php echo set_value('NO_BEBAS_NARKOBA', isset($pegawai->NO_BEBAS_NARKOBA) ? trim($pegawai->NO_BEBAS_NARKOBA) : ''); ?>" />
+                           <!-- <span class='help-inline'> (CPNS)</span> -->
                        </div>
                    </div>
                    <div class="control-group col-sm-6">
@@ -292,7 +526,7 @@
                          <div class="input-group-addon">
                            <i class="fa fa-calendar"></i>
                          </div>
-                           <input id='TGL_BEBAS_NARKOBA' type='text' class="form-control pull-right datepicker" name='TGL_BEBAS_NARKOBA' maxlength='25' value="<?php echo set_value('TGL_BEBAS_NARKOBA', isset($pegawai->TGL_BEBAS_NARKOBA) ? $pegawai->TGL_BEBAS_NARKOBA : ''); ?>" />
+                           <input id='TGL_BEBAS_NARKOBA' type='text' class="form-control pull-right datepicker" name='TGL_BEBAS_NARKOBA' value="<?php echo set_value('TGL_BEBAS_NARKOBA', isset($pegawai->TGL_BEBAS_NARKOBA) ? $pegawai->TGL_BEBAS_NARKOBA : ''); ?>" />
                            <span class='help-inline'><?php echo form_error('TGL_BEBAS_NARKOBA'); ?></span>
                        </div>
                    </div> 
@@ -309,62 +543,10 @@
                          <div class="input-group-addon">
                            <i class="fa fa-calendar"></i>
                          </div>
-                           <input id='TGL_CATATAN_POLISI' type='text' class="form-control pull-right datepicker" name='TGL_CATATAN_POLISI' maxlength='25' value="<?php echo set_value('TGL_CATATAN_POLISI', isset($pegawai->TGL_CATATAN_POLISI) ? $pegawai->TGL_CATATAN_POLISI : ''); ?>" />
+                           <input id='TGL_CATATAN_POLISI' type='text' class="form-control pull-right datepicker" name='TGL_CATATAN_POLISI' value="<?php echo set_value('TGL_CATATAN_POLISI', isset($pegawai->TGL_CATATAN_POLISI) ? $pegawai->TGL_CATATAN_POLISI : ''); ?>" />
                            <span class='help-inline'><?php echo form_error('TGL_CATATAN_POLISI'); ?></span>
                        </div>
                    </div> 
-                   <div class="control-group<?php echo form_error('AKTE_KELAHIRAN') ? ' error' : ''; ?> col-sm-12">
-                       <?php echo form_label("AKTE KELAHIRAN", 'AKTE_KELAHIRAN', array('class' => 'control-label')); ?>
-                       <div class='controls'>
-                           <input id='AKTE_KELAHIRAN' type='text' class="form-control" name='AKTE_KELAHIRAN' maxlength='25' value="<?php echo set_value('AKTE_KELAHIRAN', isset($pegawai->AKTE_KELAHIRAN) ? trim($pegawai->AKTE_KELAHIRAN) : ''); ?>" />
-                           <span class='help-inline'><?php echo form_error('AKTE_KELAHIRAN'); ?></span>
-                       </div>
-                   </div>
-                    
-                    <div class="control-group col-sm-6">
-                       <?php echo form_label("NO BPJS", 'BPJS', array('class' => 'control-label')); ?>
-                       <div class='controls'>
-                           <input id='BPJS' type='text' class="form-control" name='BPJS' maxlength='25' value="<?php echo set_value('BPJS', isset($pegawai->BPJS) ? trim($pegawai->BPJS) : ''); ?>" />
-                       </div>
-                   </div>
-                   <div class="control-group<?php echo form_error('NO_TASPEN') ? ' error' : ''; ?> col-sm-6">
-                       <?php echo form_label("NO TASPEN", 'NO_TASPEN', array('class' => 'control-label')); ?>
-                       <div class='controls'>
-                           <input id='NO_TASPEN' type='text' class="form-control" name='NO_TASPEN' maxlength='50' value="<?php echo set_value('NO_TASPEN', isset($pegawai->NO_TASPEN) ? trim($pegawai->NO_TASPEN) : ''); ?>" />
-                           <span class='help-inline'><?php echo form_error('NO_TASPEN'); ?></span>
-                       </div>
-                   </div>
-                   <div class="control-group<?php echo form_error('NPWP') ? ' error' : ''; ?> col-sm-6">
-                       <?php echo form_label(lang('pegawai_field_NPWP'), 'NPWP', array('class' => 'control-label')); ?>
-                       <div class='controls'>
-                           <input id='NPWP' type='text' class="form-control" name='NPWP' maxlength='25' value="<?php echo set_value('NPWP', isset($pegawai->NPWP) ? $pegawai->NPWP : ''); ?>" />
-                           <span class='help-inline'><?php echo form_error('NPWP'); ?></span>
-                       </div>
-                   </div>
-                   <div class="control-group col-sm-6">
-                       <label for="inputNAMA" class="control-label">TGL NPWP</label>
-                       <div class="input-group date">
-                         <div class="input-group-addon">
-                           <i class="fa fa-calendar"></i>
-                         </div>
-                           <input id='TGL_NPWP' type='text' class="form-control pull-right datepicker" name='TGL_NPWP' maxlength='25' value="<?php echo set_value('TGL_NPWP', isset($pegawai->TGL_NPWP) ? $pegawai->TGL_NPWP : ''); ?>" />
-                           <span class='help-inline'><?php echo form_error('TGL_NPWP'); ?></span>
-                       </div>
-                   </div> 
-                   <div class="control-group<?php echo form_error('NPWP') ? ' error' : ''; ?> col-sm-6">
-                       <?php echo form_label("NOMOR DARURAT", 'NOMOR_DARURAT', array('class' => 'control-label')); ?>
-                       <div class='controls'>
-                           <div class="input-group">
-                            <div class="input-group-addon">
-                              <i class="fa fa-phone"></i>
-                            </div>
-                            
-                            <input id='NOMOR_DARURAT' type='text' class="form-control" name='NOMOR_DARURAT' maxlength='32' value="<?php echo set_value('NOMOR_DARURAT', isset($pegawai->NOMOR_DARURAT) ? $pegawai->NOMOR_DARURAT : ''); ?>" />
-                            
-                          </div>
-                          <span class='help-inline'>No Tlp keluarga satu rumah</span>
-                       </div>
-                   </div>
             </fieldset>
               <!-- /.table-responsive -->
              
@@ -375,9 +557,10 @@
     </div>
 	 
     <div class="box-footer">
-        <?php if ($this->auth->has_permission('Pegawai.Kepegawaian.Updatemandiri')) : ?>
+        <?php if ($this->auth->has_permission('Pegawai.UpdateSimple.View')) : ?>
             <input type='submit' name='save' id="btnsaveprofile" class='btn btn-success' value="Simpan Perubahan" />
         <?php endif; ?>
+        <?php echo anchor(SITE_AREA . '/kepegawaian/pegawai/profilen/'.$pegawai->ref, "Batal", 'class="btn btn-warning"'); ?>
       </div>
     </form>
 </div>
@@ -440,23 +623,23 @@
 
 
     });
-    $("#TEMPAT_LAHIR_ID").select2({
-        placeholder: 'Cari Tempat Lahir...',
-        width: '100%',
-        minimumInputLength: 3,
-        allowClear: true,
-        ajax: {
-            url: '<?php echo site_url("admin/lokasi/pegawai/ajax");?>',
-            dataType: 'json',
-            data: function(params) {
-                return {
-                    term: params.term || '',
-                    page: params.page || 1
-                }
-            },
-            cache: true
-        }
-    }); 
+    // $("#TEMPAT_LAHIR_ID").select2({
+    //     placeholder: 'Cari Tempat Lahir...',
+    //     width: '100%',
+    //     minimumInputLength: 3,
+    //     allowClear: true,
+    //     ajax: {
+    //         url: '<?php echo site_url("admin/lokasi/pegawai/ajax");?>',
+    //         dataType: 'json',
+    //         data: function(params) {
+    //             return {
+    //                 term: params.term || '',
+    //                 page: params.page || 1
+    //             }
+    //         },
+    //         cache: true
+    //     }
+    // }); 
     $('#TK_PENDIDIKAN').change(function() {
         /* 
         var valuetingkat = $('#TK_PENDIDIKAN').val();
@@ -481,23 +664,23 @@
             //$("#PENDIDIKAN_ID").select2("updateResults");
             return false;
     });
-    $("#PENDIDIKAN_ID").select2({
-        placeholder: 'Cari Jabatan...',
-        width: '100%',
-        minimumInputLength: 3,
-        allowClear: true,
-        ajax: {
-            url: '<?php echo site_url("pegawai/masterpendidikan/ajax");?>',
-            dataType: 'json',
-            data: function(params) {
-                return {
-                    term: params.term || '',
-                    page: params.page || 1
-                }
-            },
-            cache: true
-        }
-    });
+    // $("#PENDIDIKAN_ID").select2({
+    //     placeholder: 'Cari Jabatan...',
+    //     width: '100%',
+    //     minimumInputLength: 3,
+    //     allowClear: true,
+    //     ajax: {
+    //         url: '<?php echo site_url("pegawai/masterpendidikan/ajax");?>',
+    //         dataType: 'json',
+    //         data: function(params) {
+    //             return {
+    //                 term: params.term || '',
+    //                 page: params.page || 1
+    //             }
+    //         },
+    //         cache: true
+    //     }
+    // });
 	function submitdata(){
 		
 		var json_url = "<?php echo base_url() ?>admin/kepegawaian/pegawai/updatemandiri";
@@ -510,6 +693,7 @@
                 if(data.success){
                     swal("Pemberitahuan!", data.msg, "success");
                     $("#btnsaveprofile").val('Simpan Perubahan').attr('disabled', false).addClass('bt-hud').unbind('click');
+                    window.location.replace("<?=base_url()?>admin/kepegawaian/pegawai/profilen/"+'<?=$pegawai->ref?>');
                 }
                 else {
                     $(".messages").empty().append(data.msg);
@@ -517,13 +701,64 @@
 			}});
 		return false; 
 	}
-  $("#LOKASI_KERJA_ID").select2({
-        placeholder: 'Cari Lokasi Kerja...',
+//   $("#LOKASI_KERJA_ID").select2({
+//         placeholder: 'Cari Lokasi Kerja...',
+//         width: '100%',
+//         minimumInputLength: 3,
+//         allowClear: true,
+//         ajax: {
+//             url: '<?php echo site_url("admin/lokasi/pegawai/ajax");?>',
+//             dataType: 'json',
+//             data: function(params) {
+//                 return {
+//                     term: params.term || '',
+//                     page: params.page || 1
+//                 }
+//             },
+//             cache: true
+//         }
+//     });
+//   $("#Unor_ID").select2({
+//         placeholder: 'Cari Unit Kerja...',
+//         width: '100%',
+//         minimumInputLength: 3,
+//         allowClear: true,
+//         ajax: {
+//             url: '<?php echo site_url("pegawai/manage_unitkerja/ajax");?>',
+//             dataType: 'json',
+//             data: function(params) {
+//                 return {
+//                     term: params.term || '',
+//                     page: params.page || 1
+//                 }
+//             },
+//             cache: true
+//         }
+//     });
+//     $("#UNOR_INDUK_ID").select2({
+//         placeholder: 'Cari Unit Kerja...',
+//         width: '100%',
+//         minimumInputLength: 3,
+//         allowClear: true,
+//         ajax: {
+//             url: '<?php echo site_url("pegawai/manage_unitkerja/ajaxall");?>',
+//             dataType: 'json',
+//             data: function(params) {
+//                 return {
+//                     term: params.term || '',
+//                     page: params.page || 1
+//                 }
+//             },
+//             cache: true
+//         }
+//     });
+$("#kepakaran").select2({
+        placeholder: '  Cari Kepakaran...',
         width: '100%',
         minimumInputLength: 3,
         allowClear: true,
         ajax: {
-            url: '<?php echo site_url("admin/lokasi/pegawai/ajax");?>',
+            url: '<?php echo site_url("pegawai/kepegawaian/ajax_bidang_kepakaran");?>',
             dataType: 'json',
             data: function(params) {
                 return {
@@ -532,6 +767,30 @@
                 }
             },
             cache: true
-        }
+        },
+        templateResult: formatOutput
     });
+$("#bidangpenelitian").select2({
+    placeholder: '  Cari Bidang Kepakaran...',
+    width: '100%',
+    minimumInputLength: 3,
+    allowClear: true,
+    ajax: {
+        url: '<?php echo site_url("pegawai/kepegawaian/ajax_bidang_penelitian");?>',
+        dataType: 'json',
+        data: function(params) {
+            return {
+                term: params.term || '',
+                page: params.page || 1
+            }
+        },
+        cache: true
+    },
+    templateResult: formatOutput
+});
+function formatOutput (optionElement) {
+  if (!optionElement.id) { return optionElement.text; }
+  var $state = $('<span><strong>' + optionElement.long_text + '</span>');
+  return $state;
+};
 </script>

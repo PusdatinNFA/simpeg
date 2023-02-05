@@ -10,7 +10,7 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-21 col-xs-12">
             <?php if ($this->auth->has_permission('RiwayatPindahUnitKerja.Kepegawaian.Create')) : ?>
-            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatpindahunitkerja/add/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Diklat">
+            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatpindahunitkerja/add/<?php echo $NIP_BARU ?>" tooltip="Tambah Riwayat Diklat">
 				<i class="fa fa-plus"></i> Tambah
             </a>
             <?php endif; ?>
@@ -18,11 +18,11 @@
             <thead>
                 <tr>
                     <th width='20px' >No</th>
-                    <th>Unit Kerja</th>
-                    <th>Satuan Kerja</th>
-                    <th width='100px' >NO SK</th>
-					<th width='100px' >SK TANGGAL</th>
-                    <th width='100px' align="center">AKSI</th>
+                    <th width='80%'>Satuan Kerja</th>
+                    <th>NO SK</th>
+					<th>SK TANGGAL</th>
+					<th>TMT SK</th>
+                    <th width='50px' align="center">AKSI</th>
                 </tr>
             </thead>
             <tfoot>
@@ -45,7 +45,7 @@
 
 	(function($){
 		var $container = $("#<?php echo $TAB_ID;?>");
-		var grid_daftar = $(".table-datatable",$container).DataTable({
+		$grid_daftar_pindahunit = $(".table-datatable",$container).DataTable({
 				ordering: false,
 				processing: true,
 				"bFilter": false,
@@ -53,19 +53,19 @@
 				serverSide: true,
 				"columnDefs": [
 					//{"className": "dt-center", "targets": "_all"}
-					{"className": "dt-center", "targets": [0,2,3,4,5]}
+					{"className": "dt-center", "targets": [0,2,3,4]}
 				],
 				ajax: {
 					url: "<?php echo base_url() ?>pegawai/riwayatpindahunitkerja/ajax_list",
 					type:'POST',
 					data : {
-						PNS_ID:'<?php echo $PNS_ID;?>'
+						PNS_ID:'<?php echo $NIP_BARU;?>'
 					}
 				}
 		});
 		$container.on('click','.show-modal-custom',function(event){
 			showModalX.call(this,'sukses-tambah-riwayat-pindah_unit_kerja',function(){
-				grid_daftar.ajax.reload();
+				$grid_daftar_pindahunit.ajax.reload();
 			},this);
 			event.preventDefault();
 		});
@@ -94,7 +94,7 @@
 								timeout:180000,
 								success: function (result) {
 									swal("Data berhasil di hapus!", result, "success");
-									grid_daftar.ajax.reload();
+									$grid_daftar_pindahunit.ajax.reload();
 							},
 							error : function(error) {
 								alert(error);

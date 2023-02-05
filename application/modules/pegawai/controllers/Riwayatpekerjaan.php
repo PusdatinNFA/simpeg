@@ -26,6 +26,7 @@ class Riwayatpekerjaan extends Admin_Controller
 		Template::set('jenis_jabatans', $jenis_jabatans);
 		
 		$this->load->model('pegawai/unitkerja_model');
+        $this->load->helper('aplikasi');
 		
     }
     public function ajax_list(){
@@ -97,8 +98,8 @@ class Riwayatpekerjaan extends Admin_Controller
                 $row []  = $convert->fmtDate($record->DARI_TANGGAL,"dd-mm-yyyy")." - ".$convert->fmtDate($record->SAMPAI_TANGGAL,"dd-mm-yyyy");
 
                 $btn_actions = array();
-                if($record->KETERANGAN_BERKAS != ""){
-                    $btn_actions  [] = "<a href='".base_url()."pegawai/riwayatpekerjaan/viewdoc/".$record->ID."' data-toggle='tooltip' title='Lihat Dokumen' tooltip='Lihat Dokumen' class='btn btn-sm btn-info show-modal'><i class='glyphicon glyphicon-eye-open'></i> </a>";
+                if($record->id_arsip != ""){
+                    $btn_actions  [] = "<a href='".base_url()."admin/arsip/arsip_digital/viewdoc2/".$record->id_arsip."' data-toggle='tooltip' title='Lihat Dokumen' tooltip='Lihat Dokumen' class='btn btn-sm btn-info modal-custom-global'><i class='glyphicon glyphicon-eye-open'></i> </a>";
                 }
                 if($this->auth->has_permission($this->permissionEdit))
                 {    
@@ -201,7 +202,7 @@ class Riwayatpekerjaan extends Admin_Controller
             $data_base64 = file_get_contents($file_tmp);
             $base64 = 'data:' . $type . ';base64,' . base64_encode($data_base64);
 
-            if(in_array(end($file_ext),$allowed_ext) === false)
+            if(in_array(strtolower(end($file_ext)),$allowed_ext) === false)
             {
                 $errors[]='Extension not allowed';
                 $response['msg'] = "
@@ -253,9 +254,15 @@ class Riwayatpekerjaan extends Admin_Controller
         }
         $id_data = $this->input->post("ID");
         if(isset($id_data) && !empty($id_data)){
+            $current = $this->riwayat_pekerjaan_model->find($id_data);
+            $perubahan = arrDiff($current,$data);
             $this->riwayat_pekerjaan_model->update($id_data,$data);
+            log_activity($this->auth->user_id(), 'Update data Riwayat pekerjaan: ' . $pegawai_data->NIP_BARU . ' perubahan : '.json_encode($perubahan).' ' . $this->input->ip_address(), 'pegawai'); 
         }
-        else $this->riwayat_pekerjaan_model->insert($data);
+        else {
+            $id = $this->riwayat_pekerjaan_model->insert($data);
+            log_activity($this->auth->user_id(), 'Insert data Riwayat pekerjaan: ' . $pegawai_data->NIP_BARU . ' data : '.json_encode($data).' ' . $this->input->ip_address(), 'pegawai');  
+        }
         $response ['success']= true;
         $response ['msg']= "berhasil";
         echo json_encode($response);    
@@ -279,14 +286,19 @@ class Riwayatpekerjaan extends Admin_Controller
         Template::set('TAB_ID', uniqid("TAB_CONTOH"));
         Template::render();
     }
-     public function viewdoc($id)
+     private function viewdoc($id)
     {
         if (empty($id)) {
             Template::set_message("ID tidak ditemukan", 'error');
         }
         $datadetil = $this->riwayat_pekerjaan_model->find($id);
-        $FILE_BASE64 = $datadetil->FILE_BASE64;
-        echo '<embed src="'.$FILE_BASE64.'" width="100%" height="700" alt="pdf">';
+        $this->load->model('arsip_digital/arsip_digital_model');
+        $arsip = $this->arsip_digital_model->find($datadetil->id_arsip);
+        if ($arsip){
+            $this->load->library('Api_s3_aws');
+            $aws = new Api_s3_aws;
+            $aws->viewdoc($arsip->location.$arsip->name);
+        }
         die();
     }
 }

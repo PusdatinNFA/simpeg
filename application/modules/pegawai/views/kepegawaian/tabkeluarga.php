@@ -21,20 +21,26 @@ $hubungan = $jk == "M" ? "Istri" : "Suami";
                     <!-- <li class="active">
                         <a href="#<?php echo $tab_pane_keluargaall; ?>" data-toggle="tab" aria-expanded="false"> Keluarga </a>
                     </li> -->
-                     <li class="active">
-                        <a href="#<?php echo $tab_pane_orangtua;?>" data-toggle="tab" aria-expanded="false"> Orangtua </a>
+
+                 <?php $active = ''; if ($this->auth->has_permission('Privacy.Kepegawaian.View') || $this->auth->username() == $pegawai->NIP_BARU){ ?>
+                     <li class="active inline">
+                        <a href="#<?php echo $tab_pane_orangtua;?>" data-toggle="tab" aria-expanded="false"> Orangtua <label id="data_orang_tua_<?=$PNS_ID?>"></label></a>
+                    </li>
+                    <?php } else { $active = 'active';} ?>
+                    <li class="<?=$active?>">
+                        <a href="#<?php echo $tab_pane_istri;?>" data-toggle="tab" aria-expanded="false"> <?php echo $hubungan; ?> <label id="data_pasangan_<?=$PNS_ID?>"></label></a>
                     </li>
                     <li class="">
-                        <a href="#<?php echo $tab_pane_istri;?>" data-toggle="tab" aria-expanded="false"> <?php echo $hubungan; ?> </a>
-                    </li>
-                    <li class="">
-                        <a href="#<?php echo $tab_pane_anak;?>" data-toggle="tab" aria-expanded="false"> Anak </a>
+                        <a href="#<?php echo $tab_pane_anak;?>" data-toggle="tab" aria-expanded="false"> Anak <label id="data_anak_<?=$PNS_ID?>"></label></a>
                     </li>
                 </ul>
                 <div class="tab-content">
                     <?php 
                         // $this->load->view('data_keluarga/tab_pane_keluargaall',array('TAB_ID'=>$tab_pane_keluargaall));
-                        $this->load->view('data_keluarga/tab_pane_orangtua',array('TAB_ID'=>$tab_pane_orangtua));
+
+                        if ($this->auth->has_permission('Privacy.Kepegawaian.View') || $this->auth->username() == $pegawai->NIP_BARU){
+                            $this->load->view('data_keluarga/tab_pane_orangtua',array('TAB_ID'=>$tab_pane_orangtua));
+                        }
                         $this->load->view('data_keluarga/tab_pane_istri',array('TAB_ID'=>$tab_pane_istri));
                         $this->load->view('data_keluarga/tab_pane_anak',array('TAB_ID'=>$tab_pane_anak));
                     ?>

@@ -522,8 +522,12 @@ class Riwayatassesmen extends Admin_Controller
         $id_data = $this->input->post("ID");
         if(isset($id_data) && !empty($id_data)){
             $this->riwayat_assesmen_model->update($id_data,$data);
+            log_activity($this->auth->user_id(), 'Update data Riwayat Assessment: ' . $id_data . ' : ' . $this->input->ip_address(), 'pegawai');  
         }
-        else $this->riwayat_assesmen_model->insert($data);
+        else {
+            $id = $this->riwayat_assesmen_model->insert($data);
+            log_activity($this->auth->user_id(), 'Insert data Riwayat Assessment: ' . $id . ' : ' . $this->input->ip_address(), 'pegawai');  
+        }
         $response ['success']= true;
         $response ['msg']= "berhasil";
         echo json_encode($response);    
@@ -605,7 +609,7 @@ class Riwayatassesmen extends Admin_Controller
         deletefile($file_upload,trim($this->settings_lib->item('site.pathassesment')));
 
         if ($this->riwayat_assesmen_model->delete($record_id)) {
-             log_activity($this->auth->user_id(), 'delete data Riwayat Kursus : ' . $record_id . ' : ' . $this->input->ip_address(), 'riwayat_assesmen');
+             log_activity($this->auth->user_id(), 'delete data Riwayat Asessment : ' . $record_id . ' : ' . $this->input->ip_address(), 'riwayat_assesmen');
              Template::set_message("Sukses Hapus data", 'success');
              echo "Sukses";
         }else{

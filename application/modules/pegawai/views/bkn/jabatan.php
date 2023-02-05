@@ -25,7 +25,7 @@
                             <th>Jabatan</th>
                             <th>Nama Unor</th>
                             <th>Unor Induk</th>
-                            <th>Nomor SK<br>TMT</th>
+                            <th>Nomor SK<br>TMT|Selesai</th>
                             <th>Tmt Pelantikan</th>
                         </tr>
                     </thead>
@@ -47,6 +47,7 @@
 
                           <td><?php echo $row->nomorSk; ?>
                             <?php echo $row->tmtJabatan ? "<br><b>TMT : </b>".$row->tmtJabatan : ""; ?>
+                            <br><b>Selesai : </b><?php echo isset($tmt_selesai_jabatan[$no]) ? $tmt_selesai_jabatan[$no] : null;?>
                           </td>
                           <td><?php echo $row->tmtPelantikan; ?></td>
                         </tr>

@@ -13,7 +13,7 @@ if ($can_delete) {
 ?>
 
 
-<div class="admin-box box box-primary expanded-box">
+<div class="admin-box box box-danger expanded-box">
 	<div class="box-header">
               <h3 class="box-title">Pencarian Lanjut</h3>
 			   <div class="box-tools pull-right">
@@ -32,69 +32,32 @@ if ($can_delete) {
 				}
 			</style>
 			<table class="filter_pegawai" sborder=0 width='100%' cellpadding="10">
-				 
 				<tr>
-					<td width="20px"><input type="checkbox" name="nama_cb"></td>
-					<td width="200px"><label for="example-text-input" class="col-form-label">NAMA</label></td>
-					<td colspan=2><input class="form-control" type="text" name="nama_key" value="" ></td>
+					<td width="200px"><label for="example-text-input" class="col-form-label">Satuan Kerja</label></td>
+					<td colspan=2><select id="unit_id_key" name="unit_id_key" width="100%" class=" col-md-10 format-control"></select></td>
 				</tr>
 				<tr>
-					<td width="20px"><input type="checkbox" name="nip_cb"></td>
-					<td width="200px"><label for="example-text-input" class="col-form-label">NIP</label></td>
-					<td colspan=2><input class="form-control" type="text" name="nip_key" value="" ></td>
-				</tr>
-				<tr>
-					<td width="20px"><input type="checkbox" name="umur_cb"></td>
-					<td width="200px"><label for="example-text-input" class="col-form-label">UMUR</label></td>
-					<td style="padding-right:10px;" width="200px" >
-						<select class="form-control" name="umur_operator">
-							<option value="=">Sama dengan</option>
-							<option value=">">Lebih dari</option>
-							<option value=">=">Lebih dari atau sama dengan</option>
-							<option value="<">Kurang dari</option>
-							<option value="<=">Kurang dari atau sama dengan</option>
-							<option value="!=">Tidak sama dengan</option>
-							<option value="in">Diantara</option>
-						</select>
-					</td>
-					<td ><input class="form-control" type="text" name="umur_key" value="" ></td>
-				</tr>
-				<tr class="hide">
-					<td width="20px"><input type="checkbox" name="eselon_cb"></td>
-					<td width="200px"><label for="example-text-input" class="col-form-label">Eselon</label></td>
+					<td width="200px"><label for="example-text-input" class="col-form-label">Pegawai</label></td>
 					<td colspan=2>
-						<select class="form-control" name="eselon" name="eselon_key">
-							<option value="1">I</option>
-							<option value="2">II</option>
-							<option value="3">III</option>
-							<option value="4">IV</option>
-							<option value="5">V</option>
+						<select id="nip" name="nip" width="100%" class="form-control select2 class_pegawai">
 						</select>
 					</td>
 				</tr>
 				<tr>
-					<td width="20px"><input type="checkbox" name="golongan_cb"></td>
-					<td width="200px"><label for="example-text-input" class="col-form-label">Golongan</label></td>
+					<td width="200px"><label for="example-text-input" class="col-form-label">Data</label></td>
 					<td colspan=2>
-						<select name="golongan_key" class="form-control">
-							<?php 
-								foreach($golongans as $row){
-									echo "<option value='".$row->ID."'>$row->NAMA_PANGKAT $row->NAMA</option>";
-								}
-							?>
+						<select name="data" class="form-control select2" id='data'>
+
 						</select>
 					</td>
 				</tr>
 				<tr>
-					<td width="20px"><input type="checkbox" name="tkp_cb"></td>
-					<td width="200px"><label for="example-text-input" class="col-form-label">Tingkat Pendidikan</label></td>
+					<td width="200px"><label for="example-text-input" class="col-form-label">Status</label></td>
 					<td colspan=2>
-						<select name="tingkat_pendidikan" class="form-control">
-							<?php 
-								foreach($tkpendidikans as $row){
-									echo "<option value='".$row->ID."'>$row->NAMA</option>";
-								}
-							?>
+						<select class="form-control" name="status_cb">
+							<option value="-1">Belum diverifikasi</option>
+							<option value="0">Ditolak</option>
+							<option value="1">Diterima</option>
 						</select>
 					</td>
 				</tr>
@@ -110,7 +73,7 @@ if ($can_delete) {
 		?>
 	</div>
 </div>
-<div class="admin-box box box-primary">
+<div class="admin-box box box-danger">
 	<div class="box-body">
 		<table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-data table-hover">
 			<thead>
@@ -120,6 +83,7 @@ if ($can_delete) {
 				<th>NAMA Pegawai</th>
 				<th>Unit Kerja</th>
 				<th>Perubahan</th>
+				<th>Keterangan</th>
 				<th width="70px" align="center">#</th></tr>
 			</thead>
 		</table>
@@ -127,6 +91,23 @@ if ($can_delete) {
 </div>
 
 <script type="text/javascript">
+$("#data").select2({
+		placeholder: 'Cari Jenis Data...',
+		width: '100%',
+		minimumInputLength: 0,
+		allowClear: true,
+		ajax: {
+			url: '<?php echo site_url("pegawai/kepegawaian/ajax_jenis_data_update"); ?>',
+			dataType: 'json',
+			data: function(params) {
+				return {
+					term: params.term || '',
+					page: params.page || 1
+				}
+			},
+			cache: true
+		}
+	});
 $("#unit_id_key").select2({
 	placeholder: 'Cari Unit Kerja...',
 	width: '100%',
@@ -151,9 +132,10 @@ $table = $(".table-data").DataTable({
 	"<'row'<'col-sm-2'l><'col-sm-3'i><'col-sm-7'p>>",
 	processing: true,
 	serverSide: true,
+	stateSave: true,
 	"columnDefs": [
-					{"className": "dt-center", "targets": [4,5]},
-					{ "targets": [0,5], "orderable": false }
+					{"className": "text-center", "targets": [1, 4,5]},
+					{ "targets": [0,1,2,3,4,5], "orderable": false }
 				],
 	ajax: {
 	  url: "<?php echo base_url() ?>admin/kepegawaian/pegawai/getdataupdatemandirisatker",
@@ -168,7 +150,38 @@ $("#form_search_pegawai").submit(function(){
 	return false;
 });
 
-
+$('#modal-global').on('hidden.bs.modal', function () {
+	$table.ajax.reload(null,true);
+});
+$('#modal-custom-global').on('hidden.bs.modal', function () {
+	$table.ajax.reload(null,true);
+});
+$('.show-modal-custom').on('hidden.bs.modal', function () {
+	$table.ajax.reload(null,true);
+});
+$('.modal-open').on('hidden.bs.modal', function () {
+	$table.ajax.reload(null,true);
+});
+$(document).on('hidden.bs.modal', function(event) {
+	$table.ajax.reload(null,true);
+});
+$(".class_pegawai").html('').select2({
+	placeholder: 'Cari Pegawai.....',
+	width: '100%',
+	minimumInputLength: 3,
+	allowClear: true,
+	ajax: {
+		url: '<?php echo site_url("pegawai/kepegawaian/ajaxnip");?>',
+		dataType: 'json',
+		data: function(params) {
+			return {
+				term: params.term || '',
+				page: params.page || 1
+			}
+		},
+		cache: false
+		}
+	});  
 $('body').on('click','.btn-hapus',function () { 
 	var kode =$(this).attr("kode");
 	swal({
@@ -205,8 +218,83 @@ $('body').on('click','.btn-hapus',function () {
 		}
 	});
 });
+$('body').on('click','.btn-tolak',function () { 
+	var kode =$(this).attr("kode");
+	swal({
+		title: "Anda yakin tolak data pengajuan perubahan?",
+		text: "Masukan keterangan penolakan",
+		type: "input",
+		showCancelButton: true,
+		confirmButtonClass: 'btn-danger',
+		confirmButtonText: 'Ya, Tolak!',
+		cancelButtonText: "Tidak, Batalkan!",
+		closeOnConfirm: false,
+		closeOnCancel: false
+	},
+	function (inputValue) {
+		if (inputValue) {
+			var post_data = "kode="+kode+"&keterangan="+inputValue;
+			$.ajax({
+					url: "<?php echo base_url() ?>admin/kepegawaian/pegawai/tolakupdatemandiri",
+					type:"POST",
+					data: post_data,
+					dataType: "json",
+					timeout:180000,
+					success: function (result) {
+						 swal("Berhasil!", result.msg, "success");
+						 $table.ajax.reload(null,true);
+				},
+				error : function(error) {
+					alert(error);
+				} 
+			});        
+			
+		} 
+		else {
+			swal("Batal", "", "error");
+		}
+	});
+});
 $(".downloadzip").click(function(){
     var xyz = $("#form_search_pegawai").serialize();
     window.open("<?php echo base_url('admin/kepegawaian/pegawai/download_updatemandiri1');?>?"+xyz);
 });
+$('body').on('click','#btnsavearsip',function () { 
+    if(!event.detail || event.detail == 1){//activate on first click only to avoid hiding again on multiple clicks
+        // code here. // It will execute only once on multiple clicks
+        submitdatadokumen();
+    }
+});
+function submitdatadokumen(){
+	    $('#btnsavearsip').prop('disabled',true);
+        $('#btnsavearsip').prop("disabled", true);
+	    var the_data = new FormData(document.getElementById("formarsip"));
+	    $.ajax({
+	        url: "<?php echo base_url('admin/arsip/arsip_digital/act_save'); ?>",
+	        type: "POST",
+	        data: the_data,
+	        enctype: 'multipart/form-data',
+	        processData: false, // tell jQuery not to process the data
+	        contentType: false, // tell jQuery not to set contentType
+	        dataType: 'JSON',
+
+	        beforeSend: function (xhr) {
+	            //$("#loading-all").show();
+	        },
+	        success: function (response) {
+	            if(response.success){
+	                swal("Sukses",response.msg,"success");
+	                $("#modal-custom-global").modal("hide");
+	                $("#modal-global").modal("hide");
+	                $('#btnsavearsip').prop('disabled',false);
+	            }else{
+	                $(".messagearsip").html(response.msg);
+	                $('#btnsavearsip').prop('disabled',false);
+	            }
+                $('#btnsavearsip').prop("disabled", false);
+	        }
+	    });
+	    
+	    return false; 
+	  }
 </script>

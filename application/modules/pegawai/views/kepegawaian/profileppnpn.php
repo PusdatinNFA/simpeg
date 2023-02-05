@@ -32,9 +32,9 @@ endif;
           <div class="box box-primary">
             <div class="box-body box-profile">
 
-              <img src="<?php echo base_url(); ?><?php echo $foto_pegawai; ?>" class="img-responsive pic-bordered" id="photopegawai" alt="Photo" width="100%">
+              <img src="<?php echo $foto_pegawai; ?>" class="img-responsive pic-bordered" id="photopegawai" alt="Photo" width="100%">
                 <h3 class="profile-username text-center">
-                    <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN : ''; ?>  <?php echo isset($pegawai->NAMA) ? $pegawai->NAMA : ''; ?> <?php echo isset($pegawai->GELAR_BELAKANG) ? $pegawai->GELAR_BELAKANG : ''; ?>
+                    <?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN.' ' : ''; ?><?php echo isset($pegawai->NAMA) ? trim($pegawai->NAMA) : ''; ?><?php echo isset($pegawai->GELAR_BELAKANG) ? ', '.$pegawai->GELAR_BELAKANG : ''; ?>
                 </h3>
               <p class="text-muted text-center">
                     <?php if($pegawai->JENIS_JABATAN_ID == "1") {  ?>

@@ -45,6 +45,10 @@ if ($can_delete) {
 					<td colspan=2><input class="form-control" type="text" name="nip_key" value="" ></td>
 				</tr>
 				<tr>
+					<td width="200px"><label for="example-text-input" class="col-form-label">Username Intra</label></td>
+					<td colspan=2><input class="form-control" type="text" name="username_intra" value="" ></td>
+				</tr>
+				<tr>
 					<td width="200px"><label for="example-text-input" class="col-form-label">UMUR</label></td>
 					<td style="padding-right:10px;" width="200px" >
 						<select class="form-control" name="umur_operator">
@@ -98,6 +102,19 @@ if ($can_delete) {
 					</td>
 				</tr>
 				<tr>
+					<td width="200px"><label for="example-text-input" class="col-form-label">Nama Jabatan</label></td>
+					<td colspan=2>
+						<select name="nama_jabatan[]" class="form-control select2" multiple>
+							<option value="">-- Silahkan Pilih --</option>
+							<?php 
+								foreach($jabatans as $row){
+									echo "<option value='".$row->KODE_JABATAN."'>$row->NAMA_JABATAN</option>";
+								}
+							?>
+						</select>
+					</td>
+				</tr>
+				<tr>
 					<td width="200px"><label for="example-text-input" class="col-form-label">Jabatan</label></td>
 					<td colspan=2>
 						<select name="kategori_jabatan" id="kategori_jabatan" class="form-control select2">
@@ -124,6 +141,51 @@ if ($can_delete) {
 								<?php endforeach;?>
 							<?php endif;?>
 	                    </select>
+					</td>
+				</tr>
+				<tr>
+					<td width="200px"><label for="example-text-input" class="col-form-label">Status Pegawai</label></td>
+					<td colspan=2>
+						<select name="status_pegawai" id="status_pegawai" class="form-control select2">
+	                        <option value="">-- Silahkan Pilih --</option>
+							<option value="1">PNS</option>
+							<option value="2">PPPK</option>
+	                    </select>
+					</td>
+				</tr>
+				<tr>
+					<td width="200px"><label for="example-text-input" class="col-form-label">Kawasan</label></td>
+					<td colspan=2>
+						<select class="form-control select2" multiple="multiple" name="kawasan[]">
+						<?php
+							if (isset($kawasans) && is_array($kawasans) && count($kawasans)) :
+								foreach ($kawasans as $kawasan) :
+									$selected = '';
+									// $bool =  in_array( $kawasan->id, $akawasans );
+									// if($bool){
+									// 	$selected = "selected";
+									// }
+									echo "<option $selected value='$kawasan->id'>".strtoupper($kawasan->name)."</option>";
+								endforeach;
+							endif;
+							?>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td width="200px"><label for="example-text-input" class="col-form-label">Pengelola Kawasan SDM</label></td>
+					<td colspan=2>
+						<select class="form-control select2" name="pengelolasdm">
+						<?php
+							if (isset($pengelolasdms) && is_array($pengelolasdms) && count($pengelolasdms)) :
+								echo '<option value="">-- Silahkan Pilih --</option>';
+								foreach ($pengelolasdms as $pengelolasdm) :
+									$selected = '';
+									echo "<option $selected value='$pengelolasdm->id'>".strtoupper($pengelolasdm->nama)."</option>";
+								endforeach;
+							endif;
+							?>
+						</select>
 					</td>
 				</tr>
 				<tr>
@@ -161,10 +223,10 @@ if ($can_delete) {
 			<tr>
 				<th style="width:10px">No</th>
 				<th>#</th>
-				<th>NIP</th>
-				<th>Nama Pegawai</th>
+				<th>NIP | Nama</th>
+				<th>Jabatan</th>
 				<th>Golongan</th>
-				<th>Unit Kerja</th>
+				<th>Unit Kerja <br> Kawasan SDM</th>
 				<th width="120px" align="center">#</th></tr>
 			</thead>
 		</table>
@@ -211,9 +273,9 @@ $table = $(".table-data").DataTable({
 	processing: true,
 	serverSide: true,
 	"columnDefs": [
-					{"className": "text-center", "targets": [1,6]},
-					{ "targets": [0,1,5,6], "orderable": false }
-				],
+		{"className": "text-center", "targets": [1,6]},
+		{ "targets": [0,1,5,6], "orderable": false }
+	],
 	ajax: {
 	  url: "<?php echo base_url() ?>admin/kepegawaian/pegawai/getdata",
 	  type:'POST',
@@ -243,15 +305,20 @@ $('body').on('click','.generatedatabkn',function () {
 	},
 	function (isConfirm) {
 		if (isConfirm) {
-			var post_data = "kode="+kode;
+			var post_data = "nip_bkn="+kode;
 			$.ajax({
-					url: "<?php echo base_url() ?>admin/kepegawaian/pegawai/getpegawaibkn",
+					url: "<?php echo base_url() ?>pegawai/bkn/getpegawaibknnew",
 					type:"POST",
 					data: post_data,
-					dataType: "html",
+					dataType: "json",
 					timeout:180000,
 					success: function (result) {
-						 swal("Perhatian!", result, "success");
+						if(result.success){
+							swal("Pemberitahuan!", data.msg, "success");
+						}
+						else {
+							swal("Pemberitahuan!", data.msg, "error");
+						}
 				},
 				error : function(error) {
 					alert(error);

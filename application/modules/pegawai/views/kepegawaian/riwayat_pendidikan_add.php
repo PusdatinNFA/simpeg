@@ -115,7 +115,7 @@
                     <span class='help-inline'><?php echo form_error('PENDIDIKAN_ID'); ?></span>
                 </div>
             </div>
-            <div class="control-group col-sm-9">
+            <div class="control-group col-sm-8">
                 <label for="inputNAMA" class="control-label">Berkas</label>
                 <div class='controls'>
                     <div id="form_upload">
@@ -124,60 +124,39 @@
                     
                 </div>
             </div> 
-            <div class="control-group col-sm-3">
+            <div class="control-group col-sm-4">
                 <label for="inputNAMA" class="control-label"><br></label>
                 <div class='controls'>
-                    
-                    <?php if(isset($detail_riwayat->FILE_BASE64) && $detail_riwayat->FILE_BASE64 != ""){ ?>
-                        <a href="<?php echo base_url(); ?>pegawai/riwayatpendidikan/viewdoc/<?php echo $detail_riwayat->ID; ?>" class="btn btn-warning show-modal" tooltip="Lihat dokumen <?php echo isset($detail_riwayat->NOMOR_IJASAH) ? $detail_riwayat->NOMOR_IJASAH : ''; ?>" ><span class="fa fa-file-o"></span> Lihat</a>
-                    <?php } ?>  
+                    <div class=" btn-group">
+                    <?php if (!$read_only){ ?>
+                        <?php $kode_arsip = uniqid(); ?>
+                        <a href="#" kode='<?=$kode_arsip?>' class="btn btn-sm btn-success btn-daftar-arsip" data-toggle='tooltip' tooltip="Pilih dokumen" title="Pilih dokumen"><span class="fa fa-search"></span> pilih</a>
+                        <a href="#" id='view_<?=$kode_arsip?>' class="btn btn-sm btn-info show-modal hide" data-toggle='tooltip' tooltip="Lihat dokumen baru" title="Lihat dokumen baru"><span class="fa fa-file-o"></span> lihat</a>
+                    <?php } ?>
+                        <input type="text" name='id_arsip' id='<?=$kode_arsip?>' class="hide" value="<?= $detail_riwayat->id_arsip ?>">
+                        <?php if (isset($detail_riwayat->id_arsip)) { ?>
+                            <a href="<?php echo base_url(); ?>admin/arsip/arsip_digital/viewdoc2/<?php echo $detail_riwayat->id_arsip; ?>" data-toggle='tooltip' class="btn btn-sm btn-warning show-modal" tooltip="Lihat dokumen" title="Lihat dokumen"><span class="fa fa-file-o"></span> Lihat</a>
+                        <?php } ?>
+                    </div>
                 </div>
             </div>
-        </fieldset>
-        <?php if ($this->auth->has_permission('RiwayatPendidikan.Kepegawaian.VerifikasiS')) { ?>
-        <fieldset>
-            <legend>Verifikasi Data (SATKER)</legend>
-            <div class="callout callout-warning">
-               <h4>Checklist "TERIMA DATA" jika data yang dimasukan oleh pegawai diterima oleh satker</h4>
-             </div>
             <div class="control-group col-sm-6">
-                <label for="inputNAMA" class="control-label">TERIMA DATA?</label>
-                <div class='controls'>
-                    <input id='STATUS_SATKER' type='checkbox' name='STATUS_SATKER' value="1" <?php echo $detail_riwayat->STATUS_SATKER == "1" ? "checked" : ""; ?> />
-                    <span class='help-inline'><?php echo form_error('STATUS_SATKER'); ?></span>
-                </div>
-            </div> 
-        </fieldset>
-        <?php } ?>
-        <?php if ($this->auth->has_permission('RiwayatPendidikan.Kepegawaian.VerifikasiB')) { ?>
-        <fieldset>
-            <legend>Verifikasi Data (BIRO)</legend>
-            <div class="callout callout-warning">
-               <h4>Checklist "TERIMA DATA" jika data yang dimasukan oleh pegawai diterima oleh BIRO</h4>
-               <P>Checklist "PENDIDIKAN TERAKHIR (Active)" jika data yang dimasukan oleh pegawai diterima oleh BIRO dan menjadi pendidikan terakhir pegawai (Pendidikan terakhir akan diupdate pada Profile utama Pegawai)</P>
-             </div>
-            <div class="control-group col-sm-6">
-                <label for="inputNAMA" class="control-label">TERIMA DATA?</label>
-                <div class='controls'>
-                    <input id='STATUS_BIRO' type='checkbox' name='STATUS_BIRO' value="1" <?php echo $detail_riwayat->STATUS_BIRO == "1" ? "checked" : ""; ?> />
-                    <span class='help-inline'><?php echo form_error('STATUS_BIRO'); ?></span>
-                </div>
-            </div> 
-            <div class="control-group col-sm-6">
-                <label for="inputNAMA" class="control-label">PENDIDIKAN TERAKHIR (Active)?</label>
+                <label for="inputNAMA" class="control-label">PENDIDIKAN TERAKHIR?</label>
                 <div class='controls'>
                     <input id='PENDIDIKAN_TERAKHIR' type='checkbox' name='PENDIDIKAN_TERAKHIR' value="1" <?php echo $detail_riwayat->PENDIDIKAN_TERAKHIR == "1" ? "checked" : ""; ?> />
                     <span class='help-inline'><?php echo form_error('PENDIDIKAN_TERAKHIR'); ?></span>
                 </div>
             </div> 
-        
-        <?php } ?>
+            <input type="text" class="hide" name='id_update_mandiri' value="<?=$id_update_mandiri?>">
+        </fieldset>
         </div>
+        <?php if (!$read_only){ ?>
   		<div class="box-footer">
             <a href="javascript:;" id="btnsavependidikan" class="btn green btn-primary button-submit"> Simpan Data
                 <i class="fa fa-save"></i>
             </a>
         </div>
+        <?php } ?>
     <?php echo form_close(); ?>
 </div>
 <script src="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/themes/explorer/theme.js" type="text/javascript"></script>
@@ -196,7 +175,7 @@
 <script>
     $(".select2").select2({width: '100%'});
     $("#SLCPENDIDIKAN_ID").select2({
-        placeholder: 'Cari Jabatan...',
+        placeholder: 'Cari Pendidikan...',
         width: '100%',
         minimumInputLength: 3,
         allowClear: true,
@@ -206,7 +185,8 @@
             data: function(params) {
                 return {
                     term: params.term || '',
-                    page: params.page || 1
+                    page: params.page || 1,
+                    tkpendidikan : $('#TK_PENDIDIKAN').val()
                 }
             },
             cache: true
@@ -214,7 +194,7 @@
     });
 	$("#btnsavependidikan").click(function(){
         $('#btnsavependidikan').text('Sedang Mengirim...');
-        $('#btnsavependidikan').addClass('disabled');
+        $('#btnsavependidikan').prop('disabled',true);
 		submitdatapendidikanformal();
 		return false; 
 	});	
@@ -237,13 +217,13 @@
                     swal("Pemberitahuan!", data.msg, "success");
                     $("#modal-custom-global").trigger("sukses-tambah-riwayat-pendidikan");
 					$("#modal-custom-global").modal("hide");
-                    $('#btnsavependidikan').removeClass('disabled');
+                    $('#btnsavependidikan').prop('disabled',false);
                     $('#btnsavependidikan').text('Simpan Data');
                     //grid_daftar_pendidikan.ajax.reload();
                     $table.ajax.reload(null,true);
                 }
                 else {
-                    $('#btnsavependidikan').removeClass('disabled');
+                    $('#btnsavependidikan').prop('disabled',false);
                     $('#btnsavependidikan').text('Simpan Data');
                     $("#form-pendidikan-add .messages").empty().append(data.msg);
                 }

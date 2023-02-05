@@ -75,6 +75,16 @@ class Riwayat_kepangkatan_model extends BF_Model
 			'label' => 'TMT GOLONGAN',
 			'rules' => 'required',
 		),
+		array(
+			'field' => 'JENIS_RIWAYAT',
+			'label' => 'JENIS RIWAYAT',
+			'rules' => 'required',
+		),
+		array(
+			'field' => 'BASIC',
+			'label' => 'GAJI POKOK',
+			'rules' => 'numeric|xss_clean',
+		),
 	);
 	protected $insert_validation_rules  = array();
 	protected $skip_validation 			= true;
@@ -92,11 +102,19 @@ class Riwayat_kepangkatan_model extends BF_Model
 	{
 
 		if (empty($this->selects)) {
-			$this->select($this->table_name . '.*');
+			$this->select($this->table_name . '.*, 
+			case WHEN "JENIS_RIWAYAT" = \'CPNS\' THEN \'Pengangkatan CPNS\'
+					WHEN "JENIS_RIWAYAT" = \'PNS\' THEN \'Pengangkatan PNS\'
+					WHEN "JENIS_RIWAYAT" = \'KGB\' THEN \'Kenaikan Gaji Berkala\'
+					WHEN "JENIS_RIWAYAT" = \'PMK\' THEN \'Peninjauan Masa Kerja\'
+					ELSE case when j."NAMA" is not null
+					then j."NAMA" else "JENIS_KP" END
+			  END as jenis_kp_text');
 		}
 		if ($PNS_NIP != "") {
 			$this->db->where('PNS_NIP', $PNS_NIP);
 		}
+		$this->db->join('jenis_kp j','j.ID = rwt_golongan."KODE_JENIS_KP"','LEFT');
 		$this->db->order_by('SK_TANGGAL', "ASC");
 		return parent::find_all();
 	}
@@ -140,7 +158,7 @@ class Riwayat_kepangkatan_model extends BF_Model
 		if (empty($this->selects)) {
 			$this->select(
 				'ID_GOLONGAN,
-				PANGKAT,SK_NOMOR,PNS_NIP'
+				PANGKAT,SK_NOMOR,PNS_NIP,TMT_GOLONGAN'
 			);
 			//$this->select($this->table_name .'.STATUS_SATKER');
 		}

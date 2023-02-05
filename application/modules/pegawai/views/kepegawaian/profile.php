@@ -51,7 +51,7 @@ $PNS_ID = isset($pegawai->PNS_ID) ? $pegawai->PNS_ID : '';
                             <div class="col-md-10">
                                 <div class="row">
                                     <div class="col-md-8 profile-info">
-                                        <h1 class="font-green sbold uppercase"><?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN : ''; ?>  <?php echo isset($pegawai->NAMA) ? $pegawai->NAMA : ''; ?> <?php echo isset($pegawai->GELAR_BELAKANG) ? $pegawai->GELAR_BELAKANG : ''; ?></h1>
+                                        <h1 class="font-green sbold uppercase"><?php echo isset($pegawai->GELAR_DEPAN) ? $pegawai->GELAR_DEPAN.' ' : ''; ?><?php echo isset($pegawai->NAMA) ? trim($pegawai->NAMA) : ''; ?><?php echo isset($pegawai->GELAR_BELAKANG) ? ', '.$pegawai->GELAR_BELAKANG : ''; ?></h1>
                                        <!-- <h4><b>PNS ID</b> <?php echo isset($pegawai->PNS_ID) ? $pegawai->PNS_ID : ''; ?></h4> -->
                                         <h4><b>NIP</b> <?php echo isset($pegawai->NIP_BARU) ? $pegawai->NIP_BARU : ''; ?></h4>
                                         <ul class="list-inline">

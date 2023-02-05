@@ -13,15 +13,15 @@ $NIP_BARU = isset($pegawai->NIP_BARU) ? $pegawai->NIP_BARU : '';
 <div class="tab-pane" id="<?php echo $TAB_ID;?>">
     <div class="nav-tabs-custom">
         <ul id="tab-insides-arsip" class="nav nav-tabs">
-            
-			<?php if($this->auth->has_permission("Sk_ds.Arsip.Pegawai")){ ?>
-            <li class="active">
-                <a href="#<?php echo $tab_pane_sk_elektronik;?>" data-toggle="tab" aria-expanded="false"> SK Elektronik </a>
+			<?php if($this->auth->has_permission("Arsip_digital.Arsip.View")){ ?>
+			<li class="active">
+                <a href="#<?php echo $tab_pane_arsi_digital;?>" data-toggle="tab" aria-expanded="false"> Arsip Digital <label id="arsip_digital_<?=$PNS_ID?>"></a>
             </li>
             <?php } ?>
-			<?php if($this->auth->has_permission("Arsip_digital.Arsip.View")){ ?>
-			<li class="">
-                <a href="#<?php echo $tab_pane_arsi_digital;?>" data-toggle="tab" aria-expanded="false"> Arsip Digital </a>
+            
+			<?php if($this->auth->has_permission("Sk_ds.Arsip.Pegawai")){ ?>
+            <li class="">
+                <a href="#<?php echo $tab_pane_sk_elektronik;?>" data-toggle="tab" aria-expanded="false"> SK Elektronik </a>
             </li>
             <?php } ?>
         </ul>

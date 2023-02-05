@@ -67,7 +67,7 @@
 			},this);
 			event.preventDefault();
 		});
-		$container.on('click','.show-modal',showModalX);
+		// $container.on('click','.show-modal',showModalX);
 
 		$container.on('click','.btn-hapus',function(event){
 			event.preventDefault();

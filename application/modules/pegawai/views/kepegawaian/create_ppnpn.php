@@ -39,6 +39,13 @@ $kode = isset($pegawai->ID) ? $pegawai->ID : '';
                     <span class='help-inline'><?php echo form_error('PNS_ID'); ?></span>
                 </div>
             </div>
+            <div class="control-group<?php echo form_error('username_intra') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label('USERNAME INTRA', 'username_intra', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <input id='username_intra' type='text' required class="form-control" name='username_intra' maxlength='32' value="<?php echo set_value('username_intra', isset($pegawai->username_intra) ? $pegawai->username_intra : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('username_intra'); ?></span>
+                </div>
+            </div>
 			 <div class="control-group<?php echo form_error('GELAR_DEPAN') ? ' error' : ''; ?> col-sm-2">
                 <?php echo form_label(lang('pegawai_field_GELAR_DEPAN'), 'GELAR_DEPAN', array('class' => 'control-label')); ?>
                 <div class='controls'>

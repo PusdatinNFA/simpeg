@@ -79,7 +79,7 @@
                                 <th>Tahun</th>
                                 <th>Nilai SKP</th>
                                 <th>Orientasi Pelayanan</th>
-                                <th>Integrasi</th>
+                                <th>Integritas</th>
                                 <th>Komitmen</th>
                                 <th>Disiplin</th>
                                 <th>Kerjasama</th>

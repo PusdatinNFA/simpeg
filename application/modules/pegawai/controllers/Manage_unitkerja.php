@@ -24,6 +24,10 @@ class Manage_unitkerja extends Admin_Controller {
         $jenis_satkers = $this->jenis_satker_model->find_all();
         // $jenis_satkers = get_list_jenis_satker();
         Template::set("jenis_satkers",$jenis_satkers); 
+        $satkers = $this->unitkerja_model->order_by("NAMA_UNOR","ASC")->find_satkerold();
+        Template::set("satkers",$satkers); 
+        $pejabats = $this->unitkerja_model->order_by("NAMA","ASC")->get_pejabat_lite();
+        Template::set("pejabats",$pejabats); 
         $peraturan_otks = $this->peraturan_otk_model->find_all();
         Template::set("peraturan_otks",$peraturan_otks); 
     }
@@ -305,10 +309,16 @@ class Manage_unitkerja extends Admin_Controller {
         $selectedAtasanLangsung = $this->pegawai_model->find_first_row();
         Template::set('selectedAtasanLangsung',$selectedAtasanLangsung );
 
-    $selectedUnorInduk = $data_unor->UNOR_INDUK;
+        $selectedUnorInduk = $data_unor->UNOR_INDUK;
         $this->unitkerja_model->where("ID",$selectedUnorInduk);
         $data_unor_induk=$this->unitkerja_model->find_first_row();
         Template::set('selectedUnorInduk',$data_unor_induk);
+
+
+        $selectedUnorPenugasan = $data_unor->ID_SATKER_PENUGASAN;
+        $this->unitkerja_model->where("ID",$selectedUnorPenugasan);
+        $data_unor_penugasan=$this->unitkerja_model->find_first_row();
+        Template::set('selectedUnorPenugasan',$data_unor_penugasan);
 
         /*OKOKOKOOKO*/
         
@@ -335,6 +345,10 @@ class Manage_unitkerja extends Admin_Controller {
         $this->cache->delete_group("unors");
         $this->cache->delete("aunor");
         $this->cache->delete_group("aunor");
+        $this->cache->delete("aunor_all");
+        $this->cache->delete_group("aunor_all");
+        $this->cache->delete("aunorAll");
+        $this->cache->delete_group("aunorAll");
         $this->form_validation->set_rules($this->unitkerja_model->get_validation_rules());
 
         if ($this->form_validation->run() === false) {
@@ -370,7 +384,8 @@ class Manage_unitkerja extends Admin_Controller {
             $data['ID']=$id;
             $this->unitkerja_model->insert($data);
         }
-        
+        $this->getcache_unor();
+        $this->genCacheUnorAll();
         $response = array();
         $response ['success']= true;
         $response ['msg']= "Transaksi berhasil";
@@ -624,7 +639,7 @@ class Manage_unitkerja extends Admin_Controller {
         if(isset($records) && is_array($records) && count($records)):
             foreach ($records as $record) :
                 $json['id'][] = $record->ID;
-                $json['nama'][] = $record->NAMA_UNOR;
+                $json['nama'][] = "[".$record->ID."] ".$record->NAMA_UNOR;
             endforeach;
         endif;
         echo json_encode($json);
@@ -669,6 +684,17 @@ class Manage_unitkerja extends Admin_Controller {
         $json = array(); 
         $records = $this->unitkerja_model->findnamajabatan_by_id($ID_UNOR);
         echo isset($records->NAMA_JABATAN) ? $records->NAMA_JABATAN : "";
+    }
+    public function getsatkerpenugasan()
+    {
+        //$this->auth->restrict($this->permissionUpdateMandiri);
+        if (!$this->input->is_ajax_request()) {
+            die("Only ajax request");
+        }
+        $ID_UNOR = $this->input->get('unor');
+        $json = array(); 
+        $records = $this->unitkerja_model->findsatkerpenugasan($ID_UNOR);
+        echo isset($records->ID) ? $records->ID : "";
     }
     public function downloadexcell()
     {
@@ -728,6 +754,7 @@ class Manage_unitkerja extends Admin_Controller {
         $searchKey = isset($_REQUEST['search']["key"]) ? $_REQUEST['search']["key"] : "";
 
         $selectedUnors = array();
+        $satker = "";
         $advanced_search_filters  = $this->input->post("search[advanced_search_filters]");
         if($advanced_search_filters){
             $filters = array();
@@ -758,6 +785,15 @@ class Manage_unitkerja extends Admin_Controller {
             if($filters['jenis']){
                 $this->db->where('upper(unitkerja."JENIS_SATKER")',strtoupper(trim($filters['jenis'])));    
             }
+            if($filters['pejabat']){
+                $this->db->where('PEMIMPIN_PNS_ID',$filters['pejabat'],"BOTH");
+            }
+            if($filters['satker']){
+                $satker = $filters['satker']; 
+            }
+            if(!empty($filters['is_satker'])){
+                $this->db->where('unitkerja."IS_SATKER"',$filters['is_satker']);    
+            }
             if($filters['status_active']){
                 if($filters['status_active'] == "1")
                     $this->db->where('unitkerja."EXPIRED_DATE" is null');    
@@ -771,7 +807,7 @@ class Manage_unitkerja extends Admin_Controller {
         $this->db->stop_cache();
         $output=array();
         $output['draw']=$draw;
-        $total= $this->unitkerja_model->count_all_pimpinan("",$non_aktif);
+        $total= $this->unitkerja_model->count_all_pimpinan($satker,$non_aktif);
         $orders = $this->input->post('order');
         $this->unitkerja_model->order_by("ID","ASC");
         foreach($orders as $order){
@@ -789,7 +825,7 @@ class Manage_unitkerja extends Admin_Controller {
         $output['data']=array();
         
         $this->unitkerja_model->limit($length,$start);
-        $records=$this->unitkerja_model->find_all_pimpinan("",$non_aktif);
+        $records=$this->unitkerja_model->find_all_pimpinan($satker,$non_aktif);
         $this->db->flush_cache();
         $nomor_urut=$start+1;
         if(isset($records) && is_array($records) && count($records)):
@@ -818,11 +854,64 @@ class Manage_unitkerja extends Admin_Controller {
         echo json_encode($output);
         
     }
+    public function downloadExcellAll()
+    {
+        $array_unor = $this->unitkerja_model->find_all_pimpinan("",true);
+        $this->load->library('Excel');
+        $a_peraturan = $this->peraturan_otk_model->get_array();
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel = PHPExcel_IOFactory::load(trim($this->settings_lib->item('site.pathuploaded')).'template.xls');
+        $no = 2;    
+        $row = 1;
+        $objPHPExcel->setActiveSheetIndex(0);
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0,1,"No");
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1,1,"ID");
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2,1,"NAMA");
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(3,1,"Abreviation");
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4,1,"Jabatan");
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(5,1,"NIP Pejabat");
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(6,1,"Nama Pejabat");
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(7,1,"Username Intra Pejabat");
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(8,1,"Jenis");
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(9,1,"Peraturan");
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(10,1,"Satker");
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(11,1,"Aktif");
+        $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(12,1,"Tanggal Tidak Aktif");
+        $type = PHPExcel_Cell_DataType::TYPE_STRING;
+        foreach ($array_unor as $record) {
+            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0,$no,$no);
+            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1,$no,$record->ID);
+            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(2,$no,$record->NAMA_UNOR);
+            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(3,$no,$record->ABBREVIATION);
+            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4,$no,$record->NAMA_JABATAN);
+            $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(5, $no)->setValueExplicit($record->NIP_BARU, $type);
+            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(6,$no,$record->GELAR_DEPAN." ".$record->NAMA." ".$record->GELAR_BELAKANG);
+            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(7,$no,$record->username_pejabat);
+            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(8,$no,$record->JENIS_SATKER);
+            $nomor_peraturan = "";//isset($a_peraturan[$record->PERATURAN]) ? $a_peraturan[$record->PERATURAN] : "";
+            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(9,$no,$nomor_peraturan);
+            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(10,$no,$record->IS_SATKER);
+            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(11,$no,$record->EXPIRED_DATE?0:1);
+            $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(12,$no,$record->EXPIRED_DATE);
+            $no++;
+        }
+        $filename = "unitkerja".mt_rand(1,100000).'.xls'; //just some random filename
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  //downloadable file is in Excel 2003 format (.xls)
+        //$objWriter = PHPExcel_IOFactory::createWriter($objTpl, 'Excel2007');
+        ob_end_clean(); 
+        $objWriter->save('php://output');  //send it to user, of course you can save it to disk also!
+        exit; //done.. exiting!
+    }
     function getcache_unor($UNOR_ID = ""){
         $aunitkerja = $this->cache->get('aunor');
         if ($aunitkerja == null) {
             $records = $this->db->query('
-                        select parent."ID",parent."NAMA_UNOR","IS_SATKER","DIATASAN_ID","ESELON_4","ESELON_3","ESELON_2","ESELON_1","PEJABAT_NAMA","PEMIMPIN_PNS_ID",
+                        select parent."KODE_INTERNAL",
+                        parent."ID",parent."NAMA_UNOR","IS_SATKER","DIATASAN_ID","ESELON_4","ESELON_3","ESELON_2","ESELON_1","PEJABAT_NAMA","PEMIMPIN_PNS_ID",
                         "NIP_BARU","GELAR_DEPAN","GELAR_BELAKANG","NAMA_JABATAN","JENIS_SATKER","PERATURAN"
                         from vw_unit_list_pejabat parent
                         where 
@@ -830,14 +919,17 @@ class Manage_unitkerja extends Admin_Controller {
                         and parent."EXPIRED_DATE" is null 
                         ORDER BY "DIATASAN_ID" asc, parent."ORDER" asc')->result();
             $json = array(); 
+            $json_unor = array();
             if(isset($records) && is_array($records) && count($records)):
                 foreach ($records as $record) :
                     $json[$record->DIATASAN_ID][] = $record;
+                    $json_unor[$record->KODE_INTERNAL] = $record;
                 endforeach;
             endif;
             $aunitkerja =  $this->createchild(ROOT_UNOR_ID,$json);
             $this->cache->write($aunitkerja, 'aunor',3600);
             $this->cache->write($json, 'json_unor',3600);
+            $this->cache->write($json_unor, 'aunor_all',0);
         } 
         return $aunitkerja;
     }
@@ -890,5 +982,15 @@ class Manage_unitkerja extends Admin_Controller {
             }
          }
          return $this->aunor;
+    }
+    private function genCacheUnorAll(){
+        $records = $this->unitkerja_model->find_all();
+        $json = array();
+        foreach ($records as $record) {
+            if($record->bkn_id != "")
+                $json[$record->bkn_id] = $record;
+        }
+        $this->cache->write($json, 'aunorAll',3600);
+        return $json;
     }
 }

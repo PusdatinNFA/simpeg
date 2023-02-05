@@ -20,7 +20,7 @@
                     <th width='20px' >No</th>
                     <th>Tahun</th>
 					<?php if ($this->auth->has_permission('Riwayatassesmen.Kepegawaian.ViewNilai')) { ?>
-                    <th>Nilai Potensi | Kinerja</th>
+                    <th>Kompetensi</th>
                     <?php } ?>
                     <?php if ($this->auth->has_permission('Riwayatassesmen.Kepegawaian.P_feedback')) { ?>
                     	<th>LAPORAN P F</th>
@@ -33,7 +33,8 @@
                     <?php } ?>
                     <?php if ($this->auth->has_permission('Riwayatassesmen.Kepegawaian.L_Lengkap')) { ?>
                     	<th>LAPORAN L L</th>
-                    <?php } ?>
+                    <?php } ?>					
+                    <th>Potensi</th>
                     <th>Saran dan Pengembangan</th>
                     <th width="10%">#</th>
                 </tr>
@@ -82,7 +83,7 @@
 			},this);
 			event.preventDefault();
 		});
-		$container.on('click','.show-modal',showModalX);
+		// $container.on('click','.show-modal',showModalX);
 
 		$container.on('click','.btn-hapus',function(event){
 			event.preventDefault();

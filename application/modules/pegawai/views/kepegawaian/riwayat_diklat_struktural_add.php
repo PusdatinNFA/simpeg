@@ -3,7 +3,17 @@
 
 <?php 
     $id = isset($detail_riwayat->ID) ? $detail_riwayat->ID : '';
-?>
+    if ($mandiri) { ?>
+        <div class="callout callout-info">
+            <h4>Perhatian</h4>
+            <ul>
+                <li>Data yang anda masukan tidak otomatis mengubah data simpeg dan akan diverifikasi terlebih dahulu oleh kepegawaian.<br>
+                                Anda dapat mengecek pengajuan perubahan pada menu <b><a href="<?=base_url()?>admin/kepegawaian/pegawai/peremajaan" target="_BLANK">Peremajaan Data</a></b></li>
+                <li>Maksimal ukuran berkas yang diunggah sebesar 2MB.</li>
+            </ul>
+        </div>
+        </div>
+    <?php } ?>
 <div class='box box-warning' id="form-diklat-struktural-add">
 	<div class="box-body">
         <div class="messages">
@@ -14,7 +24,7 @@
             <input id='PNS_ID' type='hidden' class="form-control" name='PNS_ID' maxlength='32' value="<?php echo set_value('PNS_ID', isset($PNS_ID) ? trim($PNS_ID) : ''); ?>" />
             <input nama='PNS_NIP' type='hidden' nama="">
             
-            <div class="control-group<?php echo form_error('ID_DIKLAT') ? ' error' : ''; ?> col-sm-3">
+            <div class="control-group<?php echo form_error('ID_DIKLAT') ? ' error' : ''; ?> col-sm-12">
                 <?php echo form_label('NAMA', 'NAMA', array('class' => 'control-label')); ?>
                 <div class='controls'>
                 	<select name="ID_DIKLAT" id="ID_DIKLAT" class="form-control">
@@ -29,13 +39,23 @@
                 </div>
             </div>            
 			<div class="control-group col-sm-3">
-				<label for="inputNAMA" class="control-label">TANGGAL</label>
+				<label for="inputNAMA" class="control-label">TANGGAL MULAI</label>
 				<div class="input-group date">
 				  <div class="input-group-addon">
 					<i class="fa fa-calendar"></i>
 				  </div>
 					<input type='text' class="form-control pull-right datepicker" name='TANGGAL'  value="<?php echo set_value('TANGGAL', isset($detail_riwayat->TANGGAL) ? $detail_riwayat->TANGGAL : ''); ?>" />
 					<span class='help-inline'><?php echo form_error('Tgl'); ?></span>
+				</div>
+			</div>
+            <div class="control-group col-sm-3">
+				<label for="inputNAMA" class="control-label">TANGGAL SELESAI</label>
+				<div class="input-group date">
+				  <div class="input-group-addon">
+					<i class="fa fa-calendar"></i>
+				  </div>
+					<input type='text' class="form-control pull-right datepicker" name='TANGGAL_SELESAI'  value="<?php echo set_value('TANGGAL_SELESAI', isset($detail_riwayat->TANGGAL_SELESAI) ? $detail_riwayat->TANGGAL_SELESAI : ''); ?>" />
+					<span class='help-inline'><?php echo form_error('TANGGAL_SELESAI'); ?></span>
 				</div>
 			</div> 
             <div class="control-group col-sm-3">
@@ -59,28 +79,39 @@
                     <span class='help-inline'><?php echo form_error('NOMOR'); ?></span>
                 </div>
             </div>
-            <div class="control-group col-sm-9">
+            <div class="control-group col-sm-8">
                 <label for="inputNAMA" class="control-label">Berkas</label>
                 <div class='controls'>
                     <div id="form_upload">
-                      <input id="file_dokumen" name="file_dokumen" class="file" type="file" data-preview-file-type="pdf">
+                      <input id="file_dokumen" name="file_dokumen" class="file" type="file" data-show-upload="false" data-preview-file-type="pdf">
                     </div>
                     
                 </div>
             </div> 
-            <div class="control-group col-sm-3">
+            <div class="control-group col-sm-4">
                 <label for="inputNAMA" class="control-label"><br></label>
                 <div class='controls'>
-                    
-                    <?php if(isset($detail_riwayat->FILE_BASE64) && $detail_riwayat->FILE_BASE64 != ""){ ?>
-                        <a href="<?php echo base_url(); ?>pegawai/riwayat_diklat_struktural/viewdoc/<?php echo $detail_riwayat->ID; ?>" class="btn btn-warning show-modal" tooltip="Lihat dokumen <?php echo isset($detail_riwayat->NOMOR_IJASAH) ? $detail_riwayat->NOMOR_IJASAH : ''; ?>" ><span class="fa fa-file-o"></span> Lihat</a>
-                    <?php } ?>  
+                    <div class=" btn-group">
+                    <?php if (!$read_only){ ?>
+                        <?php $kode_arsip = uniqid(); ?>
+                        <a href="#" kode='<?=$kode_arsip?>' class="btn btn-sm btn-success btn-daftar-arsip" data-toggle='tooltip' tooltip="Pilih dokumen" title="Pilih dokumen"><span class="fa fa-search"></span> pilih</a>
+                        <a href="#" id='view_<?=$kode_arsip?>' class="btn btn-sm btn-info show-modal hide" data-toggle='tooltip' tooltip="Lihat dokumen baru" title="Lihat dokumen baru"><span class="fa fa-file-o"></span> lihat</a>
+                    <?php } ?>
+                        <input type="text" name='id_arsip' id='<?=$kode_arsip?>' class="hide" value="<?= $detail_riwayat->id_arsip ?>">
+                        <?php if (isset($detail_riwayat->id_arsip)) { ?>
+                            <a href="<?php echo base_url(); ?>admin/arsip/arsip_digital/viewdoc2/<?php echo $detail_riwayat->id_arsip; ?>" data-toggle='tooltip' class="btn btn-sm btn-warning show-modal" tooltip="Lihat dokumen" title="Lihat dokumen"><span class="fa fa-file-o"></span> Lihat</a>
+                        <?php } ?>
+                    </div>
                 </div>
             </div>
+            <input type="text" class="hide" name='mandiri' value="<?=$mandiri?$mandiri:''?>">
+            <input type="text" class="hide" name='id_update_mandiri' value="<?=$id_update_mandiri?$id_update_mandiri:''?>">
         </div>
+        <?php if (!$read_only){ ?>
   		<div class="box-footer">
             <input type='submit' name='save' id="btnsavestrktural" class='btn btn-primary' value="Simpan Data" /> 
         </div>
+        <?php } ?>
     <?php echo form_close(); ?>
 </div>
 <script src="<?php echo base_url(); ?>themes/admin/plugins/datepicker/bootstrap-datepicker.js"></script>

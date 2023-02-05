@@ -380,7 +380,7 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
             </div>
             
 			<div class="control-group col-sm-3">
-				<label for="inputNAMA" class="control-label">TMT Golongan</label>
+				<label for="inputNAMA" class="control-label">TMT jabatan</label>
 				<div class="input-group date">
 				  <div class="input-group-addon">
 					<i class="fa fa-calendar"></i>
@@ -389,7 +389,13 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
 					<span class='help-inline'><?php echo form_error('TMT_GOLONGAN'); ?></span>
 				</div>
 			</div> 
-
+            <div class="control-group col-sm-12" id="form_no_induk_jf">
+				<?php echo form_label("Nomor Induk Jabatan Fungsional", 'no_induk_jf', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <input id='no_induk_jf' type='text' class="form-control" name='no_induk_jf' maxlength='32' value="<?php echo set_value('no_induk_jf', isset($pegawai->no_induk_jf) ? $pegawai->no_induk_jf : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('no_induk_jf'); ?></span>
+                </div>
+			</div> 
             <div class="control-group<?php echo form_error('PENDIDIKAN_ID') ? ' error' : ''; ?> col-sm-9">
                 <?php echo form_label(lang('pegawai_field_PENDIDIKAN_ID'), 'PENDIDIKAN_ID', array('class' => 'control-label')); ?>
                 <div class='controls'>
@@ -515,13 +521,14 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
                     <span class='help-inline'><?php echo form_error('GOLONGAN_DARAH'); ?></span>
                 </div>
             </div>
-             <div class="control-group<?php echo form_error('status_pegawai') ? ' error' : ''; ?> col-sm-12">
+            <div class="control-group<?php echo form_error('status_pegawai') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label("Status Pegawai", 'status_pegawai', array('class' => 'control-label')); ?>
                 <div class='controls'>
                     <select class="validate[required] text-input form-control" name="status_pegawai" id="status_pegawai" class="chosen-select-deselect">
                         <option value="">-- Pilih  --</option>
                         <option value="1" <?php if(isset($pegawai->status_pegawai))  echo  ("1"==$pegawai->status_pegawai) ? "selected" : ""; ?>> PNS</option>
-                        <option value="2" <?php if(isset($pegawai->status_pegawai))  echo  ("2"==$pegawai->status_pegawai) ? "selected" : ""; ?>> Bukan PNS</option>
+                        <option value="2" <?php if(isset($pegawai->status_pegawai))  echo  ("2"==$pegawai->status_pegawai) ? "selected" : ""; ?>> P3K</option>
+                        <option value="3" <?php if(isset($pegawai->status_pegawai))  echo  ("3"==$pegawai->status_pegawai) ? "selected" : ""; ?>> Bukan ASN</option>
                     </select>
                     <span class='help-inline'><?php echo form_error('status_pegawai'); ?></span>
                 </div>

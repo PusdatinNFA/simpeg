@@ -54,7 +54,15 @@ class Jenis_jabatan_model extends BF_Model
     {
         parent::__construct();
     }
+	public function find_all()
+	{
 
+		if (empty($this->selects)) {
+			$this->select($this->table_name . '.*');
+		}
+		$this->db->where_not_in('ID',array('3','5'));	
+		return parent::find_all();
+	}
 	public function find_first_row(){
 		return $this->db->get($this->db->schema.".".$this->table_name)->first_row();
 	}

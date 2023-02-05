@@ -1,3 +1,6 @@
+<link rel="stylesheet" href="<?php echo base_url(); ?>themes/admin/plugins/select2/select2.min.css">
+<link href="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/css/fileinput.css" media="all" rel="stylesheet" type="text/css"/>
+<link href="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/themes/explorer/theme.css" media="all" rel="stylesheet" type="text/css"/>
 <?php 
     $id = isset($detail_riwayat->ID) ? $detail_riwayat->ID : '';
     $jk = ISSET($pegawai_data->JENIS_KELAMIN) ? $pegawai_data->JENIS_KELAMIN : "";
@@ -29,7 +32,7 @@
             <div class="control-group<?php echo form_error('NAMA') ? ' error' : ''; ?> col-sm-12">
                 <?php echo form_label("NAMA", 'NAMA', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                    <input id='NAMA' <?php echo $view ? "":"disabled"; ?> type='text' class="form-control" name='NAMA' maxlength='32' value="<?php echo set_value('NAMA', isset($detail_riwayat->NAMA) ? $detail_riwayat->NAMA : ''); ?>" />
+                    <input id='NAMA' <?php echo $view ? "":"disabled"; ?> type='text' class="form-control" name='NAMA' maxlength='255' value="<?php echo set_value('NAMA', isset($detail_riwayat->NAMA) ? $detail_riwayat->NAMA : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('NAMA'); ?></span>
                 </div>
             </div>
@@ -69,18 +72,58 @@
                         <option value="">-- Silahkan Pilih --</option>
                         <option value="1" <?php if(isset($detail_riwayat->STATUS_ANAK))  echo  ($detail_riwayat->STATUS_ANAK=="1") ? "selected" : ""; ?>>KANDUNG</option> 
                         <option value="2" <?php if(isset($detail_riwayat->STATUS_ANAK))  echo  ($detail_riwayat->STATUS_ANAK=="2") ? "selected" : ""; ?>>ANGKAT</option>
+                        <option value="3" <?php if(isset($detail_riwayat->STATUS_ANAK))  echo  ($detail_riwayat->STATUS_ANAK=="3") ? "selected" : ""; ?>>TIRI</option>
                     </select>
                     <span class='help-inline'><?php echo form_error('STATUS'); ?></span>
                 </div>
-            </div>     
+            </div> 
+            <div class="control-group<?php echo form_error('STATUS_HIDUP') ? ' error' : ''; ?> col-sm-9">
+                <?php echo form_label('STATUS HIDUP', 'STATUS_HIDUP', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <select name="STATUS_HIDUP" <?php echo $view ? "":"disabled"; ?> id="STATUS_HIDUP" class="form-control">
+                        <option value="">-- Silahkan Pilih --</option>
+                        <option value="1" <?php if(isset($detail_riwayat->STATUS_HIDUP))  echo  ($detail_riwayat->STATUS_HIDUP=="1") ? "selected" : ""; ?>>HIDUP</option> 
+                        <option value="2" <?php if(isset($detail_riwayat->STATUS_HIDUP))  echo  ($detail_riwayat->STATUS_HIDUP=="2") ? "selected" : ""; ?>>MENINGGAL</option>
+                    </select>
+                    <span class='help-inline'><?php echo form_error('STATUS_HIDUP'); ?></span>
+                </div>
+            </div>
+            <div class="control-group col-sm-8">
+                <label for="inputNAMA" class="control-label">Berkas Akta</label>
+                <div class='controls'>
+                    <div id="form_upload">
+                        <input id="file_dokumen" name="file_dokumen" class="file" type="file" data-show-upload="false" data-preview-file-type="pdf">
+                    </div>
+
+                </div>
+            </div>
+            <div class="control-group col-sm-4">
+                <label for="inputNAMA" class="control-label"><br></label>
+                <div class='controls'>
+                    <div class=" btn-group">
+                    <?php if (!empty($view)){ ?>
+                        <?php $kode_arsip = uniqid(); ?>
+                        <a href="#" kode='<?=$kode_arsip?>' class="btn btn-sm btn-success btn-daftar-arsip" data-toggle='tooltip' tooltip="Pilih dokumen" title="Pilih dokumen"><span class="fa fa-search"></span> pilih</a>
+                        <a href="#" id='view_<?=$kode_arsip?>' class="btn btn-sm btn-info show-modal hide" data-toggle='tooltip' tooltip="Lihat dokumen baru" title="Lihat dokumen baru"><span class="fa fa-file-o"></span> lihat</a>
+                    <?php } ?>
+                        <input type="text" name='id_arsip' id='<?=$kode_arsip?>' class="hide" value="<?= $detail_riwayat->id_arsip ?>">
+                        <?php if (isset($detail_riwayat->id_arsip)) { ?>
+                            <a href="<?php echo base_url(); ?>admin/arsip/arsip_digital/viewdoc2/<?php echo $detail_riwayat->id_arsip; ?>" data-toggle='tooltip' class="btn btn-sm btn-warning show-modal" tooltip="Lihat dokumen" title="Lihat dokumen"><span class="fa fa-file-o"></span> Lihat</a>
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>         
+            <input type="text" class="hide" name='id_update_mandiri' value="<?=$id_update_mandiri?>">     
         </div>
-        <?php if($view){ ?>
+        <?php if (!$read_only){ ?>
         <div class="box-footer">
             <input type='submit' name='save' id="btnsaveanak" class='btn btn-primary' value="Simpan Data" /> 
         </div>
         <?php } ?>
     <?php echo form_close(); ?>
 </div>
+<script src="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/themes/explorer/theme.js" type="text/javascript"></script>
+<script src="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/js/fileinput.js" type="text/javascript"></script>
 <script src="<?php echo base_url(); ?>themes/admin/plugins/datepicker/bootstrap-datepicker.js"></script>
 <script>
     var form = $("#form-anak-add");
@@ -100,19 +143,24 @@
     function submitdataanak(){
         
         var json_url = "<?php echo base_url() ?>pegawai/data_keluarga/saveanak";
+        var the_data = new FormData(document.getElementById("frmanak"));
          $.ajax({    
             type: "POST",
             url: json_url,
-            data: $("#frmanak").serialize(),
+            data: the_data,
             dataType: "json",
+            processData: false, // tell jQuery not to process the data
+            contentType: false, // tell jQuery not to set contentType
             success: function(data){ 
                 if(data.success){
                     swal("Pemberitahuan!", data.msg, "success");
-                    $("#modal-global").trigger("sukses-tambah-anak");
+                    $("#modal-custom-global").trigger("sukses-tambah-anak");
                     $("#modal-global").modal("hide");
-                    loadkeluargaall();
+                    $("#modal-custom-global").modal("hide");
+                    // loadkeluargaall();
                 }
                 else {
+                    swal("Pemberitahuan!", data.msg, "error");
                     $("#form-anak-add .messages").empty().append(data.msg);
                 }
             }});

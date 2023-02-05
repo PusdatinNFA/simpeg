@@ -34,7 +34,7 @@
                     <tr>
                         <td width="200px"><label for="example-text-input" class="col-form-label">Golongan</label></td>
                         <td colspan=2>
-                            <select name="golongan_key" class="form-control">
+                            <select name="golongan_key" class="form-control select2">
                                 <?php 
                                     foreach($golongans as $row){
                                         echo "<option value='".$row->ID."'>$row->NAMA_PANGKAT $row->NAMA</option>";
@@ -63,7 +63,7 @@
                     <tr>
                         <td width="200px"><label for="example-text-input" class="col-form-label">Kategori SK</label></td>
                         <td colspan=2>
-                            <select name="kategori_sk" id="kategori_sk" class="form-control">
+                            <select name="kategori_sk" id="kategori_sk" class="form-control select2">
                                 <option value="">-- Silahkan Pilih --</option>
                                 <?php 
                                     foreach ($reckategori_ds as $record) {
@@ -139,7 +139,7 @@
         </div>
      
     <script type="text/javascript">
-     
+    $('.select2').select2();
     $("#unit_id_key").select2({
         placeholder: 'Cari Unit Kerja...',
         width: '100%',

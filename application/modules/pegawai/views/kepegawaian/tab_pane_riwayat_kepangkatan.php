@@ -15,12 +15,12 @@
             	</a>
             <?php endif; ?>
             <?php if ($this->auth->has_permission('RiwayatKepangkatan.Kepegawaian.Create')) : ?>
-            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatkepangkatan/add/<?php echo $NIP_BARU ?>" tooltip="Tambah Riwayat Diklat">
+            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatkepangkatan/add/<?php echo $PNS_ID ?>" tooltip="Tambah">
 				<i class="fa fa-plus"></i> Tambah
             </a>
             <?php endif; ?>
             <?php if ($this->auth->has_permission('RiwayatKepangkatan.Kepegawaian.Updmandiri')) : ?>
-	            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatkepangkatan/addmandiri/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Pendidikan">
+	            <a type="button" class="show-modal-custom btn btn-default btn-info margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatkepangkatan/addmandiri/<?php echo $PNS_ID ?>" tooltip="Tambah Mandiri">
 				<i class="fa fa-plus"></i> Tambah Mandiri
 	            </a>
             <?php endif; ?>
@@ -29,6 +29,7 @@
                 <tr>
                     <th width='20px' >No</th>
                     <th>Pangkat</th>
+                    <th>Jenis Riwayat/ Jenis KP</th>
                     <th width='100px' >Golongan</th>
                     <th width='100px' >TMT</th>
 					<th>MK GOLONGAN</th>
@@ -69,7 +70,8 @@
 					url: "<?php echo base_url() ?>pegawai/riwayatkepangkatan/ajax_list",
 					type:'POST',
 					data : {
-						NIP_BARU:'<?php echo $NIP_BARU;?>'
+						NIP_BARU:'<?php echo $NIP_BARU;?>',
+						PNS_ID:'<?php echo $PNS_ID;?>'
 					}
 				}
 		});

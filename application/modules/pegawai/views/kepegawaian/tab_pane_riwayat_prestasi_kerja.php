@@ -9,14 +9,19 @@
     <div class="form-group">
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-21 col-xs-12">
-	            <?php if ($this->auth->has_permission('Riwayatprestasikerja.Kepegawaian.Sinkron')) : ?>
+	            <?php if ($this->auth->has_permission('RiwayatPrestasiKerja.Kepegawaian.Sinkron')) : ?>
 	            	<a class="btn btn-default btn-success margin pull-right" id="lihat_skp_bkn" kode="<?php echo $PNS_ID ?>" tooltip="Sinkron dengan BKN">
 					<i class="fa fa-refresh"></i> Sinkron BKN
 	            	</a>
 	            <?php endif; ?>
-	            <?php if ($this->auth->has_permission('riwayatprestasikerja.Kepegawaian.Create')) : ?>
-	            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatprestasikerja/add/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Diklat">
+	            <?php if ($this->auth->has_permission('RiwayatPrestasiKerja.Kepegawaian.Create')) : ?>
+	            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatprestasikerja/add/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Penghargaan">
 					<i class="fa fa-plus"></i> Tambah
+	            </a>
+	            <?php endif; ?>
+	            <?php if ($this->auth->has_permission('RiwayatPrestasiKerja.Kepegawaian.UpdateMandiri')) : ?>
+	            <a type="button" class="show-modal-custom btn btn-default btn-info margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatprestasikerja/addmandiri/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Penghargaan">
+					<i class="fa fa-plus"></i> Tambah Mandiri
 	            </a>
 	            <?php endif; ?>
 	            <table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-datatable table-hover">
@@ -72,7 +77,7 @@
 			},this);
 			event.preventDefault();
 		});
-		$container.on('click','.show-modal',showModalX);
+		// $container.on('click','.show-modal',showModalX);
 
 		$container.on('click','.btn-hapus',function(event){
 			event.preventDefault();
@@ -97,6 +102,41 @@
 								timeout:180000,
 								success: function (result) {
 									swal("Data berhasil di hapus!", result, "success");
+									$grid_daftar_skp.ajax.reload();
+							},
+							error : function(error) {
+								alert(error);
+							} 
+						});        
+						
+					} else {
+						swal("Batal", "", "error");
+					}
+				});
+		});
+		$container.on('click','.btn-upload',function(event){
+			event.preventDefault();
+			var kode =$(this).attr("kode");
+			var nip = '<?=$pegawai->NIP_BARU?>'
+				swal({
+					title: "Anda Yakin?",
+					text: "Upload data Riwayat Prestasi Kerja!",
+					type: "warning",
+					showCancelButton: true,
+					confirmButtonClass: 'btn-danger',
+					confirmButtonText: 'Ya, Upload!',
+					cancelButtonText: "Tidak, Batalkan!",
+					closeOnConfirm: false,
+					closeOnCancel: false
+				},
+				function (isConfirm) {
+					if (isConfirm) {
+						$.ajax({
+								url: "<?php echo base_url() ?>pegawai/bkn/uploadNilaiSkp/"+nip+"/"+kode,
+								dataType: "html",
+								timeout:180000,
+								success: function (result) {
+									swal("Data berhasil di upload!", result, "success");
 									$grid_daftar_skp.ajax.reload();
 							},
 							error : function(error) {
@@ -142,7 +182,7 @@
 		                            showConfirmButton: true
 		                        }, function () {
 		                        	$("#modal-body").html(result.konten);
-		  							$("#myModalLabel").html("Riwayat Jabatan BKN");
+		  							$("#myModalLabel").html("Riwayat Prestasi Kerja BKN");
 		                            $("#modal-global").modal('show');
 		                        });
 							}else{

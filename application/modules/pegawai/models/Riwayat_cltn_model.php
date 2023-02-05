@@ -40,13 +40,18 @@ class Riwayat_cltn_model extends BF_Model
 	// be updating a portion of the data.
 	protected $validation_rules 		= array(
 		array(
-			'field' => 'pns_id',
-			'label' => 'PNS ID',
-			'rules' => 'max_length[32]|required',
+			'field' => 'pns_nip',
+			'label' => 'NIP',
+			'rules' => 'max_length[18]|required',
 		),
 		array(
 			'field' => 'nomor_sk',
 			'label' => 'NOMOR SK',
+			'rules' => 'required',
+		),
+		array(
+			'field' => 'tanggal_awal',
+			'label' => 'TANGGAL AWAL',
 			'rules' => 'required',
 		)
 	);
@@ -71,7 +76,8 @@ class Riwayat_cltn_model extends BF_Model
 		}
 		if($pns_id!=""){
 			$this->db->where('pns_id',$pns_id);
-		}
+		}		
+		$this->db->order_by('tanggal_awal','ASC');
 		return parent::find_all();
 	}
 	public function count_all($pns_id ="")
@@ -84,6 +90,7 @@ class Riwayat_cltn_model extends BF_Model
 		if($pns_id!=""){
 			$this->db->where('pns_id',$pns_id);
 		}
+		$this->db->join('pegawai', 'pegawai.NIP_BARU = rwt_cltn.pns_nip', 'inner');
 		return parent::count_all();
 	}
 	public function is_exist_cltn($no_bkn ="")
@@ -95,5 +102,20 @@ class Riwayat_cltn_model extends BF_Model
 		}
 		$this->db->where('id_bkn',$no_bkn);
 		return parent::count_all()>0;
+	}
+	public function first_row(){
+		return $this->db->get($this->db->schema.".".$this->table_name)->first_row();
+	}
+	public function find_detil()
+	{
+		if(empty($this->selects))
+		{
+			$this->select($this->table_name .'.*, 
+			pegawai.NAMA, pegawai.NIP_BARU, pegawai.username_intra, pegawai.ref, unitkerja.NAMA_UNOR');
+		}
+		$this->db->join('pegawai', 'pegawai.NIP_BARU = rwt_cltn.pns_nip', 'inner');
+		$this->db->join('unitkerja', 'unitkerja.ID = pegawai.UNOR_INDUK_ID', 'left');
+		$this->db->order_by('tanggal_awal','ASC');
+		return parent::find_all();
 	}
 }

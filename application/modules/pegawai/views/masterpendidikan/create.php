@@ -7,8 +7,14 @@
         </div>
     <?php echo form_open($this->uri->uri_string(), 'id="frm"'); ?>
         <fieldset>
-            <input id='ID' type='hidden' class="form-control" name='ID' maxlength='32' value="<?php echo set_value('id_data', isset($id) ? trim($id) : ''); ?>" />
-            
+            <div class="control-group<?php echo form_error('NAMA') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label("ID", 'ID', array('class' => 'control-label')); ?>
+                <input id='kode' type='hidden' class="form-control" name='kode' maxlength='32' value="<?php echo set_value('kode', isset($selectedData->ID) ? $selectedData->ID : ''); ?>" />
+                <div class='controls'>
+                    <input id='ID' type='text' class="form-control" name='ID' maxlength='32' value="<?php echo set_value('ID', isset($selectedData->ID) ? $selectedData->ID : ''); ?>" />
+                    <span class='help-inline'>ID BKN (kosongkan jika tidak ada)</span>
+                </div>
+            </div>
             <div class="control-group<?php echo form_error('TINGKAT PENDIDIKAN') ? ' error' : ''; ?> col-sm-3">
                 <?php echo form_label('TINGKAT PENDIDIKAN', 'TINGKAT PENDIDIKAN', array('class' => 'control-label')); ?>
                 <div class='controls'>
@@ -26,7 +32,7 @@
             <div class="control-group<?php echo form_error('NAMA') ? ' error' : ''; ?> col-sm-12">
                 <?php echo form_label("NAMA", 'NAMA', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                    <input id='NAMA' type='text' class="form-control" name='NAMA' maxlength='32'  />
+                    <input id='NAMA' type='text' class="form-control" name='NAMA' maxlength='300'  />
                     <span class='help-inline'><?php echo form_error('NAMA'); ?></span>
                 </div>
             </div>

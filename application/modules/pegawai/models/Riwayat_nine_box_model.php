@@ -67,6 +67,7 @@ class Riwayat_nine_box_model extends BF_Model
 		if($NIP!=""){
 			$this->db->where('PNS_NIP',$NIP);
 		}
+		$this->db->order_by("TAHUN","ASC");
 		return parent::find_all();
 	}
 	public function count_all($NIP ="")

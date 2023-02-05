@@ -50,8 +50,7 @@ class MasterPendidikan extends Admin_Controller
 		/*Jika $search mengandung nilai, berarti user sedang telah 
 		memasukan keyword didalam filed pencarian*/
 		if($search!=""){
-			$this->pendidikan_model->where('upper("NAMA") LIKE \'%'.strtoupper($search).'%\'');
-			$this->pendidikan_model->or_where('upper("JENIS_JABATAN") LIKE \'%'.strtoupper($search).'%\'');
+			$this->pendidikan_model->where('upper(pendidikan."NAMA") LIKE \'%'.strtoupper($search).'%\'');
 		}
 		$this->pendidikan_model->limit($length,$start);
 		
@@ -66,8 +65,7 @@ class MasterPendidikan extends Admin_Controller
 		*/
 		if($search != "")
 		{
-			$this->pendidikan_model->where('upper("NAMA") LIKE \'%'.strtoupper($search).'%\'');
-			$this->pendidikan_model->or_where('upper("JENIS_JABATAN") LIKE \'%'.strtoupper($search).'%\'');
+			$this->pendidikan_model->where('upper(pendidikan."NAMA") LIKE \'%'.strtoupper($search).'%\'');
 			$jum	= $this->pendidikan_model->count_all();
 			$output['recordsTotal']=$output['recordsFiltered']=$jum;
 		}
@@ -77,6 +75,7 @@ class MasterPendidikan extends Admin_Controller
 			foreach ($records as $record) {
                 $row = array();
                 $row []  = $nomor_urut;
+                $row []  = $record->ID;
                 $row []  = $record->TK_TEXT;
                 $row []  = $record->NAMA;
                 $btn_actions = array();
@@ -87,7 +86,7 @@ class MasterPendidikan extends Admin_Controller
                 
                 if($this->auth->has_permission($this->permissionDelete))
                 {    
-                    $btn_actions  [] = "<a href='#' kode='$record->ID' data-toggle='tooltip' title='Hapus Data' class='btn btn-sm btn-danger btn-hapus-tb'><i class='fa fa-trash-o'></i> </a>";
+                    $btn_actions  [] = "<a href='#' kode='$record->ID' data-toggle='tooltip' title='Hapus Data' class='btn btn-sm btn-danger btn-hapus'><i class='fa fa-trash-o'></i> </a>";
                 }
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
                 $output['data'][] = $row;
@@ -137,7 +136,7 @@ class MasterPendidikan extends Admin_Controller
           }
         }
         
-        Template::set('toolbar_title', "Tambah Jurusan Pendidikan");
+        Template::set('toolbar_title', "Tambah Pendidikan");
 
         Template::render();
     }
@@ -159,7 +158,7 @@ class MasterPendidikan extends Admin_Controller
         //$this->auth->restrict($this->permissionCreate); 
         $selectedData = $this->pendidikan_model->find($ID);
         Template::set('selectedData',$selectedData);
-        Template::set('toolbar_title', "Ubah Jurusan Pendidikan");
+        Template::set('toolbar_title', "Ubah Pendidikan");
 
         Template::render();
        
@@ -175,12 +174,14 @@ class MasterPendidikan extends Admin_Controller
         }
         else {
             $data = $this->pendidikan_model->prep_data($this->input->post());
+            $data['NAMA']   = $this->input->post('NAMA');
             
-            $id_data = $this->input->post("ID");
+            $id_data = $this->input->post("kode");
             if(isset($id_data) && !empty($id_data)){    
                 $this->pendidikan_model->update($id_data,$data);
             }
             else {
+                $data['ID']     = $this->input->post('ID') ? $this->input->post('ID') : strtoupper(md5($this->input->post('NAMA'))); 
                 $this->pendidikan_model->insert($data);
             }                
             $response ['success']= true;
@@ -193,24 +194,30 @@ class MasterPendidikan extends Admin_Controller
             die("Only ajax request");
         }
         $json = array();
-        $limit = 10;
+        $limit = 100;
         $page = $this->input->get('page') ? $this->input->get('page') : "1";
         $q= $this->input->get('term');
+        $tkpendidikan = $this->input->get('tkpendidikan');
         $start = ($page-1)*$limit;
         
         if(!empty($q)){
-            $json = $this->data_model($q,$start,$limit);
+            $json = $this->data_model($q,$start,$limit,$tkpendidikan);
         }
         echo json_encode($json);
     }
-    private function data_model($key,$start,$limit){
+    private function data_model($key,$start,$limit,$tkpendidikan=null){
           
             $this->db->start_cache();
             $this->db->like('lower("NAMA")', strtolower($key));
+            if ($tkpendidikan){
+                $this->db->where('TINGKAT_PENDIDIKAN_ID', $tkpendidikan);
+            }
             $this->db->from("hris.pendidikan");
             $this->db->stop_cache();
             $total = $this->db->get()->num_rows();
             $this->db->select('ID as id,NAMA as text');
+            $this->db->order_by('TINGKAT_PENDIDIKAN_ID');
+            $this->db->order_by('NAMA');
             $this->db->limit($limit,$start);
 
             $data = $this->db->get()->result();

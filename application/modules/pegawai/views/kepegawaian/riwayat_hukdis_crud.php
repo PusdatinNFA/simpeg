@@ -116,22 +116,29 @@
                     <span class='help-inline'><?php echo form_error('NO_SK_PEMBATALAN'); ?></span>
                 </div>
             </div>
-            <div class="control-group col-sm-9">
+            <div class="control-group col-sm-8">
                 <label for="inputNAMA" class="control-label">Berkas</label>
                 <div class='controls'>
                     <div id="form_upload">
-                      <input id="file_dokumen" name="file_dokumen" class="file" type="file" data-preview-file-type="pdf">
+                      <input id="file_dokumen" name="file_dokumen" class="file" type="file" data-show-upload="false" data-preview-file-type="pdf">
                     </div>
                     
                 </div>
             </div> 
-            <div class="control-group col-sm-3">
+            <div class="control-group col-sm-4">
                 <label for="inputNAMA" class="control-label"><br></label>
                 <div class='controls'>
-                    
-                    <?php if(isset($detail_riwayat->FILE_BASE64) && $detail_riwayat->FILE_BASE64 != ""){ ?>
-                        <a href="<?php echo base_url(); ?>pegawai/riwayathukdis/viewdoc/<?php echo $detail_riwayat->ID; ?>" class="btn btn-warning show-modal" tooltip="Lihat dokumen <?php echo isset($detail_riwayat->SK_NOMOR) ? $detail_riwayat->SK_NOMOR : ''; ?>" ><span class="fa fa-file-o"></span> Lihat</a>
-                    <?php } ?>  
+                    <div class=" btn-group">
+                    <?php if (!$read_only){ ?>
+                        <?php $kode_arsip = uniqid(); ?>
+                        <a href="#" kode='<?=$kode_arsip?>' class="btn btn-sm btn-success btn-daftar-arsip" data-toggle='tooltip' tooltip="Pilih dokumen" title="Pilih dokumen"><span class="fa fa-search"></span> pilih</a>
+                        <a href="#" id='view_<?=$kode_arsip?>' class="btn btn-sm btn-info show-modal hide" data-toggle='tooltip' tooltip="Lihat dokumen baru" title="Lihat dokumen baru"><span class="fa fa-file-o"></span> lihat</a>
+                    <?php } ?>
+                        <input type="text" name='id_arsip' id='<?=$kode_arsip?>' class="hide" value="<?= $detail_riwayat->id_arsip ?>">
+                        <?php if (isset($detail_riwayat->id_arsip)) { ?>
+                            <a href="<?php echo base_url(); ?>admin/arsip/arsip_digital/viewdoc2/<?php echo $detail_riwayat->id_arsip; ?>" data-toggle='tooltip' class="btn btn-sm btn-warning show-modal" tooltip="Lihat dokumen" title="Lihat dokumen"><span class="fa fa-file-o"></span> Lihat</a>
+                        <?php } ?>
+                    </div>
                 </div>
             </div>
 			</fieldset>

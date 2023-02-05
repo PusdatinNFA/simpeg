@@ -20,7 +20,7 @@
             </a>
             <?php endif; ?>
             <?php if ($this->auth->has_permission('RiwayatPendidikan.Kepegawaian.Updmandiri')) : ?>
-	            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatpendidikan/addmandiri/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Pendidikan">
+	            <a type="button" class="show-modal-custom btn btn-default btn-info margin pull-right " href="<?php echo base_url(); ?>pegawai/riwayatpendidikan/addmandiri/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Pendidikan">
 				<i class="fa fa-plus"></i> Tambah Mandiri
 	            </a>
             <?php endif; ?>

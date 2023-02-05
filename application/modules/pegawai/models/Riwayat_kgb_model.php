@@ -49,6 +49,21 @@ class Riwayat_kgb_model extends BF_Model
 			'label' => 'TGL LULUS PENDIDIKAN',
 			'rules' => 'max_length[32]',
 		),
+		array(
+			'field' => 'n_gapok',
+			'label' => 'GAJI POKOK BARU',
+			'rules' => 'numeric|xss_clean',
+		),
+		array(
+			'field' => 'n_masakerja_thn',
+			'label' => 'Masa Kerja Tahun',
+			'rules' => 'numeric|xss_clean',
+		),
+		array(
+			'field' => 'n_masakerja_bln',
+			'label' => 'Masa Kerja Bulan',
+			'rules' => 'numeric|xss_clean',
+		),
 		 
 	);
 	protected $insert_validation_rules  = array();
@@ -66,17 +81,38 @@ class Riwayat_kgb_model extends BF_Model
 	public function first_row(){
 		return $this->db->get($this->db->schema.".".$this->table_name)->first_row();
 	}
-    public function find_all($PNS_NIP ="")
+    public function find_all($PNS_NIP ="", $final = true)
 	{
 		
 		if(empty($this->selects))
 		{
-			$this->select($this->table_name .'.*');
+			$this->select($this->table_name .'.*,g.NAMA AS golongan_name,g.NAMA2 AS golongan2_name');
 		}
 		if($PNS_NIP!=""){
 			$this->db->where('pegawai_nip',$PNS_NIP);
 		}
+		if ($final){
+			$this->db->where('final is not null');
+		} 
+		$this->db->join("golongan g", "g.ID=rwt_kgb.n_golongan_id", "LEFT");
+		$this->db->order_by('tmt_sk', 'ASC');
 		return parent::find_all();
+	}
+	public function count_all($PNS_NIP ="", $final = true)
+	{
+		
+		if(empty($this->selects))
+		{
+			$this->select($this->table_name .'.*,g.NAMA AS golongan_name,g.NAMA2 AS golongan2_name');
+		}
+		if($PNS_NIP!=""){
+			$this->db->where('pegawai_nip',$PNS_NIP);
+		}
+		if ($final){
+			$this->db->where('final is not null');
+		} 
+		$this->db->join("golongan g", "g.ID=rwt_kgb.n_golongan_id", "LEFT");
+		return parent::count_all();
 	}
 	public function is_uniq($nip ="",$n_golongan_id = "",$n_masakerja_thn = "",$n_masakerja_bln = "")
 	{
@@ -116,6 +152,20 @@ class Riwayat_kgb_model extends BF_Model
 			}
 			$data = $adata;
 			$this->cache->write($data, 'wage');
+		}
+		return isset($data[$golongan."_".$working_periode]) ? $data[$golongan."_".$working_periode] : null;
+	}
+	public function getWage2($golongan,$working_periode){
+		$data = $this->cache->get('wage2');
+		$adata = array();
+		if ($data == null) {
+			$rows = $this->db->query("select * from wage")->result();
+			foreach ($rows as $row) {
+				// print_r($row->GOLONGAN."_".$row->WORKING_PERIOD."<br>");
+				$adata[$row->golongan_id."_".$row->WORKING_PERIOD] = $row;
+			}
+			$data = $adata;
+			$this->cache->write($data, 'wage2');
 		}
 		return isset($data[$golongan."_".$working_periode]) ? $data[$golongan."_".$working_periode] : null;
 	}

@@ -10,20 +10,25 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-21 col-xs-12">
             <?php if ($this->auth->has_permission('Riwayatkursus.Kepegawaian.Create')) : ?>
-            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/Riwayatkursus/add/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Kursus" title="Tambah Riwayat Kursus">
+            <a type="button" class="show-modal-custom btn btn-default btn-warning margin pull-right " href="<?php echo base_url(); ?>pegawai/Riwayatkursus/add/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Pelatihan" title="Tambah Riwayat Pelatihan">
 				<i class="fa fa-plus"></i> Tambah
+            </a>
+            <?php endif; ?>
+			<?php if ($this->auth->has_permission('Riwayatkursus.Kepegawaian.UpdateMandiri')) : ?>
+            <a type="button" class="show-modal-custom btn btn-default btn-info margin pull-right " href="<?php echo base_url(); ?>pegawai/Riwayatkursus/addmandiri/<?php echo $PNS_ID ?>" tooltip="Tambah Riwayat Pelatihan Mandiri" title="Tambah Riwayat Pelatihan Mandiri">
+				<i class="fa fa-plus"></i> Tambah Mandiri
             </a>
             <?php endif; ?>
             <table class="slug-table table table-bordered table-striped table-responsive dt-responsive table-datatable table-hover">
             <thead>
                 <tr>
                     <th width='20px' >No</th>
-                    <th>Tipe Kursus</th>
-                    <th>Jenis Kursus</th>
-                    <th width='100px' >Nama Kursus</th>
-                    <th width='100px' >Lama Kursus</th>
-					<th width='100px' >Tgl Kursus</th>
-					<th width='100px' >no_sertifikat</th>
+                    <th>Tipe Pelatihan</th>
+                    <th>Jenis Pelatihan</th>
+                    <th width='100px' >Nama Pelatihan</th>
+                    <th width='100px' >Lama Pelatihan</th>
+					<th width='100px' >Tgl Pelatihan</th>
+					<th width='100px' >No Sertifikat</th>
                     <th width='10%' align="center">AKSI</th>
                 </tr>
             </thead>
@@ -95,7 +100,9 @@
 								dataType: "html",
 								timeout:180000,
 								success: function (result) {
-									swal("Data berhasil di hapus!", result, "success");
+									
+									
+									
 									grid_daftar.ajax.reload();
 							},
 							error : function(error) {
