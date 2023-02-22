@@ -23,7 +23,7 @@
             <input id='PNS_ID' type='hidden' class="form-control" name='PNS_ID' maxlength='32' value="<?php echo set_value('PNS_ID', isset($PNS_ID) ? trim($PNS_ID) : ''); ?>" />
            
             <div class="control-group<?php echo form_error('JENIS_DIKLAT') ? ' error' : ''; ?> col-sm-12">
-                <?php echo form_label('NAMA', 'NAMA', array('class' => 'control-label')); ?>
+                <?php echo form_label('Jenis', 'NAMA', array('class' => 'control-label')); ?>
                 <div class='controls'>
                 	<select name="JENIS_DIKLAT" id="JENIS_DIKLAT" class="form-control select2">
 						<option value="">-- Silahkan Pilih --</option>

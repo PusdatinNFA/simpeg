@@ -480,7 +480,9 @@ class Manage_unitkerja extends Admin_Controller {
             $data = $query->result();
             $total = $query->num_rows();
             //var_dump($sql);
-
+            foreach($data as $row){
+                $data->text = reverseUnor($row->text);
+            }
             $endCount = $start + $limit;
             $morePages = $endCount > $total;
             $o = array(

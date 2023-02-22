@@ -99,7 +99,7 @@ endif;
           <div class="box box-danger">
             <div class="box-body box-profile">
               <!-- <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/uploadfoto/<?php echo $PNS_ID; ?>" tooltip="Upload Foto" class="show-modal"> -->
-              <img src="<?php  echo END_POINT_PHOTO.$pegawai->PHOTO;  ?>" class="img-responsive pic-bordered img-rounded" id="photopegawai" alt="Photo" width="100%">
+              <img src="<?php  echo END_POINT_PHOTO.$pegawai->username_intra;  ?>" class="img-responsive pic-bordered img-rounded" id="photopegawai" alt="Photo" width="100%">
 
               <!-- </a> -->
                 <h3 class="profile-username text-center">
@@ -205,12 +205,6 @@ endif;
                 </ul>
               </p>
               <hr>
-              <strong><i class="fa fa-book margin-r-5"></i> Kawasan</strong>
-              <p class="text-muted">
-                <?php echo $kawasan_name ? $kawasan_name : "-"; ?>
-              </p>
-
-              <hr>
               <strong><i class="fa fa-user margin-r-5"></i> Tusi</strong>
               <p class="text-muted">
                   <?php echo $tusi_name ? $tusi_name : "-"; ?>
@@ -255,11 +249,6 @@ endif;
               <strong><i class="fa fa-home margin-r-5"></i> Satker Penempatan</strong>
               <p> 
                   <?php echo isset($satker_penempatan_ids->NAMA_UNOR) ? $satker_penempatan_ids->NAMA_UNOR : ""; ?>
-                </p>
-            <hr>
-              <strong><i class="fa fa-home margin-r-5"></i> Pengelola Kawasan SDM</strong>
-              <p> 
-                  <?php echo isset($pengelolasdm) ? $pengelolasdm->nama : ""; ?>
                 </p>
             </div>
             <!-- /.box-body -->

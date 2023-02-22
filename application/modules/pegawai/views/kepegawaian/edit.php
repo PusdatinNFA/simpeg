@@ -567,34 +567,7 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
                     <span class='help-inline'><?php echo form_error('Unor_ID'); ?></span>
                 </div>
             </div>
-			<div class="control-group<?php echo form_error('kawasan_id') ? ' error' : ''; ?> col-sm-6">
-                <?php echo form_label("Kawasan", 'kawasan_id', array('class' => 'control-label')); ?>
-                <div class='controls'>
-                    <select name="kawasan_id" id="kawasan_id" class="form-control select2">
-                         <option value="">Silahkan Pilih</option>
-                         <?php if (isset($kawasans) && is_array($kawasans) && count($kawasans)):?>
-                            <?php foreach($kawasans as $record):?>
-                                <option value="<?php echo $record->id?>" <?php if(isset($pegawai->kawasan_id))  echo  ($pegawai->kawasan_id==$record->id) ? "selected" : ""; ?>><?php echo $record->name; ?></option>
-                                <?php endforeach;?>
-                            <?php endif;?>
-                    </select>
-                    <span class='help-inline'><?php echo form_error('kawasan_id'); ?></span>
-                </div>
-            </div> 
-            <div class="control-group<?php echo form_error('tusi_id') ? ' error' : ''; ?> col-sm-6">
-                <?php echo form_label("Tusi", 'tusi_id', array('class' => 'control-label')); ?>
-                <div class='controls'>
-                    <select name="tusi_id" id="tusi_id" class="form-control select2">
-                         <option value="">Silahkan Pilih</option>
-                         <?php if (isset($tusis) && is_array($tusis) && count($tusis)):?>
-                            <?php foreach($tusis as $record):?>
-                                <option value="<?php echo $record->id?>" <?php if(isset($pegawai->tusi_id))  echo  ($pegawai->tusi_id==$record->id) ? "selected" : ""; ?>><?php echo $record->name; ?></option>
-                                <?php endforeach;?>
-                            <?php endif;?>
-                    </select>
-                    <span class='help-inline'><?php echo form_error('tusi_id'); ?></span>
-                </div>
-            </div>
+			
             <div class="control-group<?php echo form_error('satker_penempatan_id') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label("Satker Penempatan", 'satker_penempatan_id', array('class' => 'control-label')); ?>
                 <div class='controls'>
@@ -607,20 +580,6 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
 						<?php endif; ?>
                     </select>
                     <span class='help-inline'><?php echo form_error('satker_penempatan_id'); ?></span>
-                </div>
-            </div>
-            <div class="control-group<?php echo form_error('pengelola_sdm_kawasan_id') ? ' error' : ''; ?> col-sm-6">
-                <?php echo form_label("Pengelola Kawasan SDM", 'pengelola_sdm_kawasan_id', array('class' => 'control-label')); ?>
-                <div class='controls'>
-                    <select name="pengelola_sdm_kawasan_id" id="pengelola_sdm_kawasan_id" class="form-control select2">
-                        <?php if (isset($pengelolasdms) && is_array($pengelolasdms) && count($pengelolasdms)) : ?>
-                            <option value="">Silahkan Pilih</option>
-							<?php foreach ($pengelolasdms as $record) : ?>
-								<option value="<?php echo $record->id ?>" <?php if (isset($pegawai->pengelola_sdm_kawasan_id))  echo (trim($pegawai->pengelola_sdm_kawasan_id) == trim($record->id)) ? "selected" : ""; ?>><?php echo $record->nama; ?></option>
-							<?php endforeach; ?>
-						<?php endif; ?>
-                    </select>
-                    <span class='help-inline'><?php echo form_error('pengelola_sdm_kawasan_id'); ?></span>
                 </div>
             </div>
         </fieldset>

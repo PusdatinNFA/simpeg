@@ -275,7 +275,7 @@ class Riwayatpendidikan extends Admin_Controller
 		Template::render();
     }
     public function save(){
-        $this->auth->restrict($this->permissionVerifikasiS);
+        $this->auth->restrict($this->permissionCreate);
         if (!$this->input->is_ajax_request()) {
             die("Only ajax request");
         }
