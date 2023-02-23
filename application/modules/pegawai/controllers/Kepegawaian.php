@@ -1528,6 +1528,7 @@ class Kepegawaian extends Admin_Controller
      */
     public function getdata(){
     	$this->auth->restrict($this->permissionView);
+    	$this->load->helper('aplikasi');
     	if (!$this->input->is_ajax_request()) {
    			Template::set_message("Hanya request ajax", 'error');
             redirect(SITE_AREA . '/kepegawaian/pegawai');
@@ -1684,14 +1685,14 @@ class Kepegawaian extends Admin_Controller
 		$nomor_urut=$start+1;
 		if(isset($records) && is_array($records) && count($records)):
 			foreach ($records as $record) {
-				$foto_pegawai =  END_POINT_PHOTO.$record->PHOTO;
+				$foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
                 $row = array();
                 $row []  = $nomor_urut.".";
                 $row []  = "<img src='".$foto_pegawai."' width='90px'>";
                 $row []  = $record->NIP_BARU."<br><i><b>".$record->NAMA."</b></i>";
                 $row []  = $record->NAMA_JABATAN;
                 $row []  = $record->NAMA_PANGKAT."/".$record->NAMA_GOLONGAN;
-                $row []  = $record->NAMA_UNOR_FULL."<br><b>Kawasan SDM ".$record->pengelola_sdm_kawasan_id.'</b>';
+                $row []  = reverseUnor($record->NAMA_UNOR_FULL);
                 $btn_actions = array();
                 $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>";
 				if ($this->auth->has_permission('Pegawai.Downloaddrh.View')) {
@@ -1842,7 +1843,7 @@ class Kepegawaian extends Admin_Controller
 		$nomor_urut=$start+1;
 		if(isset($records) && is_array($records) && count($records)):
 			foreach ($records as $record) {
-				$foto_pegawai =  END_POINT_PHOTO.$record->PHOTO;
+				$foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
                 $row = array();
                 $row []  = $nomor_urut.".";
                 $row []  = "<img src='".$foto_pegawai."' width='90px'>";
@@ -1994,7 +1995,7 @@ class Kepegawaian extends Admin_Controller
 		$nomor_urut=$start+1;
 		if(isset($records) && is_array($records) && count($records)):
 			foreach ($records as $record) {
-				$foto_pegawai =  END_POINT_PHOTO.$record->PHOTO;
+				$foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
                 $row = array();
 				$tmt = $record->TMT_PENSIUN?$record->TMT_PENSIUN:$record->terminated_date;
                 $row []  = $nomor_urut.".";
@@ -3259,7 +3260,7 @@ class Kepegawaian extends Admin_Controller
 		$nomor_urut=$start+1;
 		if(isset($records) && is_array($records) && count($records)):
 			foreach ($records as $record) {
-                $foto_pegawai =  END_POINT_PHOTO.$record->PHOTO;
+                $foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
                 $row = array();
                 $row []  = $nomor_urut.".";
                 $row []  = "<img src='".$foto_pegawai."' width='70%'>";
@@ -4764,7 +4765,7 @@ class Kepegawaian extends Admin_Controller
 		$nomor_urut=$start+1;
 		if(isset($records) && is_array($records) && count($records)):
 			foreach ($records as $record) {
-                $foto_pegawai =  END_POINT_PHOTO.$record->PHOTO;
+                $foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
                 $row = array();
                 $row []  = $nomor_urut.".";
                 $row []  = "<img src='".$foto_pegawai."' width='90px'>";

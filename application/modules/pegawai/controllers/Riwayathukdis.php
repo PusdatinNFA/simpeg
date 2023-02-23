@@ -273,7 +273,8 @@ class Riwayathukdis extends Admin_Controller
         }
         $data["MASA_TAHUN"]     = isset($pegawai_data->MASA_TAHUN) ? $pegawai_data->MASA_TAHUN : null;
         $data["MASA_BULAN"]     = isset($pegawai_data->MASA_BULAN) ? $pegawai_data->MASA_BULAN : null;
-
+        if(empty($data["id_arsip"]))
+            unset($data['id_arsip']);
         $id_data = $this->input->post("ID");
         if(isset($id_data) && !empty($id_data)){
             $this->riwayat_huk_dis_model->update($id_data,$data);
