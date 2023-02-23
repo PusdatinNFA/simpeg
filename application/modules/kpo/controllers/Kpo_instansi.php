@@ -24,6 +24,8 @@ class Kpo_instansi extends Admin_Controller
     {
         parent::__construct();
         $this->load->model('kpo/layanan_kpo_model');
+        $this->load->model('golongan/golongan_model');
+        $this->load->model('kpo/vw_kpo_model');
         $this->load->model('pegawai/pegawai_model');
         $this->load->helper('kpo/layanan_kpo');
         $this->load->helper('aplikasi');
@@ -400,17 +402,228 @@ class Kpo_instansi extends Admin_Controller
 		echo json_encode($output);
 		die();
     }
+    public function ajax_list_kp(){
+        $this->auth->restrict($this->permissionView);
+        $this->load->helper('aplikasi');
+        $draw = $this->input->post('draw');
+        $iSortCol = $this->input->post('iSortCol_1');
+        $sSortCol = $this->input->post('sSortDir_1');
+        
+        $length= $this->input->post('length') != "" ? $this->input->post('length') : 10;
+        $start= $this->input->post('start') != "" ? $this->input->post('start') : 0;
+
+        $search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+        $searchKey = isset($_REQUEST['search']["key"]) ? $_REQUEST['search']["key"] : "";
+
+        $selectedUnors = array();
+        $advanced_search_filters  = $this->input->post("search[advanced_search_filters]");
+        if($advanced_search_filters){
+            $filters = array();
+            foreach($advanced_search_filters as  $filter){
+                $filters[$filter['name']] = $filter["value"];
+            }
+            
+        }
+        $this->db->start_cache();
+        $advanced_search_filters  = $this->input->post("search[advanced_search_filters]");
+        if($advanced_search_filters){
+            $filters = array();
+            foreach($advanced_search_filters as  $filter){
+                $filters[$filter['name']] = $filter["value"];
+            }
+            if($filters['filter_unit_kerja']){
+                $this->db->group_start();
+                $this->db->where('unitkerja."UNOR_INDUK"',$filters['filter_unit_kerja']);
+                $this->db->group_end();
+            }
+            if($filters['nip_sk']){
+                $this->db->group_start();
+                $this->db->where('vw_kpo.pegawai_nip',$filters['nip_sk']);  
+                $this->db->group_end();
+            }
+            if($filters['filter_kawasan']){
+                $this->db->group_start();
+                $this->db->where('pegawai.kawasan_id',$filters['filter_kawasan']);  
+                $this->db->group_end();
+            }
+            
+            if($filters['pengelolasdm'] != ""){
+                $this->pegawai_model->where('coalesce(pengelola_sdm_kawasan_id,1)',$filters['pengelolasdm']);
+            }
+        }
+        $tanggal        = $filters['filter_tahun']."-".$filters['filter_bulan']."-01";
+        $this->db->stop_cache();
+        $output         =array();
+        $output['draw'] =$draw;
+        $total          = $this->vw_kpo_model->getEstimasiKpoCount($tanggal)[0]->jml;
+        $output['recordsTotal']= $output['recordsFiltered'] = $total;
+        $output['data']=array();
+        $this->vw_kpo_model->limit($length,$start);
+        $records = $this->vw_kpo_model->getEstimasiKpo($tanggal);
+
+        $this->db->flush_cache();
+        $nomor_urut = 1;
+        $dir = trim($this->settings_lib->item('site.pathsk'))."kgb";
+        if(isset($records) && is_array($records) && count($records)):
+            foreach ($records as $record) {
+                $rec_golongan = $this->golongan_model->getGolongan($record->golongan_id);
+                $mk_tahun = $record->n_jml_bulan/12;
+                // print_r($record);
+                $btn_actions_array = array();
+                if($record->riwayat_kgb_id){
+                    $btn_actions_array  [] = "
+                        Sudah di Proses
+                    ";  
+                }
+                else {
+                    $btn_actions_array  [] = "
+                        Belum di Proses
+                    ";  
+                }
+                $informasi_hukdis = "";
+                if($record->riwayat_hukdis>0){
+                    $informasi_hukdis = "<small class='label text-center bg-red'>HUKDIS</small>";
+                }
+                else $informasi_hukdis = "-";
+                $row = array();
+                $row []  = $nomor_urut;
+                $row []  = $record->nama_pegawai." <br>".$record->pegawai_nip." <br><i>Pendidikan</i>: ".$record->tingkat_pendidikan;
+                $row []  = $rec_golongan->NAMA_PANGKAT." - ".$rec_golongan->NAMA." <br><b><i>Sk Terakhir:</i></b> ".date("d-m-Y", strtotime($record->tmt_sk))." <br><small class='label text-center bg-yellow'>".$record->riwayat."</small>";
+                $row []  = $this->golongan_model->getGolongan($this->golongan_model->getNextGolongan($rec_golongan->ID))->NAMA_PANGKAT." - ".$this->golongan_model->getGolongan($this->golongan_model->getNextGolongan($rec_golongan->ID))->NAMA." <br><b><i>Sk Baru:</i></b> ".date("d-m-Y", strtotime($record->dt_kp_yad))." <br><small class='label text-center bg-yellow'>".$record->riwayat."</small>";
+                $row []  = "<b><i>Lama</i></b> ".$record->o_masa_kerja_thn."th ".$record->o_masa_kerja_bln."bln, <br><b><i>Baru </i></b>".($record->n_jml_bulan/12)."th 0bln";
+                $row []  = $record->ABBREVIATION;
+                
+                $row []  = $informasi_hukdis;
+                $btn_actions = array();
+                
+                $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref_pegawai."' class='btn btn-sm btn-info'  target='_BLANK'><i class='glyphicon glyphicon-user'></i> </a>"; 
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+
+                 
+                $output['data'][] = $row;
+                $nomor_urut++;
+            }
+        endif;
+        echo json_encode($output);
+    }
+    public function ajax_list_kp_jft(){
+        $this->auth->restrict($this->permissionView);
+        $this->load->helper('aplikasi');
+        $draw = $this->input->post('draw');
+        $iSortCol = $this->input->post('iSortCol_1');
+        $sSortCol = $this->input->post('sSortDir_1');
+        
+        $length= $this->input->post('length') != "" ? $this->input->post('length') : 10;
+        $start= $this->input->post('start') != "" ? $this->input->post('start') : 0;
+
+        $search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+        $searchKey = isset($_REQUEST['search']["key"]) ? $_REQUEST['search']["key"] : "";
+
+        $selectedUnors = array();
+        $advanced_search_filters  = $this->input->post("search[advanced_search_filters]");
+        if($advanced_search_filters){
+            $filters = array();
+            foreach($advanced_search_filters as  $filter){
+                $filters[$filter['name']] = $filter["value"];
+            }
+            
+        }
+        $this->db->start_cache();
+        $advanced_search_filters  = $this->input->post("search[advanced_search_filters]");
+        if($advanced_search_filters){
+            $filters = array();
+            foreach($advanced_search_filters as  $filter){
+                $filters[$filter['name']] = $filter["value"];
+            }
+            if($filters['filter_unit_kerja']){
+                $this->db->group_start();
+                $this->db->where('unitkerja."UNOR_INDUK"',$filters['filter_unit_kerja']);
+                $this->db->group_end();
+            }
+            if($filters['nip_sk']){
+                $this->db->group_start();
+                $this->db->where('vw_kpo.pegawai_nip',$filters['nip_sk']);  
+                $this->db->group_end();
+            }
+            if($filters['filter_kawasan']){
+                $this->db->group_start();
+                $this->db->where('pegawai.kawasan_id',$filters['filter_kawasan']);  
+                $this->db->group_end();
+            }
+            
+            if($filters['pengelolasdm'] != ""){
+                $this->pegawai_model->where('coalesce(pengelola_sdm_kawasan_id,1)',$filters['pengelolasdm']);
+            }
+        }
+        $tanggal        = $filters['filter_tahun']."-".$filters['filter_bulan']."-01";
+        $this->db->stop_cache();
+        $output         =array();
+        $output['draw'] =$draw;
+        $total          = $this->vw_kpo_model->getEstimasiKpoCountJft($tanggal)[0]->jml;
+        $output['recordsTotal']= $output['recordsFiltered'] = $total;
+        $output['data']=array();
+        $this->vw_kpo_model->limit($length,$start);
+        $records = $this->vw_kpo_model->getEstimasiKpoJft($tanggal);
+
+        $this->db->flush_cache();
+        $nomor_urut = 1;
+        $dir = trim($this->settings_lib->item('site.pathsk'))."kgb";
+        if(isset($records) && is_array($records) && count($records)):
+            foreach ($records as $record) {
+                $rec_golongan = $this->golongan_model->getGolongan($record->golongan_id);
+                $mk_tahun = $record->n_jml_bulan/12;
+                // print_r($record);
+                $btn_actions_array = array();
+                if($record->riwayat_kgb_id){
+                    $btn_actions_array  [] = "
+                        Sudah di Proses
+                    ";  
+                }
+                else {
+                    $btn_actions_array  [] = "
+                        Belum di Proses
+                    ";  
+                }
+                $informasi_hukdis = "";
+                if($record->riwayat_hukdis>0){
+                    $informasi_hukdis = "<small class='label text-center bg-red'>HUKDIS</small>";
+                }
+                else $informasi_hukdis = "-";
+                $row = array();
+                $row []  = $nomor_urut;
+                $row []  = $record->nama_pegawai." <br>".$record->pegawai_nip." <br><i>Pendidikan</i>: ".$record->tingkat_pendidikan;
+                $row []  = $rec_golongan->NAMA_PANGKAT." - ".$rec_golongan->NAMA." <br><b><i>Sk Terakhir:</i></b> ".date("d-m-Y", strtotime($record->tmt_sk))." <br><small class='label text-center bg-yellow'>".$record->riwayat."</small>";
+                $row []  = $this->golongan_model->getGolongan($this->golongan_model->getNextGolongan($rec_golongan->ID))->NAMA_PANGKAT." - ".$this->golongan_model->getGolongan($this->golongan_model->getNextGolongan($rec_golongan->ID))->NAMA." <br><b><i>Sk Baru:</i></b> ".date("d-m-Y", strtotime($record->dt_kp_yad))." <br><small class='label text-center bg-yellow'>".$record->riwayat."</small>";
+                $row []  = "<b><i>Lama</i></b> ".$record->o_masa_kerja_thn."th ".$record->o_masa_kerja_bln."bln, <br><b><i>Baru </i></b>".($record->n_jml_bulan/12)."th 0bln";
+                $row []  = $record->ABBREVIATION;
+                $row []  = $informasi_hukdis;
+                $btn_actions = array();
+                $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref_pegawai."' class='btn btn-sm btn-info'  target='_BLANK'><i class='glyphicon glyphicon-user'></i> </a>"; 
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+
+                 
+                $output['data'][] = $row;
+                $nomor_urut++;
+            }
+        endif;
+        echo json_encode($output);
+    }
     public function index(){
-		
+        $this->auth->restrict($this->permissionView); 
+        Template::set_view('layanan_kpo/kpo_instansi/v_index');
+        Template::render();
+    }
+    public function indexold(){
+        
         $this->auth->restrict($this->permissionView); 
         Template::set('canUploadDataBKN',$this->auth->has_permission($this->permissionUploadDataBKN));
-		Template::set('canTambahUsulan',$this->auth->has_permission($this->permissionTambahUsulan));
+        Template::set('canTambahUsulan',$this->auth->has_permission($this->permissionTambahUsulan));
         Template::set('canFinalisasiUsulan',$this->auth->has_permission($this->permissionFinalisasiUsulan));
         Template::set('canCetak',$this->auth->has_permission($this->permissionCetak));
-		Template::set('canTambahUsulan',$this->auth->has_permission($this->permissionTambahUsulan));
+        Template::set('canTambahUsulan',$this->auth->has_permission($this->permissionTambahUsulan));
         Template::set('PNS_ID', $PNS_ID);
         Template::set('TAB_ID', uniqid("TAB_CONTOH"));
-        Template::set_view('layanan_kpo/kpo_instansi/v_index');
+        Template::set_view('layanan_kpo/kpo_instansi/v_indexold');
         Template::render();
     }
     public function create()
@@ -746,5 +959,105 @@ class Kpo_instansi extends Admin_Controller
         // end email
 
          echo json_encode($response);
+    }
+    public function download_nominatif()
+    {
+        $this->load->helper('aplikasi');
+        $advanced_search_filters  = $_GET;
+        if ($advanced_search_filters) {
+            $filters = $advanced_search_filters;
+            // die(json_encode($advanced_search_filters));
+            // $filters = array();
+            // foreach($advanced_search_filters as  $filter){
+            //  $filters[$filter['name']] = $filter["value"];
+            // }
+            if ($filters['filter_unit_kerja']) {
+                $this->db->group_start();
+                $this->db->where('unitkerja."UNOR_INDUK"', $filters['filter_unit_kerja']);
+                $this->db->group_end();
+            }
+            if ($filters['nip_sk']) {
+                $this->db->group_start();
+                $this->db->where('mv_kgb.pegawai_nip', $filters['nip_sk']);
+                $this->db->group_end();
+            }
+            if ($filters['filter_kawasan']) {
+                $this->db->group_start();
+                $this->db->where('pegawai.kawasan_id',$filters['filter_kawasan']);
+                $this->db->group_end();
+            }
+            if($filters['status'] != ""){
+                $this->db->group_start();
+                if ($filters['status'] == 0)
+                    $this->db->where('r.id is null');
+                if ($filters['status'] == 1){
+                    $this->db->where('r.id is not null');
+                    $this->db->where('r.final is null');
+                }
+                if ($filters['status'] == 2){
+                    $this->db->where('r.id is not null');
+                    $this->db->where('r.final is not null');
+                }
+                if ($filters['status'] == 3){
+                    $this->db->where('r.id is null');
+                    $this->db->or_where('r.final is null');
+                }
+                
+                $this->db->group_end();
+            }
+            if($filters['pengelolasdm'] != ""){
+                $this->pegawai_model->where('coalesce(pengelola_sdm_kawasan_id,1)',$filters['pengelolasdm']);
+            }
+
+            $tanggal        = $filters['filter_tahun'] . "-" . $filters['filter_bulan'] . "-01";
+            $records = $this->vw_kpo_model->getEstimasiKpo($tanggal);
+
+            $this->load->library('Excel');
+            $objPHPExcel = new PHPExcel();
+
+            $objPHPExcel->setActiveSheetIndex(0);
+
+            // $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0,1,"Template database ".$tte->nama_proses);
+
+            $type = PHPExcel_Cell_DataType::TYPE_STRING;
+            $row = 1;
+
+            $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(0, $row)->setValueExplicit("No", $type);
+            $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(1, $row)->setValueExplicit("Nama", $type);
+            $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(2, $row)->setValueExplicit("NIP", $type);
+            $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(3, $row)->setValueExplicit("Panggol Lama", $type);
+            $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(4, $row)->setValueExplicit("Panggol Baru", $type);
+            
+            $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(5, $row)->setValueExplicit("Satuan Kerja", $type);
+            
+            $no = 1;
+            // $keys = array_keys($records);
+            if (isset($records) && is_array($records) && count($records)) :
+                foreach ($records as $record) {
+                    $rec_golongan = $this->golongan_model->getGolongan($record->golongan_id);
+                    $row++;
+                    $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, $row, $no);
+                    $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, $row, $record->nama_pegawai);
+                    $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(2, $row)->setValueExplicit($record->pegawai_nip);
+                    $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(3, $row)->setValueExplicit($rec_golongan->NAMA_PANGKAT." - ".$rec_golongan->NAMA);
+                    $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(4, $row)->setValueExplicit($this->golongan_model->getGolongan($this->golongan_model->getNextGolongan($rec_golongan->ID))->NAMA_PANGKAT." - ".$this->golongan_model->getGolongan($this->golongan_model->getNextGolongan($rec_golongan->ID))->NAMA);
+                    $objPHPExcel->getActiveSheet()->getCellByColumnAndRow(5, $row)->setValueExplicit($record->ABBREVIATION);
+                    $no++;
+                }
+            endif;
+
+            $filename = "Nominatif KPO  " . $tanggal . ' ' . date('Ymdhi') . '.xls';
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Disposition: attachment;filename="' . $filename . '"');
+            header('Cache-Control: max-age=0');
+
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  //downloadable file is in Excel 2003 format (.xls)
+            //$objWriter = PHPExcel_IOFactory::createWriter($objTpl, 'Excel2007'); 
+            ob_end_clean();
+            $objWriter->save('php://output');  //send it to user, of course you can save it to disk also!
+            exit; //done.. exiting!
+        }
+    
+        
     }
 }
