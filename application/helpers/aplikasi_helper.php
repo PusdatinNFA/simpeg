@@ -422,4 +422,10 @@ function objDiff($obj1, $obj2):array {
     $a2 = (array)$obj2;
     return arrDiff($a1, $a2);
 }
-
+function reverseUnor($string){
+	$delimiter = "-";
+	$array = explode($delimiter, $string);
+	$reversedArray = array_reverse($array);
+	$reversedString = implode($delimiter, $reversedArray);
+	return $reversedString;
+}

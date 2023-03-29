@@ -64,4 +64,23 @@ class Golongan_model extends BF_Model
 		}
 		return isset($data[$id]) ? $data[$id] : null;
 	}
+	public function getNextGolongan($id){
+		$anexgol = array(
+			"11"=>"12",
+			"12"=>"13",
+			"13"=>"14",
+			"14"=>"21",
+			"21"=>"22",
+			"23"=>"24",
+			"31"=>"32",
+			"32"=>"33",
+			"33"=>"34",
+			"34"=>"41",
+			"41"=>"42",
+			"42"=>"43",
+			"43"=>"44",
+			"44"=>"45"
+		);
+		return isset($anexgol[$id]) ? $anexgol[$id] : null;
+	}
 }

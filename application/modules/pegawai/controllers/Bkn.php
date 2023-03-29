@@ -517,18 +517,17 @@ class Bkn extends Admin_Controller
         echo json_encode($response);  
 	}
 	private function getdata_utama_bkn($nip_baru){
-		$this->load->library('Api_bkn');
-		$api_bkn = new Api_bkn;
+        $this->load->library('Api_siasn');
+        $api_bkn = new Api_siasn;
 		$data_utama_pegawai = $this->cache->get('data_utama_'.$nip_baru);
-        if($data_utama_pegawai==null){
+        // if($data_utama_pegawai==null){
         	// get data utama
-	        $jsonsatkers   = $api_bkn->getData("data-utama",$nip_baru);
-	        $decodejson    = json_decode($jsonsatkers);
-	        $decodejson    = json_decode($decodejson);
-	        $data_utama_pegawai 	= json_decode($decodejson->data);
+	        $jsonReturn   = $api_bkn->getData("data-utama",$nip_baru);
+	        $decodejson    = json_decode($jsonReturn);
+	        $data_utama_pegawai    = json_decode($decodejson);
             $this->cache->write($data_utama_pegawai,'data_utama_'.$nip_baru,43200);
-        }
-        return $data_utama_pegawai;
+        // }
+        return $data_utama_pegawai->data;
 	}
 	private function getdata_riwayat_golongan_bkn($nip_baru){
 		$this->load->library('Api_bkn');
@@ -2185,15 +2184,13 @@ class Bkn extends Admin_Controller
         $agolongan  = $this->genPangkat();
         $nip_baru   = $this->input->post('nip_bkn');
         $nips= explode(",",$nip_baru);
-        $this->load->library('Api_bkn');
-        $api_lipi = new Api_bkn;
+        
         $jumlahSukses = 0;
         $jumlahGagal = 0;
         foreach ($nips as $nip_baru) {
             $pegawai_lokal = $this->pegawai_model->find_by("NIP_BARU",$nip_baru);       
             // get data utama
             $pegawai = $this->getdata_utama_bkn($nip_baru);
-            // print_r($pegawai);
             $data       = array();
             $hasil = false;
             $msg =  "";
@@ -2208,35 +2205,35 @@ class Bkn extends Admin_Controller
                     if(isset($pegawai->id) and $pegawai->id != "") 
                         $data["PNS_ID"] =   isset($pegawai->id) ?   $pegawai->id :  "";
 
-                    if(isset($pegawai_lokal->AGAMA_ID) and $pegawai_lokal->AGAMA_ID == "") 
+                    // if(isset($pegawai_lokal->AGAMA_ID) and $pegawai_lokal->AGAMA_ID == "") 
                         $data["AGAMA_ID"]   =   isset($pegawai->agamaId)    ?   $pegawai->agamaId :     "";
-                    if(isset($pegawai_lokal->AKTE_KELAHIRAN) and $pegawai_lokal->AKTE_KELAHIRAN == "") 
+                    // if(isset($pegawai_lokal->AKTE_KELAHIRAN) and $pegawai_lokal->AKTE_KELAHIRAN == "") 
                         $data["AKTE_KELAHIRAN"] =   isset($pegawai->akteKelahiran)  ?   $pegawai->akteKelahiran :   "";
-                    if(isset($pegawai_lokal->AKTE_MENINGGAL) and $pegawai_lokal->AKTE_MENINGGAL == "") 
+                    // if(isset($pegawai_lokal->AKTE_MENINGGAL) and $pegawai_lokal->AKTE_MENINGGAL == "") 
                         $data["AKTE_MENINGGAL"] =   isset($pegawai->akteMeninggal)  ?   $pegawai->akteMeninggal :   "";
-                    if(isset($pegawai_lokal->ALAMAT) and $pegawai_lokal->ALAMAT == "") 
+                    // if(isset($pegawai_lokal->ALAMAT) and $pegawai_lokal->ALAMAT == "") 
                         $data["ALAMAT"] =   isset($pegawai->alamat) ?   $pegawai->alamat :  "";
-                    if(isset($pegawai_lokal->BPJS) and $pegawai_lokal->BPJS == "") 
+                    // if(isset($pegawai_lokal->BPJS) and $pegawai_lokal->BPJS == "") 
                         $data["BPJS"]   =   isset($pegawai->bpjs)   ?   $pegawai->bpjs :    "";
-                    if(isset($pegawai_lokal->EMAIL) and $pegawai_lokal->EMAIL == "") 
+                    // if(isset($pegawai_lokal->EMAIL) and $pegawai_lokal->EMAIL == "") 
                         $data["EMAIL"]  =   isset($pegawai->email)  ?   $pegawai->email :   "";
-                    if(isset($pegawai_lokal->GELAR_BELAKANG) and $pegawai_lokal->GELAR_BELAKANG == "") 
+                    // if(isset($pegawai_lokal->GELAR_BELAKANG) and $pegawai_lokal->GELAR_BELAKANG == "") 
                         $data["GELAR_BELAKANG"] =   isset($pegawai->gelarBelakang)  ?   $pegawai->gelarBelakang :   "";
 
-                    if(isset($pegawai_lokal->GELAR_DEPAN) and $pegawai_lokal->GELAR_DEPAN == "") 
+                    // if(isset($pegawai_lokal->GELAR_DEPAN) and $pegawai_lokal->GELAR_DEPAN == "") 
                         $data["GELAR_DEPAN"]    =   isset($pegawai->gelarDepan) ?   $pegawai->gelarDepan :  "";
-                    if(isset($pegawai_lokal->GOL_AWAL_ID) and $pegawai_lokal->GOL_AWAL_ID == "") 
+                    // if(isset($pegawai_lokal->GOL_AWAL_ID) and $pegawai_lokal->GOL_AWAL_ID == "") 
                         $data["GOL_AWAL_ID"]    =   isset($pegawai->golRuangAwalId) ?   $pegawai->golRuangAwalId :  "";
-                    if(isset($pegawai_lokal->GOL_ID) and (trim($pegawai_lokal->GOL_ID) == "" or trim($pegawai_lokal->GOL_ID) == "0")) 
+                    // if(isset($pegawai_lokal->GOL_ID) and (trim($pegawai_lokal->GOL_ID) == "" or trim($pegawai_lokal->GOL_ID) == "0")) 
                         $data["GOL_ID"] =   isset($pegawai->golRuangAkhirId)    ?   $pegawai->golRuangAkhirId :     "";
-                    if(isset($pegawai_lokal->INSTANSI_INDUK_ID) and $pegawai_lokal->INSTANSI_INDUK_ID == "") 
-                        $data["INSTANSI_INDUK_ID"]  =   isset($pegawai->instansiIndukId)    ?   $pegawai->instansiIndukId :     "";
-                    if(isset($pegawai_lokal->INSTANSI_INDUK_NAMA) and $pegawai_lokal->INSTANSI_INDUK_NAMA == "") 
-                        $data["INSTANSI_INDUK_NAMA"]    =   isset($pegawai->instansiIndukNama)  ?   $pegawai->instansiIndukNama :   "";
-                    if(isset($pegawai_lokal->INSTANSI_KERJA_ID) and $pegawai_lokal->INSTANSI_KERJA_ID == "") 
-                        $data["INSTANSI_KERJA_ID"]  =   isset($pegawai->instansiKerjaId)    ?   $pegawai->instansiKerjaId :     "";
-                    if(isset($pegawai_lokal->INSTANSI_KERJA_NAMA) and $pegawai_lokal->INSTANSI_KERJA_NAMA == "") 
-                        $data["INSTANSI_KERJA_NAMA"]    =   isset($pegawai->instansiKerjaNama)  ?   $pegawai->instansiKerjaNama :   "";
+                    // if(isset($pegawai_lokal->INSTANSI_INDUK_ID) and $pegawai_lokal->INSTANSI_INDUK_ID == "") 
+                    //     $data["INSTANSI_INDUK_ID"]  =   isset($pegawai->instansiIndukId)    ?   $pegawai->instansiIndukId :     "";
+                    // if(isset($pegawai_lokal->INSTANSI_INDUK_NAMA) and $pegawai_lokal->INSTANSI_INDUK_NAMA == "") 
+                    //     $data["INSTANSI_INDUK_NAMA"]    =   isset($pegawai->instansiIndukNama)  ?   $pegawai->instansiIndukNama :   "";
+                    // if(isset($pegawai_lokal->INSTANSI_KERJA_ID) and $pegawai_lokal->INSTANSI_KERJA_ID == "") 
+                    //     $data["INSTANSI_KERJA_ID"]  =   isset($pegawai->instansiKerjaId)    ?   $pegawai->instansiKerjaId :     "";
+                    // if(isset($pegawai_lokal->INSTANSI_KERJA_NAMA) and $pegawai_lokal->INSTANSI_KERJA_NAMA == "") 
+                    //     $data["INSTANSI_KERJA_NAMA"]    =   isset($pegawai->instansiKerjaNama)  ?   $pegawai->instansiKerjaNama :   "";
                     
                     $jabatanId = $pegawai->jabatanFungsionalUmumId;
                     if($pegawai->jabatanFungsionalId != "")
@@ -2251,7 +2248,7 @@ class Bkn extends Admin_Controller
                         $data["JENIS_JABATAN_ID"]   =   isset($pegawai->jenisJabatanId) ?   $pegawai->jenisJabatanId :  "";
                     if(isset($pegawai_lokal->JENIS_JABATAN_NAMA) and $pegawai_lokal->JENIS_JABATAN_NAMA == "") 
                         $data["JENIS_JABATAN_NAMA"] =   isset($pegawai->jenisJabatan)   ?   $pegawai->jenisJabatan :    "";
-                    if(isset($pegawai_lokal->JENIS_KAWIN_ID) and $pegawai_lokal->JENIS_KAWIN_ID == "") 
+                    // if(isset($pegawai_lokal->JENIS_KAWIN_ID) and $pegawai_lokal->JENIS_KAWIN_ID == "") 
                         $data["JENIS_KAWIN_ID"] =   isset($pegawai->jenisKawinId)   ?   $pegawai->jenisKawinId :    "";
 
                     if(isset($pegawai_lokal->JENIS_KELAMIN) and $pegawai_lokal->JENIS_KELAMIN == ""){
@@ -2264,65 +2261,64 @@ class Bkn extends Admin_Controller
                         $data["JENIS_KELAMIN"]  =   $jk;
                     } 
                         
-                    if(isset($pegawai_lokal->JENIS_PEGAWAI_ID) and $pegawai_lokal->JENIS_PEGAWAI_ID == "") 
+                    // if(isset($pegawai_lokal->JENIS_PEGAWAI_ID) and $pegawai_lokal->JENIS_PEGAWAI_ID == "") 
                         $data["JENIS_PEGAWAI_ID"]   =   isset($pegawai->jenisPegawaiId) ?   $pegawai->jenisPegawaiId :  "";
-                    if(isset($pegawai_lokal->JML_ANAK) and $pegawai_lokal->JML_ANAK == "") 
+                    // if(isset($pegawai_lokal->JML_ANAK) and $pegawai_lokal->JML_ANAK == "") 
                         $data["JML_ANAK"]   =   isset($pegawai->jumlahAnak) ?   $pegawai->jumlahAnak :  "";
-                    if(isset($pegawai_lokal->JML_ISTRI) and $pegawai_lokal->JML_ISTRI == "") 
+                    // if(isset($pegawai_lokal->JML_ISTRI) and $pegawai_lokal->JML_ISTRI == "") 
                         $data["JML_ISTRI"]  =   isset($pegawai->jumlahIstriSuami)   ?   $pegawai->jumlahIstriSuami :    "";
-                    if(isset($pegawai_lokal->KARTU_PEGAWAI) and $pegawai_lokal->KARTU_PEGAWAI == "") 
+                    // if(isset($pegawai_lokal->KARTU_PEGAWAI) and $pegawai_lokal->KARTU_PEGAWAI == "") 
                         $data["KARTU_PEGAWAI"]  =   isset($pegawai->noSeriKarpeg)   ?   $pegawai->noSeriKarpeg :    "";
-                    if(isset($pegawai_lokal->KEDUDUKAN_HUKUM_ID) and $pegawai_lokal->KEDUDUKAN_HUKUM_ID == "") 
+                    // if(isset($pegawai_lokal->KEDUDUKAN_HUKUM_ID) and $pegawai_lokal->KEDUDUKAN_HUKUM_ID == "") 
                         $data["KEDUDUKAN_HUKUM_ID"] =   isset($pegawai->kedudukanPnsId) ?   $pegawai->kedudukanPnsId :  "";
-                    if(isset($pegawai_lokal->KODECEPAT) and $pegawai_lokal->KODECEPAT == "") 
+                    // if(isset($pegawai_lokal->KODECEPAT) and $pegawai_lokal->KODECEPAT == "") 
                         $data["KODECEPAT"]  =   isset($pegawai->instansiKerjaKodeCepat) ?   $pegawai->instansiKerjaKodeCepat :  "";
-                    if(isset($pegawai_lokal->KPKN_ID) and $pegawai_lokal->KPKN_ID == "") 
+                    // if(isset($pegawai_lokal->KPKN_ID) and $pegawai_lokal->KPKN_ID == "") 
                         $data["KPKN_ID"]    =   isset($pegawai->kpknId) ?   $pegawai->kpknId :  "";
-                    if(isset($pegawai_lokal->MK_BULAN) and $pegawai_lokal->MK_BULAN == "") 
+                    // if(isset($pegawai_lokal->MK_BULAN) and $pegawai_lokal->MK_BULAN == "") 
                         $data["MK_BULAN"]   =   isset($pegawai->mkBulan)    ?   $pegawai->mkBulan :     "";
-                    if(isset($pegawai_lokal->MK_TAHUN) and $pegawai_lokal->MK_TAHUN == "") 
+                    // if(isset($pegawai_lokal->MK_TAHUN) and $pegawai_lokal->MK_TAHUN == "") 
                         $data["MK_TAHUN"]   =   isset($pegawai->mkTahun)    ?   $pegawai->mkTahun :     "";
-                    if(isset($pegawai_lokal->NAMA) and $pegawai_lokal->NAMA == "") 
+                    // if(isset($pegawai_lokal->NAMA) and $pegawai_lokal->NAMA == "") 
                         $data["NAMA"]   =   isset($pegawai->nama)   ?   $pegawai->nama :    "";
-                    if(isset($pegawai_lokal->NIK) and $pegawai_lokal->NIK == "") 
+                    // if(isset($pegawai_lokal->NIK) and $pegawai_lokal->NIK == "") 
                         $data["NIK"]    =   isset($pegawai->nik)    ?   $pegawai->nik :     "";
-                    
-                    if(isset($pegawai_lokal->NIP_LAMA) and $pegawai_lokal->NIP_LAMA == "") 
+                    // if(isset($pegawai_lokal->NIP_LAMA) and $pegawai_lokal->NIP_LAMA == "") 
                         $data["NIP_LAMA"]   =   isset($pegawai->nipLama)    ?   $pegawai->nipLama :     "";
-                    if(isset($pegawai_lokal->NO_ASKES) and $pegawai_lokal->NO_ASKES == "") 
+                    // if(isset($pegawai_lokal->NO_ASKES) and $pegawai_lokal->NO_ASKES == "") 
                         $data["NO_ASKES"]   =   isset($pegawai->noAskes)    ?   $pegawai->noAskes :     "";
-                    if(isset($pegawai_lokal->NO_BEBAS_NARKOBA) and $pegawai_lokal->NO_BEBAS_NARKOBA == "") 
+                    // if(isset($pegawai_lokal->NO_BEBAS_NARKOBA) and $pegawai_lokal->NO_BEBAS_NARKOBA == "") 
                         $data["NO_BEBAS_NARKOBA"]   =   isset($pegawai->noSuratKeteranganBebasNarkoba)  ?   $pegawai->noSuratKeteranganBebasNarkoba :   "";
-                    if(isset($pegawai_lokal->NO_CATATAN_POLISI) and $pegawai_lokal->NO_CATATAN_POLISI == "") 
+                    // if(isset($pegawai_lokal->NO_CATATAN_POLISI) and $pegawai_lokal->NO_CATATAN_POLISI == "") 
                         $data["NO_CATATAN_POLISI"]  =   isset($pegawai->skck)   ?   $pegawai->skck :    "";
-                    if(isset($pegawai_lokal->NO_SURAT_DOKTER) and $pegawai_lokal->NO_SURAT_DOKTER == "") 
+                    // if(isset($pegawai_lokal->NO_SURAT_DOKTER) and $pegawai_lokal->NO_SURAT_DOKTER == "") 
                         $data["NO_SURAT_DOKTER"]    =   isset($pegawai->noSuratKeteranganDokter)    ?   $pegawai->noSuratKeteranganDokter :     "";
-                    if(isset($pegawai_lokal->NO_TASPEN) and $pegawai_lokal->NO_TASPEN == "") 
+                    // if(isset($pegawai_lokal->NO_TASPEN) and $pegawai_lokal->NO_TASPEN == "") 
                         $data["NO_TASPEN"]  =   isset($pegawai->noTaspen)   ?   $pegawai->noTaspen :    "";
-                    if(isset($pegawai_lokal->NOMOR_HP) and $pegawai_lokal->NOMOR_HP == "") 
+                    // if(isset($pegawai_lokal->NOMOR_HP) and $pegawai_lokal->NOMOR_HP == "") 
                         $data["NOMOR_HP"]   =   isset($pegawai->noHp)   ?   $pegawai->noHp :    "";
-                    if(isset($pegawai_lokal->NOMOR_SK_CPNS) and $pegawai_lokal->NOMOR_SK_CPNS == "") 
+                    // if(isset($pegawai_lokal->NOMOR_SK_CPNS) and $pegawai_lokal->NOMOR_SK_CPNS == "") 
                         $data["NOMOR_SK_CPNS"]  =   isset($pegawai->nomorSkCpns)    ?   $pegawai->nomorSkCpns :     "";
-                    if(isset($pegawai_lokal->NPWP) and $pegawai_lokal->NPWP == "") 
+                    // if(isset($pegawai_lokal->NPWP) and $pegawai_lokal->NPWP == "") 
                         $data["NPWP"]   =   isset($pegawai->noNpwp) ?   $pegawai->noNpwp :  "";
-                    if(isset($pegawai_lokal->PENDIDIKAN) and $pegawai_lokal->PENDIDIKAN == "") 
+                    // if(isset($pegawai_lokal->PENDIDIKAN) and $pegawai_lokal->PENDIDIKAN == "") 
                         $data["PENDIDIKAN"] =   isset($pegawai->pendidikanTerakhirId)   ?   $pegawai->pendidikanTerakhirId :    "";
                     
-                    if(isset($pegawai_lokal->SATUAN_KERJA_INDUK_ID) and $pegawai_lokal->SATUAN_KERJA_INDUK_ID == "") 
-                        $data["SATUAN_KERJA_INDUK_ID"]  =   isset($pegawai->satuanKerjaIndukId) ?   $pegawai->satuanKerjaIndukId :  "";
-                    if(isset($pegawai_lokal->SATUAN_KERJA_INDUK_NAMA) and $pegawai_lokal->SATUAN_KERJA_INDUK_NAMA == "") 
-                        $data["SATUAN_KERJA_INDUK_NAMA"]    =   isset($pegawai->satuanKerjaIndukNama)   ?   $pegawai->satuanKerjaIndukNama :    "";
-                    if(isset($pegawai_lokal->SATUAN_KERJA_KERJA_ID) and $pegawai_lokal->SATUAN_KERJA_KERJA_ID == "") 
-                        $data["SATUAN_KERJA_KERJA_ID"]  =   isset($pegawai->satuanKerjaKerjaId) ?   $pegawai->satuanKerjaKerjaId :  "";
-                    if(isset($pegawai_lokal->SATUAN_KERJA_NAMA) and $pegawai_lokal->SATUAN_KERJA_NAMA == "") 
-                        $data["SATUAN_KERJA_NAMA"]  =   isset($pegawai->satuanKerjaKerjaNama)   ?   $pegawai->satuanKerjaKerjaNama :    "";
-                    if(isset($pegawai_lokal->STATUS_CPNS_PNS) and $pegawai_lokal->STATUS_CPNS_PNS == "") 
+                    //if(isset($pegawai_lokal->SATUAN_KERJA_INDUK_ID) and $pegawai_lokal->SATUAN_KERJA_INDUK_ID == "") 
+                        // $data["SATUAN_KERJA_INDUK_ID"]  =   isset($pegawai->satuanKerjaIndukId) ?   $pegawai->satuanKerjaIndukId :  "";
+                    //if(isset($pegawai_lokal->SATUAN_KERJA_INDUK_NAMA) and $pegawai_lokal->SATUAN_KERJA_INDUK_NAMA == "") 
+                        // $data["SATUAN_KERJA_INDUK_NAMA"]    =   isset($pegawai->satuanKerjaIndukNama)   ?   $pegawai->satuanKerjaIndukNama :    "";
+                    //if(isset($pegawai_lokal->SATUAN_KERJA_KERJA_ID) and $pegawai_lokal->SATUAN_KERJA_KERJA_ID == "") 
+                        // $data["SATUAN_KERJA_KERJA_ID"]  =   isset($pegawai->satuanKerjaKerjaId) ?   $pegawai->satuanKerjaKerjaId :  "";
+                    //if(isset($pegawai_lokal->SATUAN_KERJA_NAMA) and $pegawai_lokal->SATUAN_KERJA_NAMA == "") 
+                        // $data["SATUAN_KERJA_NAMA"]  =   isset($pegawai->satuanKerjaKerjaNama)   ?   $pegawai->satuanKerjaKerjaNama :    "";
+                    //if(isset($pegawai_lokal->STATUS_CPNS_PNS) and $pegawai_lokal->STATUS_CPNS_PNS == "") 
                         $data["STATUS_CPNS_PNS"]    =   isset($pegawai->statusPegawai)  ?   $pegawai->statusPegawai :   "";
-                    if(isset($pegawai_lokal->STATUS_HIDUP) and $pegawai_lokal->STATUS_HIDUP == "") 
+                    //if(isset($pegawai_lokal->STATUS_HIDUP) and $pegawai_lokal->STATUS_HIDUP == "") 
                         $data["STATUS_HIDUP"]   =   isset($pegawai->statusHidup)    ?   $pegawai->statusHidup :     "";
-                    if(isset($pegawai_lokal->TEMPAT_LAHIR) and trim($pegawai_lokal->TEMPAT_LAHIR) == "") 
+                    //if(isset($pegawai_lokal->TEMPAT_LAHIR) and trim($pegawai_lokal->TEMPAT_LAHIR) == "") 
                         $data["TEMPAT_LAHIR"]   =   isset($pegawai->tempatLahir)    ?   $pegawai->tempatLahir :     "";
-                    if(isset($pegawai_lokal->TEMPAT_LAHIR_ID) and trim($pegawai_lokal->TEMPAT_LAHIR_ID) == "") 
+                    //if(isset($pegawai_lokal->TEMPAT_LAHIR_ID) and trim($pegawai_lokal->TEMPAT_LAHIR_ID) == "") 
                         $data["TEMPAT_LAHIR_ID"]    =   isset($pegawai->tempatLahirId)  ?   $pegawai->tempatLahirId :   "";
                     if(isset($pegawai_lokal->TGL_BEBAS_NARKOBA) and $pegawai_lokal->TGL_BEBAS_NARKOBA == "") 
                         $data["TGL_BEBAS_NARKOBA"]  =   isset($pegawai->tglSuratKeteranganBebasNarkoba) ?   date('Y-m-d', strtotime($pegawai->tglSuratKeteranganBebasNarkoba)) :    "";
@@ -2336,7 +2332,7 @@ class Bkn extends Admin_Controller
                         $data["TGL_NPWP"]   =   isset($pegawai->tglNpwp)    ?   $pegawai->tglNpwp :     "";
                     if(isset($pegawai_lokal->TGL_SURAT_DOKTER) and $pegawai_lokal->TGL_SURAT_DOKTER == "") 
                         $data["TGL_SURAT_DOKTER"]   =   isset($pegawai->tglSuratKeteranganDokter)   ?   $pegawai->tglSuratKeteranganDokter :    "";
-                    if(isset($pegawai_lokal->TK_PENDIDIKAN) and $pegawai_lokal->TK_PENDIDIKAN == "") 
+                    //if(isset($pegawai_lokal->TK_PENDIDIKAN) and $pegawai_lokal->TK_PENDIDIKAN == "") 
                         $data["TK_PENDIDIKAN"]  =   isset($pegawai->tkPendidikanTerakhirId) ?   $pegawai->tkPendidikanTerakhirId :  "";
                     if(isset($pegawai_lokal->TMT_CPNS) and $pegawai_lokal->TMT_CPNS == "") 
                         $data["TMT_CPNS"]   =   isset($pegawai->tmtCpns)    ?   $pegawai->tmtCpns :     "";
@@ -2346,12 +2342,12 @@ class Bkn extends Admin_Controller
                         $data["TMT_GOLONGAN"]   =   isset($pegawai->tmtGolAkhir)    ?   $pegawai->tmtGolAkhir :     "";
                     if(isset($pegawai_lokal->TMT_JABATAN) and $pegawai_lokal->TMT_JABATAN == "") 
                         $data["TMT_JABATAN"]    =   isset($pegawai->tmtJabatan) ?   $pegawai->tmtJabatan :  "";
-                    if(isset($pegawai_lokal->LOKASI_KERJA_ID) and $pegawai_lokal->LOKASI_KERJA_ID == "") 
+                    //if(isset($pegawai_lokal->LOKASI_KERJA_ID) and $pegawai_lokal->LOKASI_KERJA_ID == "") 
                         $data["LOKASI_KERJA_ID"]    =   isset($pegawai->lokasiKerjaId)  ?   $pegawai->lokasiKerjaId :   "";
-                    if(isset($pegawai_lokal->UNOR_ID) and $pegawai_lokal->UNOR_ID == "") 
-                        $data["UNOR_ID"]    =   isset($adataunor[$pegawai->unorId]) ?   $adataunor[$pegawai->unorId]->ID :  "";
-                    if(isset($pegawai_lokal->UNOR_INDUK_ID) and $pegawai_lokal->UNOR_INDUK_ID == "") 
-                        $data["UNOR_INDUK_ID"]  =   isset($adataunor[$pegawai->unorIndukId]) ?   $adataunor[$pegawai->unorIndukId]->ID :  "";
+                    //if(isset($pegawai_lokal->UNOR_ID) and $pegawai_lokal->UNOR_ID == "") 
+                        // $data["UNOR_ID"]    =   isset($adataunor[$pegawai->unorId]) ?   $adataunor[$pegawai->unorId]->ID :  "";
+                    //if(isset($pegawai_lokal->UNOR_INDUK_ID) and $pegawai_lokal->UNOR_INDUK_ID == "") 
+                        // $data["UNOR_INDUK_ID"]  =   isset($adataunor[$pegawai->unorIndukId]) ?   $adataunor[$pegawai->unorIndukId]->ID :  "";
                     if(isset($pegawai_lokal->NIP_BARU)){
                         $this->load->helper('aplikasi');
                         $perubahan = arrDiff($pegawai_lokal,$data);
@@ -2498,54 +2494,54 @@ class Bkn extends Admin_Controller
                 }
                 
                 // data riwayat golongan
-                $jsonrwt_golongan = $api_lipi->data_rwt_golongan_bkn($nip_baru);
-                $jsonrwt_golongan = json_decode($jsonrwt_golongan);
-                $jsonrwt_golongan = json_decode($jsonrwt_golongan);
-                $datajsonrwt_golongan = $jsonrwt_golongan->data;
-                foreach($datajsonrwt_golongan as $row)
-                {
-                    $idPns      = $row->idPns;
-                    $golonganId = $row->golonganId;
-                    $golongan   = $row->golongan;
-                    $skNomor    = TRIM($row->skNomor);
-                    $skTanggal  = $row->skTanggal;
-                    $tmtGolongan    = $row->tmtGolongan;
-                    $noPertekBkn    = $row->noPertekBkn;
-                    $tglPertekBkn   = $row->tglPertekBkn;
-                    $this->riwayat_kepangkatan_model->where("SK_NOMOR",$skNomor);  
-                    $count_golongan = $this->riwayat_kepangkatan_model->count_all($idPns);
-                    if($count_golongan <= 0){
-                        $data = array();
-                        $NIP_BARU = $pegawai_lokal->NIP_BARU;
-                        $data["ID_BKN"] = $row->id;
-                        $data["PNS_NIP"] = $pegawai_lokal->NIP_BARU;
-                        $data["PNS_ID"] = $pegawai_lokal->PNS_ID;
-                        $data["PNS_NAMA"] = $pegawai_lokal->NAMA;
-                        $data["JENIS_KP"] = $row->jenisKPNama;
-                        $data["ID_GOLONGAN"] = $row->golonganId;
-                        $data["SK_NOMOR"] = $row->skNomor;
-                        $data["NOMOR_BKN"] = $row->noPertekBkn;
-                        $data["MK_GOLONGAN_TAHUN"] = (int)$row->masaKerjaGolonganTahun;
-                        $data["MK_GOLONGAN_BULAN"] = (int) $row->masaKerjaGolonganBulan;
+                // $jsonrwt_golongan = $api_lipi->data_rwt_golongan_bkn($nip_baru);
+                // $jsonrwt_golongan = json_decode($jsonrwt_golongan);
+                // $jsonrwt_golongan = json_decode($jsonrwt_golongan);
+                // $datajsonrwt_golongan = $jsonrwt_golongan->data;
+                // foreach($datajsonrwt_golongan as $row)
+                // {
+                //     $idPns      = $row->idPns;
+                //     $golonganId = $row->golonganId;
+                //     $golongan   = $row->golongan;
+                //     $skNomor    = TRIM($row->skNomor);
+                //     $skTanggal  = $row->skTanggal;
+                //     $tmtGolongan    = $row->tmtGolongan;
+                //     $noPertekBkn    = $row->noPertekBkn;
+                //     $tglPertekBkn   = $row->tglPertekBkn;
+                //     $this->riwayat_kepangkatan_model->where("SK_NOMOR",$skNomor);  
+                //     $count_golongan = $this->riwayat_kepangkatan_model->count_all($idPns);
+                //     if($count_golongan <= 0){
+                //         $data = array();
+                //         $NIP_BARU = $pegawai_lokal->NIP_BARU;
+                //         $data["ID_BKN"] = $row->id;
+                //         $data["PNS_NIP"] = $pegawai_lokal->NIP_BARU;
+                //         $data["PNS_ID"] = $pegawai_lokal->PNS_ID;
+                //         $data["PNS_NAMA"] = $pegawai_lokal->NAMA;
+                //         $data["JENIS_KP"] = $row->jenisKPNama;
+                //         $data["ID_GOLONGAN"] = $row->golonganId;
+                //         $data["SK_NOMOR"] = $row->skNomor;
+                //         $data["NOMOR_BKN"] = $row->noPertekBkn;
+                //         $data["MK_GOLONGAN_TAHUN"] = (int)$row->masaKerjaGolonganTahun;
+                //         $data["MK_GOLONGAN_BULAN"] = (int) $row->masaKerjaGolonganBulan;
 
-                        $data["KODE_JENIS_KP"] = $row->jenisKPId;
-                        $data["GOLONGAN"] = $row->golongan;
-                        $data["PANGKAT"] = isset($agolongan[$row->golonganId]) ? $agolongan[$row->golonganId] : "";
+                //         $data["KODE_JENIS_KP"] = $row->jenisKPId;
+                //         $data["GOLONGAN"] = $row->golongan;
+                //         $data["PANGKAT"] = isset($agolongan[$row->golonganId]) ? $agolongan[$row->golonganId] : "";
                         
-                        $data["TMT_GOLONGAN"]   = date("Y-m-d", strtotime($row->tmtGolongan));
-                        $data["SK_TANGGAL"]     = date("Y-m-d", strtotime($row->skTanggal));
-                        if(empty($data["TMT_GOLONGAN"])){
-                            unset($data["TMT_GOLONGAN"]);
-                        }
-                        if(empty($data["SK_TANGGAL"])){
-                            unset($data["SK_TANGGAL"]);
-                        }
-                        $insert_id = $this->riwayat_kepangkatan_model->insert($data);
-                        log_activity_pegawai($NIP_BARU,$this->auth->user_id(),"Tambah data rwt_golongan", 'pegawai');
-                        log_activity($this->auth->user_id(),"Tambah data rwt_golongan ".json_encode($data), 'pegawai');
-                    }
+                //         $data["TMT_GOLONGAN"]   = date("Y-m-d", strtotime($row->tmtGolongan));
+                //         $data["SK_TANGGAL"]     = date("Y-m-d", strtotime($row->skTanggal));
+                //         if(empty($data["TMT_GOLONGAN"])){
+                //             unset($data["TMT_GOLONGAN"]);
+                //         }
+                //         if(empty($data["SK_TANGGAL"])){
+                //             unset($data["SK_TANGGAL"]);
+                //         }
+                //         $insert_id = $this->riwayat_kepangkatan_model->insert($data);
+                //         log_activity_pegawai($NIP_BARU,$this->auth->user_id(),"Tambah data rwt_golongan", 'pegawai');
+                //         log_activity($this->auth->user_id(),"Tambah data rwt_golongan ".json_encode($data), 'pegawai');
+                //     }
 
-                }
+                // }
             }
         }
         // end history golongan
@@ -2572,6 +2568,13 @@ class Bkn extends Admin_Controller
             $agolongan[$row->ID] = $row->NAMA_PANGKAT;
         }
         return $agolongan;        
+    }
+    public function testdata(){
+        $this->load->library('Api_siasn');
+        $api_bkn = new Api_siasn;
+        $jsonsatkers   = $api_bkn->getData("data-utama","197704061997032002");    
+        print_r($jsonsatkers);
+        die();
     }
 }
 
