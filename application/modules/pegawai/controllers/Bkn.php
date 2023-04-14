@@ -258,10 +258,7 @@ class Bkn extends Admin_Controller
 	public function viewkepangkatan(){
         $kode 	= $this->input->post('kode');
 		$pegawai_lokal = $this->pegawai_model->find_by("PNS_ID",$kode);
-		$this->load->library('Api_bkn');
-		$api_bkn = new Api_bkn;
         $data_golongan = $this->getdata_riwayat_golongan_bkn(trim($pegawai_lokal->NIP_BARU));
-        
         $result = false;
         $id = "";
         if($data_golongan != null) {
@@ -281,6 +278,29 @@ class Bkn extends Admin_Controller
     	}
         echo json_encode($response);  
 	}
+    public function lihatdokumen(){
+        $file   = urlencode($this->input->get('file'));
+        if($file != ""){
+            $response   = $this->getDokumen($file);
+            if($response != ""){
+                $this->saveArsip($this->input->get('file'), $response);
+                header('Content-Disposition: inline; filename="example.pdf"');
+                header('Content-Type: application/pdf');
+                echo $response;
+            }
+        }
+    }
+    private function getDokumen($file){
+        $api_bkn = new Api_siasn;
+        $response   = $api_bkn->requestData("download-dok?filePath=".$file);
+        return $response;
+    }
+    private function saveArsip($file,$response){
+        $filename = end((explode("/", $file)));
+        if($response != "")
+            file_put_contents($this->settings_lib->item('site.urluploaded').$filename, $response);
+        return $filename;
+    }
     public function viewcltn(){
         $kode   = $this->input->post('kode');
         $pegawai_lokal = $this->pegawai_model->find_by("PNS_ID",$kode);
@@ -532,6 +552,7 @@ class Bkn extends Admin_Controller
 	        $data_golongan = $jsonrwt_golongan->data;
             $this->cache->write($data_golongan,'golongan_'.$nip_baru,43200);
         }
+        // print_r($data_golongan);
         return $data_golongan;
 	}
     private function getdata_riwayat_cltn($nip_baru){
@@ -1084,6 +1105,8 @@ class Bkn extends Admin_Controller
         echo json_encode($response); 
     }
 	private function sinkron_panggol($pegawai_lokal = null){
+        $this->load->library('Api_s3_aws');
+        $aws = new Api_s3_aws;
 		$nip_baru = trim($pegawai_lokal->NIP_BARU);
 		$data_golongan = $this->cache->get('golongan_'.$nip_baru);
 		$result = true;
@@ -1091,8 +1114,66 @@ class Bkn extends Admin_Controller
 		if($data_golongan != null){
 			foreach($data_golongan as $row)
 			{
+                $id_jenis_arsip = 0;
+                $data = array();
+                $data['ID_GOLONGAN'] = $row->golonganId;
+                 foreach($row->path as $i => $i_value) {
+                    $file = urlencode($i_value->dok_uri);
+                    if($file != ""){
+                        $response   = $this->getDokumen($file);
+                        if($response != ""){
+                            if ($data['ID_GOLONGAN'] == 11) {
+                                $id_jenis_arsip = 64;
+                            } else if ($data['ID_GOLONGAN'] == 12) {
+                                $id_jenis_arsip = 3;
+                            } else if ($data['ID_GOLONGAN'] == 13) {
+                                $id_jenis_arsip = 30;
+                            } else if ($data['ID_GOLONGAN'] == 14) {
+                                $id_jenis_arsip = 31;
+                            } else if ($data['ID_GOLONGAN'] == 21) {
+                                $id_jenis_arsip = 32;
+                            } else if ($data['ID_GOLONGAN'] == 22) {
+                                $id_jenis_arsip = 33;
+                            } else if ($data['ID_GOLONGAN'] == 23) {
+                                $id_jenis_arsip = 34;
+                            } else if ($data['ID_GOLONGAN'] == 24) {
+                                $id_jenis_arsip = 35;
+                            } else if ($data['ID_GOLONGAN'] == 31) {
+                                $id_jenis_arsip = 36;
+                            } else if ($data['ID_GOLONGAN'] == 32) {
+                                $id_jenis_arsip = 37;
+                            } else if ($data['ID_GOLONGAN'] == 33) {
+                                $id_jenis_arsip = 38;
+                            } else if ($data['ID_GOLONGAN'] == 34) {
+                                $id_jenis_arsip = 39;
+                            } else if ($data['ID_GOLONGAN'] == 41) {
+                                $id_jenis_arsip = 40;
+                            } else if ($data['ID_GOLONGAN'] == 42) {
+                                $id_jenis_arsip = 41;
+                            } else if ($data['ID_GOLONGAN'] == 43) {
+                                $id_jenis_arsip = 42;
+                            } else if ($data['ID_GOLONGAN'] == 44) {
+                                $id_jenis_arsip = 43;
+                            } else if ($data['ID_GOLONGAN'] == 45) {
+                                $id_jenis_arsip = 45;
+                            } else {
+
+                            }
+                            $file_name = $this->saveArsip($i_value->dok_uri, $response);
+                            $keterangan = "TMT ".$row->tmtGolongan;
+                            $idArsip = $aws->insertArsip($nip_baru,$row->skNomor,$id_jenis_arsip,$keterangan, $response,$file_name,1);
+                            if ($idArsip){
+                                $data['id_arsip'] = $idArsip;
+                            } else {                
+                                if (empty($data['id_arsip']))
+                                    unset($data['id_arsip']);
+                            }
+                        }
+                    }
+                }
+
 				$golongans = $this->golongan_model->find_by("ID",$row->golonganId);
-				$idPns 		= $row->idPns;
+				$idPns 		= $pegawai_lokal->PNS_ID;
 				$golonganId = $row->golonganId;
 				$NAMA_PANGKAT = isset($golongans->NAMA_PANGKAT) ? $golongans->NAMA_PANGKAT : "";
 				$golongan 	= $row->golongan;
@@ -1104,10 +1185,10 @@ class Bkn extends Admin_Controller
 	        	$this->riwayat_kepangkatan_model->where("ID_GOLONGAN",$golonganId);  
 	        	$count_golongan = $this->riwayat_kepangkatan_model->count_all($row->nipBaru);
 	        	if($count_golongan <= 0){
-	        		$data = array();
+	        		
 			        $data["ID_BKN"] = $row->id;
 			        $data["PNS_NIP"] = $row->nipBaru;
-			        $data["PNS_ID"] = $row->idPns;
+			        $data["PNS_ID"] = $idPns;
 			        $data["PNS_NAMA"] = $pegawai_lokal->NAMA;
 			        $data["JENIS_KP"] = $row->jenisKPNama ? $row->jenisKPNama : null;
 			        $data["ID_GOLONGAN"] = $row->golonganId ? $row->golonganId : null;
@@ -1138,17 +1219,7 @@ class Bkn extends Admin_Controller
 				    $result = $this->riwayat_kepangkatan_model->insert($data);
 				    log_activity_pegawai($row->nipBaru,$this->auth->user_id(),"sinkron data rwt_golongan dari BKN ".$NAMA_PANGKAT, 'pegawai');
 					
-	        	} 
-				// else if($count_golongan == 1){
-				// 	$data["ID_BKN"] = $row->id;
-			    //     $data["PNS_ID"] = $row->idPns;
-				// 	$this->riwayat_kepangkatan_model->where("ID_GOLONGAN",$golonganId);
-				// 	$this->riwayat_kepangkatan_model->where("PNS_NIP",$row->nipBaru);
-				// 	$golongan = $this->riwayat_kepangkatan_model->find();
-				// 	$result = $this->riwayat_kepangkatan_model->update($golongan->ID, $data);
-				//     log_activity_pegawai($row->nipBaru,$this->auth->user_id(),"sinkron data rwt_golongan dari BKN ".$NAMA_PANGKAT, 'pegawai');
-					
-				// }
+	        	}
 
 			}	
 		}

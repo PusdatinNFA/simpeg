@@ -26,6 +26,7 @@
                         <th>No Pertek</th>
                         <th>Tgl Pertek</th>
                         <th>Jenis KP</th>
+                        <th>File</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,6 +43,12 @@
                       <td><?php echo $row->noPertekBkn; ?></td>
                       <td><?php echo $row->tglPertekBkn; ?></td>
                       <td><?php echo $row->jenisKPNama; ?></td>
+                      <td><?php 
+                        foreach($row->path as $i => $i_value) { ?>
+                          <?php //print_r($i_value); ?>
+                            <span url="<?php echo base_url().'pegawai/bkn/lihatdokumen?file='.urlencode($i_value->dok_uri); ?>" class='btn btn-sm btn-info popup' target="_blank"> <i class="fa fa-eye"></i> </span>
+                        <?php } ?>
+                      </td>
                     </tr>
                     <?php  
                     $no++;
