@@ -64,6 +64,7 @@ class Bkn extends Admin_Controller
         $this->form_validation->set_error_delimiters("<span class='has-error'>", "</span>");
         Template::set_block('sub_nav', 'kepegawaian/_sub_nav');
         Assets::add_module_js('pegawai', 'pegawai.js');
+        $this->load->library('Api_siasn');
     }
 
     /**
@@ -234,10 +235,7 @@ class Bkn extends Admin_Controller
 	public function viewpendidikan(){
         $kode 	= $this->input->post('kode');
 		$pegawai_lokal = $this->pegawai_model->find_by("PNS_ID",$kode);
-		$this->load->library('Api_bkn');
-		$api_bkn = new Api_bkn;
         $data_pendidikan = $this->getdata_rwt_pendidikan(trim($pegawai_lokal->NIP_BARU));
-        
         $result = false;
         $id = "";
         if($data_pendidikan != null) {
@@ -311,8 +309,6 @@ class Bkn extends Admin_Controller
 	public function viewjabatan(){
         $kode 	= $this->input->post('kode');
 		$pegawai_lokal = $this->pegawai_model->find_by("PNS_ID",$kode);
-		$this->load->library('Api_bkn');
-		$api_bkn = new Api_bkn;
         $data_jabatan = $this->getdata_rwt_jabatan(trim($pegawai_lokal->NIP_BARU));
         
         $result = false;
@@ -394,8 +390,6 @@ class Bkn extends Admin_Controller
 	public function viewortu(){
         $kode 	= $this->input->post('kode');
 		$pegawai_lokal = $this->pegawai_model->find_by("PNS_ID",$kode);
-		$this->load->library('Api_bkn');
-		$api_bkn = new Api_bkn;
         $data_ortu = $this->getdata_ortu(trim($pegawai_lokal->NIP_BARU));
         $result = false;
         $id = "";
@@ -444,14 +438,12 @@ class Bkn extends Admin_Controller
 	public function viewanak(){
         $kode 	= $this->input->post('kode');
 		$pegawai_lokal = $this->pegawai_model->find_by("PNS_ID",$kode);
-		$this->load->library('Api_bkn');
-		$api_bkn = new Api_bkn;
         $data_anak = $this->getdata_anak(trim($pegawai_lokal->NIP_BARU));
         $result = false;
         $id = "";
         if($data_anak != null) {
 			$result = true;
-		} 
+		}
         if($result){
  	       	$response ['success']= true;
     		$response ['nip']= trim($pegawai_lokal->NIP_BARU);
@@ -517,7 +509,6 @@ class Bkn extends Admin_Controller
         echo json_encode($response);  
 	}
 	private function getdata_utama_bkn($nip_baru){
-        $this->load->library('Api_siasn');
         $api_bkn = new Api_siasn;
 		$data_utama_pegawai = $this->cache->get('data_utama_'.$nip_baru);
         // if($data_utama_pegawai==null){
@@ -530,8 +521,7 @@ class Bkn extends Admin_Controller
         return $data_utama_pegawai->data;
 	}
 	private function getdata_riwayat_golongan_bkn($nip_baru){
-		$this->load->library('Api_bkn');
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_golongan = $this->cache->get('golongan_'.$nip_baru);
         if($data_golongan==null){
         	// data riwayat golongan
@@ -545,8 +535,7 @@ class Bkn extends Admin_Controller
         return $data_golongan;
 	}
     private function getdata_riwayat_cltn($nip_baru){
-        $this->load->library('Api_bkn');
-        $api_bkn = new Api_bkn;
+        $api_bkn = new Api_siasn;
         $data_golongan = $this->cache->get('cltn_'.$nip_baru);
         if($data_golongan==null){
             // data riwayat cltn
@@ -559,7 +548,7 @@ class Bkn extends Admin_Controller
         return $data_golongan;
     }
 	private function getdata_riwayat_dp3($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_dp3 = $this->cache->get('data_dp3_'.$nip_baru);
         if($data_dp3==null){
         	// data riwayat dp3
@@ -572,11 +561,11 @@ class Bkn extends Admin_Controller
         return $data_dp3;
 	}
 	private function getdata_pasangan($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_pasangan = $this->cache->get('data_pasangan_'.$nip_baru);
         if($data_pasangan==null){
         	// data riwayat pasangan
-			$json_return = $api_bkn->get_data_pasangan($nip_baru);
+			$json_return = $api_bkn->getData("data-pasangan",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_pasangan = $json_return->data;
@@ -585,25 +574,22 @@ class Bkn extends Admin_Controller
         return $data_pasangan;
 	}
 	private function getdata_ortu($nip_baru){
-		$api_bkn = new Api_bkn;
-		$data_ortu = $this->cache->get('data_ortu_'.$nip_baru);
-        if($data_ortu==null){
-        	// data riwayat ortu
-			$json_return = $api_bkn->get_data_ortu($nip_baru);
-	        $json_return = json_decode($json_return);
-	        $json_return = json_decode($json_return);
-	        $data_ortu = $json_return->data;
-            $this->cache->write($data_ortu,'data_ortu_'.$nip_baru,43200);
-        }
+        $api_bkn = new Api_siasn;
+		$json_return = $api_bkn->getData("data-ortu",$nip_baru);
+        $json_return = json_decode($json_return);
+        $json_return = json_decode($json_return);
+        $data_ortu = $json_return->data;
+        $this->cache->write($data_ortu,'data_ortu_'.$nip_baru,43200);
         return $data_ortu;
 	}
 	private function getdata_anak($nip_baru){
-		$api_bkn = new Api_bkn;
-		$this->cache->delete('data_anak_'.$nip_baru);  
+		$api_bkn = new Api_siasn;
+		// $this->cache->delete('data_anak_'.$nip_baru);  
 		$data_return = $this->cache->get('data_anak_'.$nip_baru);
+        // print_r($data_return);
         if($data_return==null){
         	// data anak
-			$json_return = $api_bkn->get_data_anak($nip_baru);
+			$json_return = $api_bkn->getData("data-anak",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
@@ -612,11 +598,11 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_kursus($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_kursus = $this->cache->get('data_kursus_'.$nip_baru);
         if($data_kursus==null){
         	// data riwayat kursus
-			$json_return = $api_bkn->get_data_kursus($nip_baru);
+			$json_return = $api_bkn->getData("rw-kursus",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_kursus = $json_return->data;
@@ -625,11 +611,11 @@ class Bkn extends Admin_Controller
         return $data_kursus;
 	}
 	private function getdata_penghargaan($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('data_penghargaan_'.$nip_baru);
         if($data_return==null){
         	// data riwayat penghargaan
-			$json_return = $api_bkn->get_data_penghargaan($nip_baru);
+			$json_return = $api_bkn->getData("rw-penghargaan",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        // $data_return = $json_return->data;
@@ -639,11 +625,11 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_pindahinstansi($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('data_pindah_instansi_'.$nip_baru);
         if($data_return==null){
         	// data riwayat golongan
-			$json_return = $api_bkn->get_data_pindah_instansi($nip_baru);
+			$json_return = $api_bkn->getData("rw-pindahinstansi",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
@@ -652,12 +638,12 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_angka_kredit($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$this->cache->delete('data_angka_kredit_'.$nip_baru);  
 		$data_return = $this->cache->get('data_angka_kredit_'.$nip_baru);
         if($data_return==null){
         	// data ak
-			$json_return = $api_bkn->getDataRealtime('angkakredit',$nip_baru);
+			$json_return = $api_bkn->getData("rw-angkakredit",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->mapData->data;
@@ -668,8 +654,6 @@ class Bkn extends Admin_Controller
     public function viewskp(){
         $kode   = $this->input->post('kode');
         $pegawai_lokal = $this->pegawai_model->find_by("PNS_ID",$kode);
-        $this->load->library('Api_bkn');
-        $api_bkn = new Api_bkn;
         $data_skp = $this->getdata_rwt_skp(trim($pegawai_lokal->NIP_BARU));
         $result = false;
         $id = "";
@@ -691,7 +675,7 @@ class Bkn extends Admin_Controller
         echo json_encode($response);  
     }
 	private function getdata_rwt_skp($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('data_rwt_skp_'.$nip_baru);
         if($data_return==null){
         	// data riwayat golongan
@@ -704,10 +688,10 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_rwt_cltn($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('data_rwt_cltn_'.$nip_baru);
         if($data_return==null){
-			$json_return = $api_bkn->get_data_rwt_cltn($nip_baru);
+			$json_return = $api_bkn->getData("rw-cltn",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
@@ -716,10 +700,10 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_rwt_pemberhentian($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('data_rwt_pemberhentian_'.$nip_baru);
         if($data_return==null){
-			$json_return = $api_bkn->get_data_rwt_pemberhentian($nip_baru);
+            $json_return = $api_bkn->getData("rw-pemberhentian",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
@@ -728,10 +712,10 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_rwt_ak($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('data_rwt_ak_'.$nip_baru);
         if($data_return==null){
-			$json_return = $api_bkn->get_data_rwt_ak($nip_baru);
+			$json_return = $api_bkn->getData("rw-angkakredit",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
@@ -740,10 +724,10 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_rwt_pnsunor($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('data_rwt_pnsunor_'.$nip_baru);
         if($data_return==null){
-			$json_return = $api_bkn->get_data_rwt_pnsunor($nip_baru);
+            $json_return = $api_bkn->getData("rw-pnsunor",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
@@ -752,10 +736,10 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_rwt_hukdis($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('data_rwt_hukdis_'.$nip_baru);
         if($data_return==null){
-			$json_return = $api_bkn->get_data_rwt_hukdis($nip_baru);
+			$json_return = $api_bkn->getData("rw-hukdis",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
@@ -764,7 +748,7 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_kpo_sk($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('data_kpo_sk_'.$nip_baru);
         if($data_return==null){
 			$json_return = $api_bkn->get_data_kpo_sk($nip_baru);
@@ -776,7 +760,7 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_sk_hist($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('data_kpo_sk_hist_'.$nip_baru);
         if($data_return==null){
 			$json_return = $api_bkn->get_data_kpo_sk_hist($nip_baru);
@@ -788,7 +772,7 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_ppo_sk($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('data_ppo_sk_'.$nip_baru);
         if($data_return==null){
 			$json_return = $api_bkn->get_data_ppo_sk($nip_baru);
@@ -800,7 +784,7 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_ppo_sk_hist($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('ppo_sk_hist_'.$nip_baru);
         if($data_return==null){
 			$json_return = $api_bkn->get_data_ppo_sk_hist($nip_baru);
@@ -812,10 +796,11 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_rwt_pendidikan($nip_baru){
-		$api_bkn = new Api_bkn;
+        $api_bkn = new Api_siasn;
+        $this->cache->delete('rwt_pendidikan_'.$nip_baru);  
 		$data_return = $this->cache->get('rwt_pendidikan_'.$nip_baru);
         if($data_return==null){
-			$json_return = $api_bkn->get_data_rwt_pendidikan($nip_baru);
+            $json_return = $api_bkn->getData("rw-pendidikan",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
@@ -824,10 +809,10 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_rwt_jabatan($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('rwt_jabatan_'.$nip_baru);
         if($data_return==null){
-			$json_return = $api_bkn->get_data_rwt_jabatan($nip_baru);
+            $json_return = $api_bkn->getData("rw-jabatan",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
@@ -836,10 +821,10 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_rwt_diklat($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('rwt_diklat_'.$nip_baru);
         if($data_return==null){
-			$json_return = $api_bkn->get_data_rwt_diklat($nip_baru);
+			$json_return = $api_bkn->getData("rw-diklat",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
@@ -848,10 +833,10 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_rwt_masakerja($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('rwt_masakerja_'.$nip_baru);
         if($data_return==null){
-			$json_return = $api_bkn->get_data_rwt_masakerja($nip_baru);
+			$json_return = $api_bkn->getData("rw-masakerja",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
@@ -860,10 +845,10 @@ class Bkn extends Admin_Controller
         return $data_return;
 	}
 	private function getdata_rwt_pwk($nip_baru){
-		$api_bkn = new Api_bkn;
+		$api_bkn = new Api_siasn;
 		$data_return = $this->cache->get('rwt_pwk_'.$nip_baru);
         if($data_return==null){
-			$json_return = $api_bkn->get_data_rwt_pwk($nip_baru);
+			$json_return = $api_bkn->getData("rw-pwk",$nip_baru);
 	        $json_return = json_decode($json_return);
 	        $json_return = json_decode($json_return);
 	        $data_return = $json_return->data;
@@ -1876,7 +1861,7 @@ class Bkn extends Admin_Controller
 			        $data["JENIS_KELAMIN"] 	= trim($row->jenisKelamin)=="Pria"?"M":(trim($row->jenisKelamin)=="Wanita"?"F":null);
 			        $data["TANGGAL_LAHIR"] 	= trim($row->tglLahir)?convertDate($row->tglLahir,'d-m-Y','Y-m-d'):null;
 			        $data["TEMPAT_LAHIR"] 	= ucwords(strtolower(trim($row->tempatLahir)));
-			        $data["STATUS_ANAK"] 	= trim($row->jenisAnak) == "-"?null:(trim($row->jenisAnak) == "KANDUNG"? 1:2);
+			        $data["STATUS_ANAK"] 	= trim($row->jenisAnak) == "-"?null:(trim($row->jenisAnak) == "KANDUNG"? 1:null);
 			        $data["PASANGAN"] 	= $pasangan->ID?$pasangan->ID : null;
 
 			        
@@ -2202,7 +2187,7 @@ class Bkn extends Admin_Controller
                 $jumlahSukses++;
                 if(isset($pegawai->id) and $pegawai->id != "" and isset($pegawai_lokal->NIP_BARU))
                 {
-                    if(isset($pegawai->id) and $pegawai->id != "") 
+                    // if(isset($pegawai->id) and $pegawai->id != "") 
                         $data["PNS_ID"] =   isset($pegawai->id) ?   $pegawai->id :  "";
 
                     // if(isset($pegawai_lokal->AGAMA_ID) and $pegawai_lokal->AGAMA_ID == "") 
