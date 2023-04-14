@@ -797,7 +797,7 @@ class Bkn extends Admin_Controller
 	}
 	private function getdata_rwt_pendidikan($nip_baru){
         $api_bkn = new Api_siasn;
-        $this->cache->delete('rwt_pendidikan_'.$nip_baru);  
+        // $this->cache->delete('rwt_pendidikan_'.$nip_baru);  
 		$data_return = $this->cache->get('rwt_pendidikan_'.$nip_baru);
         if($data_return==null){
             $json_return = $api_bkn->getData("rw-pendidikan",$nip_baru);
@@ -1265,12 +1265,13 @@ class Bkn extends Admin_Controller
 		if($data_pendidikan != null){
 			foreach($data_pendidikan as $row)
 			{
+                // print_r($row);
 				$this->riwayat_pendidikan_model->where("PENDIDIKAN_ID",$row->pendidikanId);
 				$data_riwayat = $this->riwayat_pendidikan_model->find_by("NIP",trim($nip_baru));		
 				$idPns 		= $row->idPns;
 	        	if(!isset($data_riwayat->ID)){
 	        		$data = array();
-			        $data["PNS_ID"] 			= $idPns;
+			        $data["PNS_ID"] 			= $pegawai_lokal->PNS_ID;
 			        $data["NIP"] 				= $pegawai_lokal->NIP_BARU;
 			        $data['TINGKAT_PENDIDIKAN_ID'] 	= $row->tkPendidikanId;
 			        $data['PENDIDIKAN_ID'] 			= $row->pendidikanId;
