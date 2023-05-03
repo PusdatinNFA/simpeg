@@ -24,7 +24,7 @@ class Kgb_satker extends Admin_Controller
         $this->load->model('kgb/vw_kgb_model');
 
 		$this->load->helper('aplikasi');
-		$this->satker_pegawai = getSatkerPegawai($this->auth->username());
+		$this->satker_pegawai = $this->pegawai_model->getunor_induk(trim($this->auth->username()));
 		Template::set('module_url',base_url('kgb/kgb-satker'));
 		Template::set('canCetakSKKolektif',$this->permissionCetakKolektif);
     }
@@ -84,7 +84,7 @@ class Kgb_satker extends Admin_Controller
 				$this->db->group_end();
 			}
 		}
-		$this->vw_kgb_model->where_in('kawasan_id',$akawasan);
+		$this->db->where('unitkerja."UNOR_INDUK"',$this->satker_pegawai);
 		$this->db->stop_cache();
 		$tanggal 				= $filters['filter_tahun']."-".$filters['filter_bulan']."-01";
 		$output 				= array();
@@ -130,12 +130,14 @@ class Kgb_satker extends Admin_Controller
                 if($record->tmt_sk == $tanggal){
                 	if($record->riwayat == 'kgb'){
                 		$btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/printsk/".$record->ref."/pdf' data-toggle='tooltip' title='Print Ulang SK KGB' tooltip='Print Ulang SK KGB' class='btn btn-sm btn-success show-modal'><i class='fa fa-print'></i> </a>";	
-                		$btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/printsk/".$record->ref."' data-toggle='tooltip' title='Download Dokumen word' tooltip='Download word' class='btn btn-sm btn-info'><i class='fa fa-download'></i> </a>";
+                		// $btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/printsk/".$record->ref."' data-toggle='tooltip' title='Download Dokumen word' tooltip='Download word' class='btn btn-sm btn-info'><i class='fa fa-download'></i> </a>";
                 	}
                 }else{
-                	$btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/create_sk/pdf/".$record->pegawai_nip."/".$tanggal."?golongan=$rec_golongan->NAMA2&mk_tahun=$mk_tahun' data-toggle='tooltip' title='Print SK' tooltip='Print SK' class='btn btn-sm btn-warning show-modal'><i class='fa fa-print'></i> </a>";
+                	// $btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/create_sk/pdf/".$record->pegawai_nip."/".$tanggal."?golongan=$rec_golongan->NAMA2&mk_tahun=$mk_tahun' data-toggle='tooltip' title='Print SK' tooltip='Print SK' class='btn btn-sm btn-warning show-modal'><i class='fa fa-print'></i> </a>";
                 }
-                
+                $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref_pegawai."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>"; 
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
 
                  

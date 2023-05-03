@@ -7,6 +7,7 @@ class Kepegawaian extends Admin_Controller
 {
     protected $permissionCreate 			= 'Pegawai.Kepegawaian.Create';
     protected $permissionViewPpnpn 			= 'Pegawai.Kepegawaian.CreatePpnpn';
+    protected $permissionViewPensiun 			= 'Pegawai.Kepegawaian.ViewPensiun';
     protected $permissionDelete 			= 'Pegawai.Kepegawaian.Delete';
     protected $permissionEdit   			= 'Pegawai.Kepegawaian.Edit';
     protected $permissionView   			= 'Pegawai.Kepegawaian.View';
@@ -153,14 +154,14 @@ class Kepegawaian extends Admin_Controller
     }
     public function ppnpn()
     {	
-    	$this->auth->restrict($this->permissionView);
+    	$this->auth->restrict($this->permissionViewPpnpn);
         Template::set('toolbar_title', "Pegawai Non ASN");		
         Template::render();
     }
     public function pensiun()
     {	
 
-    	$this->auth->restrict($this->permissionView);
+    	$this->auth->restrict($this->permissionViewPensiun);
         Template::set('toolbar_title',"Pegawai Pensiun");
 		
         Template::render();
@@ -1878,7 +1879,7 @@ class Kepegawaian extends Admin_Controller
 		
 	}
 	public function getpensiundata(){
-    	$this->auth->restrict($this->permissionView);
+    	$this->auth->restrict($this->permissionViewPensiun);
     	if (!$this->input->is_ajax_request()) {
    			Template::set_message("Hanya request ajax", 'error');
             redirect(SITE_AREA . '/kepegawaian/pegawai/pensiun');

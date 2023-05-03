@@ -314,10 +314,10 @@ $('body').on('click','.generatedatabkn',function () {
 					timeout:180000,
 					success: function (result) {
 						if(result.success){
-							swal("Pemberitahuan!", data.msg, "success");
+							swal("Pemberitahuan!", result.msg, "success");
 						}
 						else {
-							swal("Pemberitahuan!", data.msg, "error");
+							swal("Pemberitahuan!", result.msg, "error");
 						}
 				},
 				error : function(error) {

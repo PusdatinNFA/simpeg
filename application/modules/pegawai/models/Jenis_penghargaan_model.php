@@ -88,4 +88,18 @@ class Jenis_penghargaan_model extends BF_Model
 		$this->db->order_by("ID","asc");
 		return parent::find_all();
 	}
+	public function cekUniq($data)
+	{
+		if(empty($this->selects))
+		{
+			$this->select("ID,NAMA");
+		}
+		$this->db->where("NAMA",$data['NAMA']);
+		$dataJenis = parent::find_all();
+		if ($dataJenis == null) {
+			return parent::insert($data);
+
+		}
+		return $dataJenis[0]->ID;
+	}
 }

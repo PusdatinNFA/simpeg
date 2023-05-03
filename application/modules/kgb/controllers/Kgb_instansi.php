@@ -115,7 +115,7 @@ class Kgb_instansi extends Admin_Controller
 				else $informasi_hukdis = "-";
 				$row = array();
                 $row []  = $nomor_urut;
-                $row []  = $record->nama_pegawai." <br>".$record->pegawai_nip.$tanggal;
+                $row []  = "<b>".$record->nama_pegawai."</b><br>".$record->pegawai_nip."<br>".$tanggal;
                 $row []  = $rec_golongan->NAMA_PANGKAT." - ".$rec_golongan->NAMA." <br><b><i>Sk Terakhir:</i></b> ".date("d-m-Y", strtotime($record->tmt_sk))." <br><small class='label text-center bg-yellow'>".$record->riwayat."</small>";
                 $row []  = "<b><i>Lama</i></b> ".$record->o_masa_kerja_thn."th ".$record->o_masa_kerja_bln."bln, <br><b><i>Baru </i></b>".($record->n_jml_bulan/12)."th 0bln";
                	$row []  = "<b><i>Lama</i></b> ".number_format($record->gaji_lama,0,",",".").",<br><b><i>Baru </i></b>".number_format($record->gaji_baru,0,",",".");
@@ -124,13 +124,13 @@ class Kgb_instansi extends Admin_Controller
                 $btn_actions = array();
                 if($record->tmt_sk == $tanggal){
                 	if($record->riwayat == 'kgb'){
-                		$btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/printsk/".$record->ref."/pdf' data-toggle='tooltip' title='Print Ulang SK KGB' tooltip='Print Ulang SK KGB' class='btn btn-sm btn-success show-modal'><i class='fa fa-print'></i> </a>";	
-                		$btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/printsk/".$record->ref."' data-toggle='tooltip' title='Download Dokumen word' tooltip='Download word' class='btn btn-sm btn-info'><i class='fa fa-download'></i> </a>";
+                		// $btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/printsk/".$record->ref."/pdf' data-toggle='tooltip' title='Print Ulang SK KGB' tooltip='Print Ulang SK KGB' class='btn btn-sm btn-success show-modal'><i class='fa fa-print'></i> </a>";	
+                		// $btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/printsk/".$record->ref."' data-toggle='tooltip' title='Download Dokumen word' tooltip='Download word' class='btn btn-sm btn-info'><i class='fa fa-download'></i> </a>";
                 	}
                 }else{
-                	$btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/create_sk/pdf/".$record->pegawai_nip."/".$tanggal."?golongan=$rec_golongan->NAMA2&mk_tahun=$mk_tahun' data-toggle='tooltip' title='Print SK' tooltip='Print SK' class='btn btn-sm btn-warning show-modal'><i class='fa fa-print'></i> </a>";
+                	// $btn_actions  [] = "<a href='".base_url()."pegawai/riwayat_kgb/create_sk/pdf/".$record->pegawai_nip."/".$tanggal."?golongan=$rec_golongan->NAMA2&mk_tahun=$mk_tahun' data-toggle='tooltip' title='Print SK' tooltip='Print SK' class='btn btn-sm btn-warning show-modal'><i class='fa fa-print'></i> </a>";
                 }
-                
+                $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref_pegawai."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>"; 
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
 
                  
@@ -241,5 +241,144 @@ class Kgb_instansi extends Admin_Controller
 		}	
 		
 	}
-    
+ 	public function download_nominatif()
+	{
+        $this->load->helper('aplikasi');
+		$advanced_search_filters  = $_GET;
+		if ($advanced_search_filters) {
+			$filters = $advanced_search_filters;
+			// die(json_encode($advanced_search_filters));
+			// $filters = array();
+			// foreach($advanced_search_filters as  $filter){
+			// 	$filters[$filter['name']] = $filter["value"];
+			// }
+			if ($filters['filter_unit_kerja']) {
+				$this->db->group_start();
+				$this->db->where('unitkerja."UNOR_INDUK"', $filters['filter_unit_kerja']);
+				$this->db->group_end();
+			}
+			if ($filters['nip_sk']) {
+				$this->db->group_start();
+				$this->db->where('mv_kgb.pegawai_nip', $filters['nip_sk']);
+				$this->db->group_end();
+			}
+			if ($filters['filter_kawasan']) {
+				$this->db->group_start();
+				$this->db->where('pegawai.kawasan_id',$filters['filter_kawasan']);
+				$this->db->group_end();
+			}
+			if($filters['status'] != ""){
+				$this->db->group_start();
+				if ($filters['status'] == 0)
+					$this->db->where('r.id is null');
+				if ($filters['status'] == 1){
+					$this->db->where('r.id is not null');
+					$this->db->where('r.final is null');
+				}
+				if ($filters['status'] == 2){
+					$this->db->where('r.id is not null');
+					$this->db->where('r.final is not null');
+				}
+				if ($filters['status'] == 3){
+					$this->db->where('r.id is null');
+					$this->db->or_where('r.final is null');
+				}
+				
+				$this->db->group_end();
+			}
+			if($filters['pengelolasdm'] != ""){
+				$this->pegawai_model->where('coalesce(pengelola_sdm_kawasan_id,1)',$filters['pengelolasdm']);
+			}
+
+			$tanggal 		= $filters['filter_tahun'] . "-" . $filters['filter_bulan'] . "-01";
+			$records = $this->vw_kgb_model->getEstimasiKgbDetail($tanggal);
+			$this->load->library('Excel');
+			$objPHPExcel = new PHPExcel();
+
+			$objPHPExcel->setActiveSheetIndex(0);
+
+			// $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0,1,"Template database ".$tte->nama_proses);
+
+			$type = PHPExcel_Cell_DataType::TYPE_STRING;
+			$row = 1;
+
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(0, $row)->setValueExplicit("No", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(1, $row)->setValueExplicit("Nama", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(2, $row)->setValueExplicit("NIP", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(3, $row)->setValueExplicit("Pangkat", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(4, $row)->setValueExplicit("Golongan", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(5, $row)->setValueExplicit("Jabatan", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(6, $row)->setValueExplicit("Tanggal SK Lama", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(7, $row)->setValueExplicit("Nomor SK Lama", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(8, $row)->setValueExplicit("Pejabat Lama", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(9, $row)->setValueExplicit("MK lama (Tahun)", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(10, $row)->setValueExplicit("MK Lama (Bulan)", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(11, $row)->setValueExplicit("Gaji Pokok Lama", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(12, $row)->setValueExplicit("Terbilang (lama)", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(13, $row)->setValueExplicit("Tanggal Berlaku Lama", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(14, $row)->setValueExplicit("MK Baru (Tahun)", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(15, $row)->setValueExplicit("MK Baru (Tahun)", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(16, $row)->setValueExplicit("Gaji Baru", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(17, $row)->setValueExplicit("Terbilang (baru)", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(18, $row)->setValueExplicit("TMT Gaji Baru", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(19, $row)->setValueExplicit("Satuan Kerja", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(20, $row)->setValueExplicit("Kawasan", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(21, $row)->setValueExplicit("Tanggal SK Baru", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(22, $row)->setValueExplicit("Nomor SK Baru", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(23, $row)->setValueExplicit("Pejabat Baru", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(24, $row)->setValueExplicit("is_generated", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(25, $row)->setValueExplicit("is_archived", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(26, $row)->setValueExplicit("Status KGB", $type);
+			$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(27, $row)->setValueExplicit("Kawasan SDM", $type);
+			$no = 1;
+			// $keys = array_keys($records);
+			if (isset($records) && is_array($records) && count($records)) :
+				foreach ($records as $kgb) {
+					$row++;
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, $row, $no);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(1, $row, $kgb->nama_pegawai);
+					$objPHPExcel->getActiveSheet()->getCellByColumnAndRow(2, $row)->setValueExplicit($kgb->pegawai_nip);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(3, $row, $kgb->pangkat_text);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(4, $row, $kgb->golongan_text);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(5, $row, $kgb->NAMA_JABATAN);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(6, $row, $kgb->id_riwayat_kgb? getIndonesiaFormat($kgb->o_tgl_sk):getIndonesiaFormat($kgb->tgl_sk));
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(7, $row, $kgb->id_riwayat_kgb? $kgb->o_no_sk: $kgb->no_sk);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(8, $row, $kgb->id_riwayat_kgb? $kgb->nama_pejabat_lama:$kgb->pejabat);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(9, $row, $kgb->id_riwayat_kgb? $kgb->r_mk_thn:$kgb->o_masa_kerja_thn);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(10, $row, $kgb->id_riwayat_kgb? $kgb->r_mk_bln: $kgb->o_masa_kerja_bln);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(11, $row, $kgb->id_riwayat_kgb? rupiah($kgb->r_gapok):rupiah($kgb->gaji_lama));
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(12, $row, $kgb->id_riwayat_kgb? Terbilang($kgb->r_gapok):Terbilang($kgb->gaji_lama)." rupiah");
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(13, $row, $kgb->id_riwayat_kgb? getIndonesiaFormat($kgb->o_tmt_sk):getIndonesiaFormat($kgb->tmt_sk));
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(14, $row, $kgb->n_jml_bulan/12);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(15, $row, 0);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(16, $row, rupiah($kgb->gaji_baru));
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(17, $row, Terbilang($kgb->gaji_baru)." rupiah");
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(18, $row, getIndonesiaFormat($kgb->tgl_estimasi));
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(19, $row, $kgb->ABBREVIATION);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(20, $row, $kgb->kawasan);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(21, $row, $kgb->id_riwayat_kgb? getIndonesiaFormat($kgb->tgl_sk): "");
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(22, $row, $kgb->id_riwayat_kgb? $kgb->no_sk: "");
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(23, $row, $kgb->id_riwayat_kgb? $kgb->pejabat: "");
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(24, $row, $kgb->id_riwayat_kgb? 1 : 0);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(25, $row, $kgb->id_arsip? 1 : 0);
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(26, $row, $kgb->final? "Final" : ($kgb->id_riwayat_kgb? "Draft":"Belum Diproses"));
+					$objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(27, $row, $kgb->pengelola_sdm_kawasan_id);
+					$no++;
+				}
+			endif;
+
+			$filename = "Nominatif KGB  " . $tanggal . ' ' . date('Ymdhi') . '.xls';
+			header('Content-Type: application/vnd.ms-excel');
+			header('Content-Disposition: attachment;filename="' . $filename . '"');
+			header('Cache-Control: max-age=0');
+
+			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  //downloadable file is in Excel 2003 format (.xls)
+			//$objWriter = PHPExcel_IOFactory::createWriter($objTpl, 'Excel2007'); 
+			ob_end_clean();
+			$objWriter->save('php://output');  //send it to user, of course you can save it to disk also!
+			exit; //done.. exiting!
+		}
+	
+		
+	}   
 }

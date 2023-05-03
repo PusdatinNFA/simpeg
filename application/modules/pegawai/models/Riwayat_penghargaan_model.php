@@ -102,5 +102,4 @@ class Riwayat_penghargaan_model extends BF_Model
 		}
 		return parent::count_all();
 	}
-	
 }

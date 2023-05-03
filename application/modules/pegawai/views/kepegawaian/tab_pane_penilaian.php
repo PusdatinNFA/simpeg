@@ -3,6 +3,7 @@
 	$this->load->library('convert');
  	$convert = new convert();
     $tab_pane_prestasi_kerja = "tab_pane_prestasi_kerja";
+    $tab_pane_kinerja = "tab_pane_riwayat_kinerja";
     $tab_pane_rwt_assesmen = "tab_pane_rwt_assesmen";
     $tab_pane_rwt_assesmenadmin = "tab_pane_rwt_assesmenadmin";
     $tab_pane_rwt_nine_box = "tab_pane_rwt_nine_box";
@@ -19,6 +20,11 @@ $PNS_ID = isset($pegawai->PNS_ID) ? $pegawai->PNS_ID : '';
             <?php if($this->auth->has_permission("RiwayatPrestasiKerja.Kepegawaian.View")){ ?>
             <li class="active">
                 <a href="#<?php echo $tab_pane_prestasi_kerja;?>" data-toggle="tab" aria-expanded="false"> Prestasi Kerja <label id="riwayat_ppk_<?=$PNS_ID?>"></a>
+            </li>
+            <?php } ?>
+            <?php if($this->auth->has_permission("RiwayatKinerja.Kepegawaian.View")){ ?>
+            <li class="">
+                <a href="#<?php echo $tab_pane_kinerja;?>" data-toggle="tab" aria-expanded="false"> Kinerja <label id="riwayat_kinerja_<?=$PNS_ID?>"></a>
             </li>
             <?php } ?>
             <?php if($this->auth->has_permission("Riwayatassesmen.Kepegawaian.ViewPegawai")){ ?>
@@ -41,6 +47,9 @@ $PNS_ID = isset($pegawai->PNS_ID) ? $pegawai->PNS_ID : '';
             <?php 
             if($this->auth->has_permission("RiwayatPrestasiKerja.Kepegawaian.View")){
                 $this->load->view('kepegawaian/tab_pane_riwayat_prestasi_kerja',array('TAB_ID'=>$tab_pane_prestasi_kerja));
+            }
+            if($this->auth->has_permission("RiwayatKinerja.Kepegawaian.View")){
+                $this->load->view('kepegawaian/tab_pane_riwayat_kinerja',array('TAB_ID'=>$tab_pane_kinerja));
             }
             if($this->auth->has_permission("Riwayatassesmen.Kepegawaian.View")){
                 $this->load->view('kepegawaian/tab_pane_rwt_assesmen',array('TAB_ID'=>$tab_pane_rwt_assesmen));
