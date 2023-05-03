@@ -64,7 +64,10 @@
 				
 				<tr>
 					<td colspan=4>
-						<button type="submit" class="btn btn-success pull-right "><i class="fa fa-search"></i> Cari</button>
+                        <div class="pull-right">
+    						<button type="submit" class="btn btn-success"><i class="fa fa-search"></i> Cari</button>
+                            <button type="button" id="download" class="btn btn-warning" target="_blank"><i class="fa fa-download"></i> Download Nominatif</button>
+                        </div>
 					</td>
 				</tr>
 			</table>
@@ -227,5 +230,9 @@ function newexportaction(e, dt, button, config) {
     // Requery the server with the new one-time export settings
     dt.ajax.reload();
 };
+$("#download").click(function(){
+    var xyz = $("#form_search_pegawai").serialize();
+    window.open("<?=base_url()?>kgb/kgb_instansi/download_nominatif?"+xyz);
+});
 //For Export Buttons available inside jquery-datatable "server side processing" - End
 </script>

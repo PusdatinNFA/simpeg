@@ -74,4 +74,18 @@ class Jenis_arsip_model extends BF_Model
 		$this->db->order_by("jenis_arsip.ID",'ASC');
 		return parent::find_all();
 	}
+	public function cekUniq($data)
+	{
+		if(empty($this->selects))
+		{
+			$this->select("jenis_arsip.ID,NAMA_JENIS");
+		}
+		$this->db->where("NAMA_JENIS",$data['NAMA_JENIS']);
+		$dataJenis = parent::find_all();
+		if ($dataJenis == null) {
+			return parent::insert($data);
+
+		}
+		return $dataJenis[0]->ID;
+	}
 }

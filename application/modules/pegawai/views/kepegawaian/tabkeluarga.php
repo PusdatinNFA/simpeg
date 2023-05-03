@@ -28,7 +28,7 @@ $hubungan = $jk == "M" ? "Istri" : "Suami";
                     </li>
                     <?php } else { $active = 'active';} ?>
                     <li class="<?=$active?>">
-                        <a href="#<?php echo $tab_pane_istri;?>" data-toggle="tab" aria-expanded="false"> <?php echo $hubungan; ?> <label id="data_pasangan_<?=$PNS_ID?>"></label></a>
+                        <a href="#<?php echo $tab_pane_istri;?>" data-toggle="tab" aria-expanded="false"> Pasangan <label id="data_pasangan_<?=$PNS_ID?>"></label></a>
                     </li>
                     <li class="">
                         <a href="#<?php echo $tab_pane_anak;?>" data-toggle="tab" aria-expanded="false"> Anak <label id="data_anak_<?=$PNS_ID?>"></label></a>

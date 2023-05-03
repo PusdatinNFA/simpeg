@@ -4,13 +4,13 @@ $tab_jft = "tab_jft";
 ?>
 <div class="row">
     <div class="col-md-12">
-		<div class="nav-tabs-custom">
+        <div class="nav-tabs-custom">
             <ul id="tab-insides-here" class="nav nav-tabs">
                 <li class="active">
-                    <a href="#<?php echo $tab_jfu; ?>" data-toggle="tab" aria-expanded="true"> JFU </a>
+                    <a href="#<?php echo $tab_jfu; ?>" data-toggle="tab"> JFU </a>
                 </li>
                 <li class="">
-                    <a href="#<?php echo $tab_jft; ?>" data-toggle="tab" aria-expanded="false"> JFT </a>
+                    <a href="#<?php echo $tab_jft; ?>" data-toggle="tab"> JFT </a>
                 </li>
             </ul>
             <div class="tab-content">
@@ -21,6 +21,9 @@ $tab_jft = "tab_jft";
                     $this->load->view('layanan_kpo/kpo_instansi/kp_jft',array('TAB_ID'=>$tab_jft));
                 ?>
             </div>
+        </div>
+    </div>
+</div>
  <script type="text/javascript">
     $(".filter_unit_kerja").select2({
             placeholder: 'Filter Unit Kerja...',

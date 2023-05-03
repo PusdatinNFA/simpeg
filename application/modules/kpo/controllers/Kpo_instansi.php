@@ -14,12 +14,14 @@ class Kpo_instansi extends Admin_Controller
 	protected $permissionFinalisasiUsulan   = 'LayananKpo.FinalisasiUsulan';
     protected $permissionUploadDokumenPendukung = 'LayananKpo.UploadDokumenPendukung';
 	protected $permissionViewDokumenPendukung = 'LayananKpo.ViewDokumenPendukung';
-    
+    protected $permissionFiltersatker       = 'Pegawai.Kepegawaian.Filtersatker';
     /**
      * Constructor
      *
      * @return void
      */
+    public $UNOR_ID = null;
+    public $UkerTerbatas = false;
     public function __construct()
     {
         parent::__construct();
@@ -33,6 +35,9 @@ class Kpo_instansi extends Admin_Controller
         $this->load->model('pegawai/unitkerja_model');
         $this->role = $this->session->userdata('role_id');
         Template::set('module_url',base_url('kpo/kpo-instansi'));
+        if($this->auth->has_permission($this->permissionFiltersatker)){
+            $this->UNOR_ID = $this->pegawai_model->getunor_induk(trim($this->auth->username()));
+        }
     }
     
     public function proses_usulan($nama_file){
@@ -283,15 +288,9 @@ class Kpo_instansi extends Admin_Controller
 		
 		$output['recordsTotal']= $output['recordsFiltered']=$total;
 		$output['data']=array();
-
-
-		/*Jika $search mengandung nilai, berarti user sedang telah 
-		memasukan keyword didalam filed pencarian*/
 		if($search!=""){
 			$this->layanan_kpo_model->where('upper("NAMA") LIKE \'%'.strtoupper($search).'%\'');
-
         }
-        
 		$this->layanan_kpo_model->limit($length,$start);
 		
 		$kolom = $iSortCol != "" ? $iSortCol : "name";
@@ -323,11 +322,6 @@ class Kpo_instansi extends Admin_Controller
             $this->layanan_kpo_model->db->where("no_surat_pengantar_es1",$no_surat_pengantar_es1);
         }
 		$records=$this->layanan_kpo_model->find_all();
-
-		/*Ketika dalam mode pencarian, berarti kita harus
-		'recordsTotal' dan 'recordsFiltered' sesuai dengan jumlah baris
-		yang mengandung keyword tertentu
-		*/
 		if($search != "")
 		{
 			$this->layanan_kpo_model->where('upper("NAMA") LIKE \'%'.strtoupper($search).'%\'');
@@ -452,6 +446,9 @@ class Kpo_instansi extends Admin_Controller
             }
         }
         $tanggal        = $filters['filter_tahun']."-".$filters['filter_bulan']."-01";
+        if($this->auth->has_permission($this->permissionFiltersatker)){
+            $this->db->where('unitkerja."UNOR_INDUK"',$this->UNOR_INDUK);
+        }
         $this->db->stop_cache();
         $output         =array();
         $output['draw'] =$draw;
@@ -556,6 +553,9 @@ class Kpo_instansi extends Admin_Controller
             }
         }
         $tanggal        = $filters['filter_tahun']."-".$filters['filter_bulan']."-01";
+        if($this->auth->has_permission($this->permissionFiltersatker)){
+            $this->db->where('unitkerja."UNOR_INDUK"',$this->UNOR_INDUK);
+        }
         $this->db->stop_cache();
         $output         =array();
         $output['draw'] =$draw;

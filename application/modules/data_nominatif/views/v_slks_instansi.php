@@ -104,8 +104,10 @@
 				</tr>
                 <tr>
                 <td colspan=4>
-                    <button type="submit" class="btn btn-warning pull-right margin"><i class="fa fa-search"></i> Cari</button>
-                    <button type="button" id="download" class="btn btn-success margin pull-right " target="_blank"><i class="fa fa-download"></i> Download Nominatif</button>
+                    <div class=" pull-right">
+                        <button type="submit" class="btn btn-warning"><i class="fa fa-search"></i> Cari</button>
+                        <button type="button" id="download" class="btn btn-success" target="_blank"><i class="fa fa-download"></i> Download Nominatif</button>
+                    </div>
                 </td>
             </tr>
         </table>
