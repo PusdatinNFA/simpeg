@@ -1376,12 +1376,14 @@ class Bkn extends Admin_Controller
 			$dataupdate['JUMLAH_ANGKA_KREDIT_TAMBAHAN'] = $row->jumlahKreditTambahan != 'null' ? $row->jumlahKreditTambahan : null;
 
 			if ($row->path) {
-				if (is_array($row->path)) {
-					foreach ($row->path as $path) {
-						$id_arsip = $this->saveBerkas($row->nipBaru, $data["SK_NOMOR"], $keterangan, $id_jenis_arsip, $path->path);
+				foreach($row->path as $i => $i_value) {
+                    $file = urlencode($i_value->dok_uri);
+                    if($file != ""){
+						// echo $path->dok_uri;
+						$response   = $this->getDokumen($file);
+						$file_name = $this->saveArsip($i_value->dok_uri, $response);
+						$id_arsip = $aws->insertArsip($row->nipBaru,$data["SK_NOMOR"],$id_jenis_arsip,$keterangan, $response,$file_name,1);
 					}
-				} else {
-					$id_arsip = $this->saveBerkas($row->nipBaru, $data["SK_NOMOR"], $keterangan, $id_jenis_arsip, $row->path);
 				}
 			}
 			if ($id_arsip) {
@@ -2905,7 +2907,7 @@ class Bkn extends Admin_Controller
         if($file != ""){
             $response   = $this->getDokumen($file);
             if($response != ""){
-                $this->saveArsip($this->input->get('file'), $response);
+                // $this->saveArsip($this->input->get('file'), $response);
                 header('Content-Disposition: inline; filename="example.pdf"');
                 header('Content-Type: application/pdf');
                 echo $response;
@@ -2919,8 +2921,8 @@ class Bkn extends Admin_Controller
     }
     private function saveArsip($file,$response){
         $filename = end((explode("/", $file)));
-        if($response != "")
-            file_put_contents($this->settings_lib->item('site.urluploaded').$filename, $response);
+        // if($response != "")
+            // file_put_contents($this->settings_lib->item('site.urluploaded').$filename, $response);
         return $filename;
     }
     private function genCacheUnorAll(){

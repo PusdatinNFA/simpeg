@@ -7,7 +7,6 @@ class Kepegawaian extends Admin_Controller
 {
     protected $permissionCreate 			= 'Pegawai.Kepegawaian.Create';
     protected $permissionViewPpnpn 			= 'Pegawai.Kepegawaian.CreatePpnpn';
-    protected $permissionViewPensiun 			= 'Pegawai.Kepegawaian.ViewPensiun';
     protected $permissionDelete 			= 'Pegawai.Kepegawaian.Delete';
     protected $permissionEdit   			= 'Pegawai.Kepegawaian.Edit';
     protected $permissionView   			= 'Pegawai.Kepegawaian.View';
@@ -154,14 +153,14 @@ class Kepegawaian extends Admin_Controller
     }
     public function ppnpn()
     {	
-    	$this->auth->restrict($this->permissionViewPpnpn);
+    	$this->auth->restrict($this->permissionView);
         Template::set('toolbar_title', "Pegawai Non ASN");		
         Template::render();
     }
     public function pensiun()
     {	
 
-    	$this->auth->restrict($this->permissionViewPensiun);
+    	$this->auth->restrict($this->permissionView);
         Template::set('toolbar_title',"Pegawai Pensiun");
 		
         Template::render();
@@ -1879,7 +1878,7 @@ class Kepegawaian extends Admin_Controller
 		
 	}
 	public function getpensiundata(){
-    	$this->auth->restrict($this->permissionViewPensiun);
+    	$this->auth->restrict($this->permissionView);
     	if (!$this->input->is_ajax_request()) {
    			Template::set_message("Hanya request ajax", 'error');
             redirect(SITE_AREA . '/kepegawaian/pegawai/pensiun');
@@ -4789,6 +4788,311 @@ class Kepegawaian extends Admin_Controller
 		die();
 
 	}
+	public function listbypendidikan($tingkat = "")
+    {	
+    	$this->auth->restrict($this->permissionView);
+    	Template::set('tingkat', $tingkat);
+    	Template::set('toolbar_title', "Pegawai Pendidikan");
+		Template::set_view('pegawai/kepegawaian/listpendidikan');
+        Template::render();
+    }
+    public function getdatapendidikan($tingkat){
+		$draw = $this->input->post('draw');
+		$iSortCol = $this->input->post('iSortCol_1');
+		$sSortCol = $this->input->post('sSortDir_1');
+		
+		$length= $this->input->post('length');
+		$start= $this->input->post('start');
+
+		$search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+		 
+		
+		$output=array();
+		
+
+		/*Jika $search mengandung nilai, berarti user sedang telah 
+		memasukan keyword didalam filed pencarian*/
+		if($search!=""){
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+		}
+		
+		$this->pegawai_model->limit($length,$start);
+		/*Urutkan dari alphabet paling terkahir*/
+		$kolom = $iSortCol != "" ? $iSortCol : "NAMA";
+		$sSortCol == "asc" ? "asc" : "desc";
+		$this->pegawai_model->order_by($iSortCol,$sSortCol);
+		$records=$this->pegawai_model->find_all_pendidikan($this->UNOR_ID,$tingkat);
+
+		/*Ketika dalam mode pencarian, berarti kita harus
+		'recordsTotal' dan 'recordsFiltered' sesuai dengan jumlah baris
+		yang mengandung keyword tertentu
+		*/
+		if($search != "")
+		{
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+			//$this->pegawai_model->or_where('NIP_BARU',$search);
+			$jum	= $this->pegawai_model->count_all_pendidikan($this->UNOR_ID,$tingkat);
+			$output['recordsTotal']=$output['recordsFiltered']=$jum;
+		}else{
+			$total= $this->pegawai_model->count_all_pendidikan($this->UNOR_ID,$tingkat);
+			$output['draw']=$draw;
+			$output['recordsTotal']= $output['recordsFiltered']=$total;
+			$output['data']=array();
+
+		}
+		
+		$nomor_urut=$start+1;
+		if(isset($records) && is_array($records) && count($records)):
+			foreach ($records as $record) {
+                $foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
+                $row = array();
+                $row []  = $nomor_urut.".";
+                $row []  = "<img src='".$foto_pegawai."' width='90px'>";
+                $row []  = $record->NIP_BARU;
+                $row []  = $record->NAMA;
+                $row []  = $record->TGL_LAHIR;
+                $row []  = $record->NAMA_PENDIDIKAN;
+                $row []  = $record->NAMA_UNOR;
+                
+                $btn_actions = array();
+                $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>"; 
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+                
+
+                $output['data'][] = $row;
+				$nomor_urut++;
+			}
+		endif;
+		echo json_encode($output);
+		die();
+
+	}
+	public function listbygolongan($tingkat = "")
+    {	
+    	$this->auth->restrict($this->permissionView);
+    	Template::set('tingkat', $tingkat);
+    	Template::set('toolbar_title', "Pegawai Golongan");
+		Template::set_view('pegawai/kepegawaian/listbygolongan');
+        Template::render();
+    }
+    public function getdatabygolongan($tingkat){
+		$draw = $this->input->post('draw');
+		$iSortCol = $this->input->post('iSortCol_1');
+		$sSortCol = $this->input->post('sSortDir_1');
+		
+		$length= $this->input->post('length');
+		$start= $this->input->post('start');
+
+		$search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+		 
+		
+		$output=array();
+		
+
+		/*Jika $search mengandung nilai, berarti user sedang telah 
+		memasukan keyword didalam filed pencarian*/
+		if($search!=""){
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+		}
+		
+		$this->pegawai_model->limit($length,$start);
+		/*Urutkan dari alphabet paling terkahir*/
+		$kolom = $iSortCol != "" ? $iSortCol : "NAMA";
+		$sSortCol == "asc" ? "asc" : "desc";
+		$this->pegawai_model->order_by($iSortCol,$sSortCol);
+		$records=$this->pegawai_model->find_all_golongan($this->UNOR_ID,$tingkat);
+
+		/*Ketika dalam mode pencarian, berarti kita harus
+		'recordsTotal' dan 'recordsFiltered' sesuai dengan jumlah baris
+		yang mengandung keyword tertentu
+		*/
+		if($search != "")
+		{
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+			//$this->pegawai_model->or_where('NIP_BARU',$search);
+			$jum	= $this->pegawai_model->count_all_golongan($this->UNOR_ID,$tingkat);
+			$output['recordsTotal']=$output['recordsFiltered']=$jum;
+		}else{
+			$total= $this->pegawai_model->count_all_golongan($this->UNOR_ID,$tingkat);
+			$output['draw']=$draw;
+			$output['recordsTotal']= $output['recordsFiltered']=$total;
+			$output['data']=array();
+
+		}
+		
+		$nomor_urut=$start+1;
+		if(isset($records) && is_array($records) && count($records)):
+			foreach ($records as $record) {
+                $foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
+                $row = array();
+                $row []  = $nomor_urut.".";
+                $row []  = "<img src='".$foto_pegawai."' width='90px'>";
+                $row []  = $record->NIP_BARU;
+                $row []  = $record->NAMA;
+                $row []  = $record->TGL_LAHIR;
+                $row []  = $record->NAMA_GOLONGAN;
+                $row []  = $record->NAMA_UNOR;
+                
+                $btn_actions = array();
+                $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>"; 
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+                
+
+                $output['data'][] = $row;
+				$nomor_urut++;
+			}
+		endif;
+		echo json_encode($output);
+		die();
+
+	}
+	public function listpensiuntahun($tingkat = "")
+    {	
+    	$this->auth->restrict($this->permissionView);
+    	Template::set('tingkat', $tingkat);
+    	Template::set('toolbar_title', "Pegawai Pensiun");
+        Template::render();
+    }
+    public function getdatapensiuntahun($tahun = ""){
+		$draw = $this->input->post('draw');
+		$iSortCol = $this->input->post('iSortCol_1');
+		$sSortCol = $this->input->post('sSortDir_1');
+		$length= $this->input->post('length');
+		$start= $this->input->post('start');
+		$search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+		$output=array();
+		if($search!=""){
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+		}
+		
+		$this->pegawai_model->limit($length,$start);
+		/*Urutkan dari alphabet paling terkahir*/
+		$kolom = $iSortCol != "" ? $iSortCol : "NAMA";
+		$sSortCol == "asc" ? "asc" : "desc";
+		$this->pegawai_model->order_by($iSortCol,$sSortCol);
+		$records=$this->pegawai_model->find_all_estimasi_pensiun_tahun($this->UNOR_ID,$tahun);
+		if($search != "")
+		{
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$jum	= $this->pegawai_model->count_all_estimasi_pensiun_tahun($this->UNOR_ID,$tahun);
+			$output['recordsTotal']=$output['recordsFiltered']=$jum;
+		}else{
+			$total= $this->pegawai_model->count_all_estimasi_pensiun_tahun($this->UNOR_ID,$tahun);
+			$output['draw']=$draw;
+			$output['recordsTotal']= $output['recordsFiltered']=$total;
+			$output['data']=array();
+
+		}
+		$nomor_urut=$start+1;
+		if(isset($records) && is_array($records) && count($records)):
+			foreach ($records as $record) {
+                $foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
+                $row = array();
+                $row []  = $nomor_urut.".";
+                $row []  = "<img src='".$foto_pegawai."' width='70%'>";
+                $row []  = $record->NIP_BARU;
+                $row []  = $record->NAMA;
+                $row []  = $record->NAMA_JABATAN." (".$record->PENSIUN.")";
+                $row []  = $record->TGL_LAHIR;
+                $row []  = $record->umur;
+                $row []  = $record->NAMA_UNOR;
+                
+                $btn_actions = array();
+                $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>"; 
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+                 
+                $row[] = implode(" ",$btn_actions);
+                
+
+                $output['data'][] = $row;
+				$nomor_urut++;
+			}
+		endif;
+		echo json_encode($output);
+		die();
+
+	}
+	public function listbyumur($tingkat = "")
+    {	
+    	$this->auth->restrict($this->permissionView);
+    	Template::set('tingkat', $tingkat);
+    	Template::set('toolbar_title', "Pegawai Umur");
+        Template::render();
+    }
+    public function getdatabyumur($tingkat){
+		$draw = $this->input->post('draw');
+		$iSortCol = $this->input->post('iSortCol_1');
+		$sSortCol = $this->input->post('sSortDir_1');
+		
+		$length= $this->input->post('length');
+		$start= $this->input->post('start');
+
+		$search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+		 
+		
+		$output=array();
+		
+
+		/*Jika $search mengandung nilai, berarti user sedang telah 
+		memasukan keyword didalam filed pencarian*/
+		if($search!=""){
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+		}
+		
+		$this->pegawai_model->limit($length,$start);
+		/*Urutkan dari alphabet paling terkahir*/
+		$kolom = $iSortCol != "" ? $iSortCol : "NAMA";
+		$sSortCol == "asc" ? "asc" : "desc";
+		$this->pegawai_model->order_by($iSortCol,$sSortCol);
+		$records=$this->pegawai_model->find_all_umur($this->UNOR_ID,$tingkat);
+
+		if($search != "")
+		{
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+			//$this->pegawai_model->or_where('NIP_BARU',$search);
+			$jum	= $this->pegawai_model->count_all_umur($this->UNOR_ID,$tingkat);
+			$output['recordsTotal']=$output['recordsFiltered']=$jum;
+		}else{
+			$total= $this->pegawai_model->count_all_umur($this->UNOR_ID,$tingkat);
+			$output['draw']=$draw;
+			$output['recordsTotal']= $output['recordsFiltered']=$total;
+			$output['data']=array();
+
+		}
+		
+		$nomor_urut=$start+1;
+		if(isset($records) && is_array($records) && count($records)):
+			foreach ($records as $record) {
+                $foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
+                $row = array();
+                $row []  = $nomor_urut.".";
+                $row []  = "<img src='".$foto_pegawai."' width='90px'>";
+                $row []  = $record->NIP_BARU;
+                $row []  = $record->NAMA;
+                $row []  = $record->TGL_LAHIR;
+                $row []  = $record->umur;
+                $row []  = $record->NAMA_UNOR;
+                
+                $btn_actions = array();
+                $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>"; 
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+                
+
+                $output['data'][] = $row;
+				$nomor_urut++;
+			}
+		endif;
+		echo json_encode($output);
+		die();
+
+	}
+
 	private function simpanKepakaran($nip_baru, $kepakarans,$mandiri = null)
 	{
 		$this->load->model('pegawai/kepakaran_pegawai_model');
@@ -4824,6 +5128,343 @@ class Kepegawaian extends Admin_Controller
 				}
 			}
 		}
+	}
+	public function listbykatjabatan($tingkat = "")
+    {	
+    	$this->auth->restrict($this->permissionView);
+    	Template::set('tingkat', $tingkat);
+    	Template::set('toolbar_title', "Pegawai Jabatan");
+        Template::render();
+    }
+    public function getdatabykatjabatan($tingkat){
+		$draw = $this->input->post('draw');
+		$iSortCol = $this->input->post('iSortCol_1');
+		$sSortCol = $this->input->post('sSortDir_1');
+		
+		$length= $this->input->post('length');
+		$start= $this->input->post('start');
+		$search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+		$output=array();
+		if($search!=""){
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+		}
+		
+		$this->pegawai_model->limit($length,$start);
+		/*Urutkan dari alphabet paling terkahir*/
+		$kolom = $iSortCol != "" ? $iSortCol : "NAMA";
+		$sSortCol == "asc" ? "asc" : "desc";
+		$this->pegawai_model->order_by($iSortCol,$sSortCol);
+		$records=$this->pegawai_model->find_all_katjabatan($this->UNOR_ID,$tingkat);
+
+		if($search != "")
+		{
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+			//$this->pegawai_model->or_where('NIP_BARU',$search);
+			$jum	= $this->pegawai_model->count_all_katjabatan($this->UNOR_ID,$tingkat);
+			$output['recordsTotal']=$output['recordsFiltered']=$jum;
+		}else{
+			$total= $this->pegawai_model->count_all_katjabatan($this->UNOR_ID,$tingkat);
+			$output['draw']=$draw;
+			$output['recordsTotal']= $output['recordsFiltered']=$total;
+			$output['data']=array();
+
+		}
+		$nomor_urut=$start+1;
+		if(isset($records) && is_array($records) && count($records)):
+			foreach ($records as $record) {
+                $foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
+                $row = array();
+                $row []  = $nomor_urut.".";
+                $row []  = "<img src='".$foto_pegawai."' width='90px'>";
+                $row []  = $record->NIP_BARU;
+                $row []  = $record->NAMA;
+                $row []  = $record->TGL_LAHIR;
+                $row []  = $record->KATEGORI_JABATAN;
+                $row []  = $record->NAMA_UNOR;
+                
+                $btn_actions = array();
+                $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>"; 
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+                
+
+                $output['data'][] = $row;
+				$nomor_urut++;
+			}
+		endif;
+		echo json_encode($output);
+		die();
+
+	}
+	public function listbykeljabatan($tingkat = "")
+    {	
+    	$this->auth->restrict($this->permissionView);
+    	Template::set('tingkat', $tingkat);
+    	Template::set('toolbar_title', "Pegawai Jabatan");
+        Template::render();
+    }
+    public function getdatabykeljabatan($tingkat){
+		$draw = $this->input->post('draw');
+		$iSortCol = $this->input->post('iSortCol_1');
+		$sSortCol = $this->input->post('sSortDir_1');
+		$tingkat = urldecode($tingkat);
+		$length= $this->input->post('length');
+		$start= $this->input->post('start');
+		$search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+		$output=array();
+		if($search!=""){
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+		}
+		
+		$this->pegawai_model->limit($length,$start);
+		/*Urutkan dari alphabet paling terkahir*/
+		$kolom = $iSortCol != "" ? $iSortCol : "NAMA";
+		$sSortCol == "asc" ? "asc" : "desc";
+		$this->pegawai_model->order_by($iSortCol,$sSortCol);
+		$records=$this->pegawai_model->find_all_keljabatan($this->UNOR_ID,$tingkat);
+
+		if($search != "")
+		{
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+			//$this->pegawai_model->or_where('NIP_BARU',$search);
+			$jum	= $this->pegawai_model->count_all_keljabatan($this->UNOR_ID,$tingkat);
+			$output['recordsTotal']=$output['recordsFiltered']=$jum;
+		}else{
+			$total= $this->pegawai_model->count_all_keljabatan($this->UNOR_ID,$tingkat);
+			$output['draw']=$draw;
+			$output['recordsTotal']= $output['recordsFiltered']=$total;
+			$output['data']=array();
+
+		}
+		$nomor_urut=$start+1;
+		if(isset($records) && is_array($records) && count($records)):
+			foreach ($records as $record) {
+                $foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
+                $row = array();
+                $row []  = $nomor_urut.".";
+                $row []  = "<img src='".$foto_pegawai."' width='90px'>";
+                $row []  = $record->NIP_BARU;
+                $row []  = $record->NAMA;
+                $row []  = $record->TGL_LAHIR;
+                $row []  = $record->kel_jabatan;
+                $row []  = $record->NAMA_UNOR;
+                
+                $btn_actions = array();
+                $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>"; 
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+                
+
+                $output['data'][] = $row;
+				$nomor_urut++;
+			}
+		endif;
+		echo json_encode($output);
+		die();
+
+	}
+	public function listbystatuspegawai($tingkat = "")
+    {	
+    	$this->auth->restrict($this->permissionView);
+    	Template::set('tingkat', $tingkat);
+    	Template::set('toolbar_title', "Status Pegawai");
+        Template::render();
+    }
+    public function getdatabystatus($tingkat){
+		$draw = $this->input->post('draw');
+		$iSortCol = $this->input->post('iSortCol_1');
+		$sSortCol = $this->input->post('sSortDir_1');
+		$tingkat = urldecode($tingkat);
+		$length= $this->input->post('length');
+		$start= $this->input->post('start');
+		$search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+		$output=array();
+		if($search!=""){
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+		}
+		
+		$this->pegawai_model->limit($length,$start);
+		/*Urutkan dari alphabet paling terkahir*/
+		$kolom = $iSortCol != "" ? $iSortCol : "NAMA";
+		$sSortCol == "asc" ? "asc" : "desc";
+		$this->pegawai_model->order_by($iSortCol,$sSortCol);
+		$records=$this->pegawai_model->find_all_status($this->UNOR_ID,$tingkat);
+
+		if($search != "")
+		{
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+			$jum	= $this->pegawai_model->count_all_status($this->UNOR_ID,$tingkat);
+			$output['recordsTotal']=$output['recordsFiltered']=$jum;
+		}else{
+			$total= $this->pegawai_model->count_all_status($this->UNOR_ID,$tingkat);
+			$output['draw']=$draw;
+			$output['recordsTotal']= $output['recordsFiltered']=$total;
+			$output['data']=array();
+
+		}
+		$nomor_urut=$start+1;
+		if(isset($records) && is_array($records) && count($records)):
+			foreach ($records as $record) {
+                $foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
+                $row = array();
+                $row []  = $nomor_urut.".";
+                $row []  = "<img src='".$foto_pegawai."' width='90px'>";
+                $row []  = $record->NIP_BARU;
+                $row []  = $record->NAMA;
+                $row []  = $record->TGL_LAHIR;
+                $row []  = $record->kel_jabatan;
+                $row []  = $record->NAMA_UNOR;
+                
+                $btn_actions = array();
+                $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>"; 
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+                
+
+                $output['data'][] = $row;
+				$nomor_urut++;
+			}
+		endif;
+		echo json_encode($output);
+		die();
+
+	}
+	public function listbyagama($tingkat = "")
+    {	
+    	$this->auth->restrict($this->permissionView);
+    	Template::set('tingkat', $tingkat);
+    	Template::set('toolbar_title', "Agama Pegawai");
+        Template::render();
+    }
+    public function getdatabyagama($tingkat){
+		$draw = $this->input->post('draw');
+		$iSortCol = $this->input->post('iSortCol_1');
+		$sSortCol = $this->input->post('sSortDir_1');
+		$tingkat = urldecode($tingkat);
+		$length= $this->input->post('length');
+		$start= $this->input->post('start');
+		$search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+		$output=array();
+		if($search!=""){
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+		}
+		
+		$this->pegawai_model->limit($length,$start);
+		/*Urutkan dari alphabet paling terkahir*/
+		$kolom = $iSortCol != "" ? $iSortCol : "NAMA";
+		$sSortCol == "asc" ? "asc" : "desc";
+		$this->pegawai_model->order_by($iSortCol,$sSortCol);
+		$records=$this->pegawai_model->find_all_agama($this->UNOR_ID,$tingkat);
+
+		if($search != "")
+		{
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+			$jum	= $this->pegawai_model->count_all_agama($this->UNOR_ID,$tingkat);
+			$output['recordsTotal']=$output['recordsFiltered']=$jum;
+		}else{
+			$total= $this->pegawai_model->count_all_agama($this->UNOR_ID,$tingkat);
+			$output['draw']=$draw;
+			$output['recordsTotal']= $output['recordsFiltered']=$total;
+			$output['data']=array();
+
+		}
+		$nomor_urut=$start+1;
+		if(isset($records) && is_array($records) && count($records)):
+			foreach ($records as $record) {
+                $foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
+                $row = array();
+                $row []  = $nomor_urut.".";
+                $row []  = "<img src='".$foto_pegawai."' width='90px'>";
+                $row []  = $record->NIP_BARU;
+                $row []  = $record->NAMA;
+                $row []  = $record->TGL_LAHIR;
+                $row []  = $record->nama_agama;
+                $row []  = $record->NAMA_UNOR;
+                
+                $btn_actions = array();
+                $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>"; 
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+                
+
+                $output['data'][] = $row;
+				$nomor_urut++;
+			}
+		endif;
+		echo json_encode($output);
+		die();
+
+	}
+	public function listbyjeniskelamin($tingkat = "")
+    {	
+    	$this->auth->restrict($this->permissionView);
+    	Template::set('tingkat', $tingkat);
+    	Template::set('toolbar_title', "Agama Pegawai");
+        Template::render();
+    }
+    public function getdatabyjk($tingkat){
+		$draw = $this->input->post('draw');
+		$iSortCol = $this->input->post('iSortCol_1');
+		$sSortCol = $this->input->post('sSortDir_1');
+		$tingkat = urldecode($tingkat);
+		$length= $this->input->post('length');
+		$start= $this->input->post('start');
+		$search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+		$output=array();
+		if($search!=""){
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+		}
+		
+		$this->pegawai_model->limit($length,$start);
+		/*Urutkan dari alphabet paling terkahir*/
+		$kolom = $iSortCol != "" ? $iSortCol : "NAMA";
+		$sSortCol == "asc" ? "asc" : "desc";
+		$this->pegawai_model->order_by($iSortCol,$sSortCol);
+		$records=$this->pegawai_model->find_all_jenis_kelamin($this->UNOR_ID,$tingkat);
+
+		if($search != "")
+		{
+			$this->pegawai_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+			$this->pegawai_model->or_where('upper("NIP_BARU") LIKE \''.strtoupper($search).'%\'');
+			$jum	= $this->pegawai_model->count_all_jenis_kelamin($this->UNOR_ID,$tingkat);
+			$output['recordsTotal']=$output['recordsFiltered']=$jum;
+		}else{
+			$total= $this->pegawai_model->count_all_jenis_kelamin($this->UNOR_ID,$tingkat);
+			$output['draw']=$draw;
+			$output['recordsTotal']= $output['recordsFiltered']=$total;
+			$output['data']=array();
+
+		}
+		$nomor_urut=$start+1;
+		if(isset($records) && is_array($records) && count($records)):
+			foreach ($records as $record) {
+                $foto_pegawai =  END_POINT_PHOTO.$record->username_intra;
+                $row = array();
+                $row []  = $nomor_urut.".";
+                $row []  = "<img src='".$foto_pegawai."' width='90px'>";
+                $row []  = $record->NIP_BARU;
+                $row []  = $record->NAMA;
+                $row []  = $record->TGL_LAHIR;
+                $row []  = $record->JENIS_KELAMIN;
+                $row []  = $record->NAMA_UNOR;
+                
+                $btn_actions = array();
+                $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>"; 
+                $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
+                
+
+                $output['data'][] = $row;
+				$nomor_urut++;
+			}
+		endif;
+		echo json_encode($output);
+		die();
+
 	}
 	private function simpanPenelitian($nip_baru, $penelitians,$mandiri = null)
 	{

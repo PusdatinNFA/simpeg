@@ -50,7 +50,7 @@ class reports extends Admin_Controller
 		if($unit_id != ""){
 			$this->UNOR_ID = $unit_id;
 		}
-
+		date_default_timezone_set('Asia/Jakarta');
 	}
 	//--------------------------------------------------------------------
 	/**
@@ -82,6 +82,7 @@ class reports extends Admin_Controller
 				else
 					$dataprov["NAMA"] = "-";
 				$dataprov["jumlah"] = $record->jumlah;
+				$dataprov["kode"] = $record->ID;
 				$jsonpendidikan[] 	= $dataprov;
 			endforeach;
 		endif;
@@ -157,6 +158,9 @@ class reports extends Admin_Controller
 		// group kelompok jabatan
 		$data_jml_pegawai_perkelompok_jabatan = $this->pegawai_model->grupby_kelompok_jabatan($this->UNOR_ID);
 		Template::set('json_kelompok_jabatan', json_encode($data_jml_pegawai_perkelompok_jabatan));
+		// prosentase berdasarkan status pegawai
+		$data_jml_pegawai_perstatus_pegawai = $this->pegawai_model->grupby_status_pegawai($this->UNOR_ID);
+		Template::set('jsonstatus_pegawai', json_encode($data_jml_pegawai_perstatus_pegawai));
 
 		$action = $this->input->get("action");
 		if($action=="download"){
@@ -472,6 +476,31 @@ class reports extends Admin_Controller
 					$objPHPExcel->getActiveSheet()->setCellValue('K'.$start_row, $total);
 
 				$filename = 'kategori_jabatan.xls';
+				header('Content-Type: application/vnd.ms-excel');
+				header('Content-Disposition: attachment;filename="'.$filename.'"');
+				header('Cache-Control: max-age=0');
+
+				$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');  //downloadable file is in Excel 2003 format (.xls) 
+				ob_end_clean();
+				$objWriter->save('php://output');  //send it to user, of course you can save it to disk also!
+				exit; //done.. exiting!
+			}
+			else if($data =='status_pegawai'){
+				$o = json_decode(Template::get('jsonstatus_pegawai'));
+				$this->load->library('Excel');
+				$objPHPExcel = new PHPExcel();
+				$objPHPExcel = PHPExcel_IOFactory::load(FCPATH.DIRECTORY_SEPARATOR.'/assets/templates/template_data_dashboard_jenis_kelamin.xlsx');
+
+				$objPHPExcel->setActiveSheetIndex(0);
+				$objPHPExcel->getActiveSheet()->setCellValue('B2', "Rekap Berdasarkan Status Pegawai");
+				$objPHPExcel->getActiveSheet()->setCellValue('B4', "Status Pegawai");
+				$start_row = 5;
+				foreach($o as $row){
+					$objPHPExcel->getActiveSheet()->setCellValue('B'.$start_row, $row->status_pegawai);
+					$objPHPExcel->getActiveSheet()->setCellValue('C'.$start_row, $row->jumlah);
+					$start_row++;			
+				}
+				$filename = 'status_pegawai.xls';
 				header('Content-Type: application/vnd.ms-excel');
 				header('Content-Disposition: attachment;filename="'.$filename.'"');
 				header('Cache-Control: max-age=0');

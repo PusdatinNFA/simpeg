@@ -8,50 +8,50 @@
 <script src="<?php echo base_url(); ?>assets/js/amcharts/exporting/jspdf.js" type="text/javascript" ></script>  
 <script src="<?php echo base_url(); ?>assets/js/amcharts/exporting/rgbcolor.js" type="text/javascript" ></script>  
 <?php
-	$this->load->library('convert');
-	$convert = new convert();
-	$mainmenu = $this->uri->segment(2);
-	$menu = $this->uri->segment(3);
-	$submenu = $this->uri->segment(4);
+  $this->load->library('convert');
+  $convert = new convert();
+  $mainmenu = $this->uri->segment(2);
+  $menu = $this->uri->segment(3);
+  $submenu = $this->uri->segment(4);
 ?>
 <?php if(!$this->auth->has_permission("Pegawai.Kepegawaian.Filtersatker") or $this->auth->has_permission("Pegawai.Kepegawaian.permissionEselon1")){ ?>
 <div class="row " style="margin:10px 0px;">
-	<div class="col-md-12x">
-		<table class="filter_unit_kerja" sborder=0 width='100%' cellpadding="10">
-				<tr>
-					<td><label for="example-text-input" class="col-form-label">Unit Kerja</label></td>
-				</tr>	
-				<tr>
-					<td colspan=2>
-						<select id="unit_id_key" name="unit_id_key" width="100%" class=" col-md-10 format-control">
-							<?php 
-								if($selectedSatker){
-									echo "<option value='$selectedSatker->ID' SELECTED>$selectedSatker->NAMA_UNOR_FULL</option>";
-								}
-							?>
-						</select>
-					</td>
-				</tr>
-		</table>		
-	</div>
+  <div class="col-md-12x">
+    <table class="filter_unit_kerja" sborder=0 width='100%' cellpadding="10">
+        <tr>
+          <td><label for="example-text-input" class="col-form-label">Unit Kerja</label></td>
+        </tr> 
+        <tr>
+          <td colspan=2>
+            <select id="unit_id_key" name="unit_id_key" width="100%" class=" col-md-10 format-control">
+              <?php 
+                if($selectedSatker){
+                  echo "<option value='$selectedSatker->ID' SELECTED>$selectedSatker->NAMA_UNOR_FULL</option>";
+                }
+              ?>
+            </select>
+          </td>
+        </tr>
+    </table>    
+  </div>
 </div>
 <?Php } ?>
 <div class="row">
-		<div class="col-md-3 col-sm-6 col-xs-12">
-	        <div class="info-box bg-aqua">
-	          <span class="info-box-icon"><i class="fa fa-users"></i></span>
-	          <div class="info-box-content">
-	            <span class="info-box-text">Pegawai</span>
-	            <span class="info-box-number"><?php echo isset($totalpegawai) ? number_format($totalpegawai,0,"",".") : ""; ?>  Orang</span>
-	            <div class="progress">
-	              <div class="progress-bar" style="width: 100%"></div>
-	            </div>
-	            <span class="progress-description">
-	              Jumlah Pegawai
-	            </span>
-	          </div><!-- /.info-box-content -->
-	        </div><!-- /.info-box -->
-	      </div>
+    <div class="col-md-3 col-sm-6 col-xs-12">
+          <div class="info-box bg-aqua">
+            <span class="info-box-icon"><i class="fa fa-users"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">Pegawai</span>
+              <span class="info-box-number"><?php echo isset($totalpegawai) ? number_format($totalpegawai,0,"",".") : ""; ?>  Orang</span>
+              <div class="progress">
+                <div class="progress-bar" style="width: 100%"></div>
+              </div>
+              <span class="progress-description">
+                Jumlah Pegawai
+              </span>
+            </div><!-- /.info-box-content -->
+          </div><!-- /.info-box -->
+        </div>
         <div class="col-md-3 col-sm-6 col-xs-12">
             <div class="info-box bg-green">
               <span class="info-box-icon"><i class="fa fa-birthday-cake"></i></span>
@@ -102,78 +102,78 @@
         
 </div>
 <script type="text/javascript">
-	$("#unit_id_key").select2({
-		placeholder: 'Cari Unit Kerja...',
-		width: '100%',
-		minimumInputLength: 0,
-		allowClear: true,
-		ajax: {
-			url: '<?php echo site_url("pegawai/kepegawaian/ajax_unit_list");?>',
-			dataType: 'json',
-			data: function(params) {
-				return {
-					term: params.term || '',
-					page: params.page || 1
-				}
-			},
-			cache: true
-		}
-	}).change(function(){
-		if($(this).val()){
-			window.location = "?unit_id="+$(this).val();
-		}
-		else window.location = "?";
-	});
-</script>	
+  $("#unit_id_key").select2({
+    placeholder: 'Cari Unit Kerja...',
+    width: '100%',
+    minimumInputLength: 0,
+    allowClear: true,
+    ajax: {
+      url: '<?php echo site_url("pegawai/kepegawaian/ajax_unit_list");?>',
+      dataType: 'json',
+      data: function(params) {
+        return {
+          term: params.term || '',
+          page: params.page || 1
+        }
+      },
+      cache: true
+    }
+  }).change(function(){
+    if($(this).val()){
+      window.location = "?unit_id="+$(this).val();
+    }
+    else window.location = "?";
+  });
+</script> 
 <div class="row">
-	<div class="col-md-7">
-		<div class="box box-danger">
+  <div class="col-md-7">
+    <div class="box box-danger">
             <div class="box-header with-border">
               <h3 class="box-title">Grafik Berdasarkan Golongan</h3>
 
               <div class="box-tools pull-right">
-					<a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=golongan" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
-					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-					</button>
-					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-				</div>
+          <a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=golongan" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
+          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+        </div>
             </div>
             <!-- /.box-header -->
-            <div class="box-body no-padding">	
-	         	<div id="container" ></div>
-	         		<div id="chartgolongan" style="width: 100%; height: 350px;"> </div>
-	      		</div>
-          	</div>
+            <div class="box-body no-padding"> 
+            <div id="container" ></div>
+              <div id="chartgolongan" style="width: 100%; height: 350px;"> </div>
+            </div>
+            </div>
         <div class="box box-danger">
             <div class="box-header with-border">
               <h3 class="box-title">Grafik Pendidikan</h3>
               <div class="box-tools pull-right">
-					<div class="btn-group ">
-						<a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=pendidikan" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
-					</div>	
-					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-					</button>
-					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-					
-				</div>
+          <div class="btn-group ">
+            <a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=pendidikan" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
+          </div>  
+          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+          
+        </div>
             </div>
             <!-- /.box-header -->
-            <div class="box-body no-padding">	
-			   <div id="container" ></div>
-				   <div id="chartpendidikan" style="width: 100%; height: 350px;"> </div>
-			   </div>
+            <div class="box-body no-padding"> 
+         <div id="container" ></div>
+           <div id="chartpendidikan" style="width: 100%; height: 350px;"> </div>
+         </div>
           </div> 
-		  <div class="box box-danger">
+      <div class="box box-danger">
             <div class="box-header with-border">
               <h3 class="box-title">Grafik Umur</h3>
-              	<div class="box-tools pull-right">
-					<div class="btn-group ">
-						<a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=umur" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
-					</div>	
-					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-					</button>
-					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-				</div>
+                <div class="box-tools pull-right">
+          <div class="btn-group ">
+            <a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=umur" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
+          </div>  
+          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+        </div>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
@@ -213,13 +213,13 @@
 
              
               <div class="box-tools pull-right">
-								<div class="btn-group ">
-									<a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=kategori_jabatan" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
-								</div>	
-								<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-								</button>
-								<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-							</div>
+                <div class="btn-group ">
+                  <a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=kategori_jabatan" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
+                </div>  
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
@@ -238,25 +238,57 @@
             
             <!-- /.footer -->
           </div>
-	</div>
-	<div class="col-md-5">
-		<div class="box box-danger">
+      <div class="box box-warning">
+            <div class="box-header with-border">
+              <h3 class="box-title">Grafik Status Kepegawaian</h3>
+
+             
+              <div class="box-tools">
+        <div class="btn-group ">
+          <a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=status_pegawai" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
+        </div>  
+        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+        </button>
+        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+      </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="chart-responsive">
+                    <div id="divstatus_pegawai" style="width: 100%; height: 300px;"></div>
+                  </div>
+                  <!-- ./chart-responsive -->
+                </div>
+                <!-- /.col -->
+              </div>
+              <!-- /.row -->
+            </div>
+            <!-- /.box-body -->
+            
+            <!-- /.footer -->
+          </div>
+
+  </div>
+  <div class="col-md-5">
+    <div class="box box-danger">
             <div class="box-header with-border">
               <h3 class="box-title">Proyeksi Pensiun Pertahun</h3>
               <div class="box-tools pull-right">
-					<div class="btn-group ">
-						<a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=proyeksi_pensiun" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
-					</div>	
-					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-					</button>
-					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-				</div>
+          <div class="btn-group ">
+            <a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=proyeksi_pensiun" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
+          </div>  
+          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+        </div>
             </div>
             <!-- /.box-header -->
-            <div class="box-body no-padding">	
-	         	<div id="container" ></div>
-	         	<div id="chartpensiuntahun" style="width: 100%; height: 350px;"> </div>
-	      	</div>
+            <div class="box-body no-padding"> 
+            <div id="container" ></div>
+            <div id="chartpensiuntahun" style="width: 100%; height: 350px;"> </div>
+          </div>
         </div>
           <div class="box box-warning">
             <div class="box-header with-border">
@@ -264,14 +296,14 @@
 
               
               <div class="box-tools pull-right">
-								<div class="btn-group ">
-									<a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=agama" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
-								</div>	
-								<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-								</button>
-								<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-								
-							</div>
+                <div class="btn-group ">
+                  <a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=agama" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
+                </div>  
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                
+              </div>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
@@ -289,39 +321,39 @@
             <!-- /.box-body -->
             <div class="box-footer no-padding">
               <ul class="nav nav-pills nav-stacked">
-              	<?php
-				 if (isset($agamas) && is_array($agamas) && count($agamas)):
-					 foreach($agamas as $rec):
-					 if($rec->value > 0){
-				?>
-					<li><a href="#"><?=$rec->label;?>
- 	               		<span class="pull-right text-red"><?=$rec->value?></span></a>
- 	               	</li>
-				<?php
-					}
-					 endforeach;
-				 endif;
-		
-		
-              	?>
+                <?php
+         if (isset($agamas) && is_array($agamas) && count($agamas)):
+           foreach($agamas as $rec):
+           if($rec->value > 0){
+        ?>
+          <li><a href="#"><?=$rec->label;?>
+                    <span class="pull-right text-red"><?=$rec->value?></span></a>
+                  </li>
+        <?php
+          }
+           endforeach;
+         endif;
+    
+    
+                ?>
               </ul>
             </div>
             <!-- /.footer -->
           </div>
           <!-- /.box -->
-							
+              
            <div class="box box-danger">
             <div class="box-header with-border">
               <h3 class="box-title">Grafik Jenis Kelamin</h3>
-              	<div class="box-tools pull-right">
-					<div class="btn-group ">
-						<a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=jenis_kelamin" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
-					</div>	
-					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-					</button>
-					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-					
-				</div>
+                <div class="box-tools pull-right">
+          <div class="btn-group ">
+            <a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=jenis_kelamin" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
+          </div>  
+          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+          
+        </div>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
@@ -347,13 +379,13 @@
 
              
               <div class="box-tools pull-right">
-								<div class="btn-group ">
-									<a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=kelompok_jabatan" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
-								</div>	
-								<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-								</button>
-								<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-							</div>
+                <div class="btn-group ">
+                  <a href="?unit_id=<?php echo $this->input->get('unit_id');?>&action=download&data=kelompok_jabatan" target="_blank"><i class="fa fa-download" aria-hidden="true"></i> Download .xls</a>
+                </div>  
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
@@ -380,66 +412,65 @@
 var colors=    [ '#FCD202', '#B0DE09','#FF6600', '#0D8ECF', '#2A0CD0', '#CD0D74', '#CC0000', '#00CC00', '#0000CC', '#DDDDDD', '#999999', '#333333', '#990000']
 var inputpendidikan = <?php echo $jsonpendidikan; ?>;
 //inject color attribute with value
-for (i = 0; i < inputpendidikan.length; i++) {inputpendidikan[i].color = colors[i];}	
-	var chart = AmCharts.makeChart("chartpendidikan", {
-				  "type": "serial",
-				  "dataProvider":  inputpendidikan,
-				   "theme": "light",
-				  "categoryField": "NAMA",
-				  "rotate": false,
-				  "startDuration": 0,
-				  "depth3D": 0,
-				  "colorField" : "#ffd900",
-				  "angle": 30,
-				  "chartCursor": {
-					  "categoryBalloonEnabled": false,
-					  "cursorAlpha": 0,
-					  "zoomable": false,
-				  },    
-				   "categoryAxis": {
-					 "gridPosition": "start",
-					 "labelRotation": 45,
-					 "axisAlpha": 0,
-					 "autoWrap":false,
-					 minHorizontalGap:0,
-				   },
-				   
-					"titles" : [{
-						  "text": "NAMA"
-					  }, {
-						  "text": "",
-						  "bold": false
-					  }],
-				  "trendLines": [],
-				  "graphs": [
-					  {
-						  "balloonText": "<b>[[category]]: [[value]]</b>",
-						  "fillAlphas": 0.8,
-						  "id": "AmGraph-1",
-						  "lineAlpha": 0.2,
-						  "title": "Pendidikan",
-						  "type": "column",
-						  "colorField": "color",
-						  "valueField": "jumlah",
+for (i = 0; i < inputpendidikan.length; i++) {inputpendidikan[i].color = colors[i];}  
+  var chart = AmCharts.makeChart("chartpendidikan", {
+          "type": "serial",
+          "dataProvider":  inputpendidikan,
+           "theme": "light",
+          "categoryField": "NAMA",
+          "rotate": false,
+          "startDuration": 0,
+          "depth3D": 0,
+          "angle": 30,
+          "chartCursor": {
+            "categoryBalloonEnabled": false,
+            "cursorAlpha": 0,
+            "zoomable": false,
+          },    
+           "categoryAxis": {
+           "gridPosition": "start",
+           "labelRotation": 45,
+           "axisAlpha": 0,
+           "autoWrap":false,
+           minHorizontalGap:0,
+           },
+           
+          "titles" : [{
+              "text": "NAMA"
+            }, {
+              "text": "",
+              "bold": false
+            }],
+          "trendLines": [],
+          "graphs": [
+            {
+              "balloonText": "<b>[[category]]: [[value]]</b>",
+              "fillAlphas": 0.8,
+              "id": "AmGraph-1",
+              "lineAlpha": 0.2,
+              "title": "Pendidikan",
+              "type": "column",
+              "colorField": "color",
+              "valueField": "jumlah",
               "labelText": "[[value]]",
               "labelPosition": "top",
-					  } 
-				  ],
-				  "guides": [],
-				  "valueAxes": [
-					  {
-						  "id": "ValueAxis-1",
-						  "position": "top",
-						  "axisAlpha": 0
-					  }
-				  ],
-				  "allLabels": [],
-				  "balloon": {},
-				  "titles": [],
-				  
-				  "export": {
-					  "enabled": true
-				   },
+            } 
+          ],
+          "guides": [],
+          "valueAxes": [
+            {
+              "id": "ValueAxis-1",
+              "position": "top",
+              "axisAlpha": 0
+            }
+          ],
+          "allLabels": [],
+          "balloon": {},
+          "titles": [],
+          
+          "export": {
+            "enabled": true
+           },
            "exportConfig": {
                 "menuTop": "20px",
                 "menuBottom": "auto",
@@ -464,66 +495,73 @@ for (i = 0; i < inputpendidikan.length; i++) {inputpendidikan[i].color = colors[
                 }]
             }
 
-	});
-	
-	var chartPensiunTahun = AmCharts.makeChart("chartpensiuntahun", {
-				  "type": "serial",
-				  "dataProvider":   <?php echo $jsonpensiuntahun; ?>,
-				   "theme": "light",
-				  "categoryField": "tahun",
-				  "rotate": false,
-				  "startDuration": 0,
-				  "depth3D": 2,
-				  "angle": 30,
-				  labelsEnabled: true,
-				  "chartCursor": {
-					  "categoryBalloonEnabled": false,
-					  "cursorAlpha": 0,
-					  "zoomable": false,
-				  },    
-				   "categoryAxis": {
-					 "gridPosition": "start",
-					 "labelRotation": 45,
-					 "axisAlpha": 0,
-					 "autoWrap":false,
-					 minHorizontalGap:0,
-				   },
-				   
-					"titles" : [{
-						  "text": "tahun"
-					  }, {
-						  "text": "",
-						  "bold": false
-					  }],
-				  "trendLines": [],
-				  "graphs": [
-					  {
-						  "balloonText": "<b>[[category]]: [[value]]</b>",
-						  "colorField": "color",
-						  "fillAlphas": 0.8,
-						  "id": "AmGraph-1",
-						  "lineAlpha": 0.2,
-						  "type": "column",
-						  "valueField": "jumlah",
+  });
+  chart.addListener("clickGraphItem", function (event) {
+    let tingkat = event.item.dataContext.kode;
+    let tingkatName = event.item.dataContext.NAMA;
+    event.href = "<?php echo base_url(); ?>admin/kepegawaian/pegawai/listbypendidikan/"+tingkat;
+    event.tooltip = "Pendidikan "+tingkatName;
+    showmodalnew("","",event);
+  });
+
+  var chartPensiunTahun = AmCharts.makeChart("chartpensiuntahun", {
+          "type": "serial",
+          "dataProvider":   <?php echo $jsonpensiuntahun; ?>,
+           "theme": "light",
+          "categoryField": "tahun",
+          "rotate": false,
+          "startDuration": 0,
+          "depth3D": 2,
+          "angle": 30,
+          labelsEnabled: true,
+          "chartCursor": {
+            "categoryBalloonEnabled": false,
+            "cursorAlpha": 0,
+            "zoomable": false,
+          },    
+           "categoryAxis": {
+           "gridPosition": "start",
+           "labelRotation": 45,
+           "axisAlpha": 0,
+           "autoWrap":false,
+           minHorizontalGap:0,
+           },
+           
+          "titles" : [{
+              "text": "tahun"
+            }, {
+              "text": "",
+              "bold": false
+            }],
+          "trendLines": [],
+          "graphs": [
+            {
+              "balloonText": "<b>[[category]]: [[value]]</b>",
+              "colorField": "color",
+              "fillAlphas": 0.8,
+              "id": "AmGraph-1",
+              "lineAlpha": 0.2,
+              "type": "column",
+              "valueField": "jumlah",
               "labelText": "[[value]]",
               "labelPosition": "top",
-					  } 
-				  ],
-				  "guides": [],
-				  "valueAxes": [
-					  {
-						  "id": "ValueAxis-1",
-						  "position": "top",
-						  "axisAlpha": 0
-					  }
-				  ],
-				  "allLabels": [],
-				  "balloon": {},
-				  "titles": [],
-				  
-				  "export": {
-					  "enabled": true
-				   },
+            } 
+          ],
+          "guides": [],
+          "valueAxes": [
+            {
+              "id": "ValueAxis-1",
+              "position": "top",
+              "axisAlpha": 0
+            }
+          ],
+          "allLabels": [],
+          "balloon": {},
+          "titles": [],
+          
+          "export": {
+            "enabled": true
+           },
            "exportConfig": {
                 "menuTop": "20px",
                 "menuBottom": "auto",
@@ -549,37 +587,50 @@ for (i = 0; i < inputpendidikan.length; i++) {inputpendidikan[i].color = colors[
             }
 
 
-	});
-	AmCharts.makeChart("pieChart", {
-		 "type": "pie",
-		 "theme": "light",
-		 "dataProvider":  <?php echo json_encode($agamas); ?>,
-		 "titleField": "label",
-		 "valueField": "value",
-		 "pulledField": "pullOut",
-		 labelsEnabled: false,
-		 "categoryBalloonEnabled": false,
-		 "export": {
-		   "enabled": true
-		 },
-		 "balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
-		 "legend": {
-			 "align": "center",
-			 "markerType": "circle"
-		 }
+  });
+chartPensiunTahun.addListener("clickGraphItem", function (event) {
+  let tingkat = event.item.dataContext.tahun;
+  let tingkatName = event.item.dataContext.tahun;
+  event.href = "<?php echo base_url(); ?>admin/kepegawaian/pegawai/listpensiuntahun/"+tingkat;
+  event.tooltip = "Perkiraan Pensiun tahun "+tingkatName;
+  showmodalnew("","",event);
+});
+var chartAgama =  AmCharts.makeChart("pieChart", {
+     "type": "pie",
+     "theme": "light",
+     "dataProvider":  <?php echo json_encode($agamas); ?>,
+     "titleField": "label",
+     "valueField": "value",
+     "pulledField": "pullOut",
+     labelsEnabled: false,
+     "categoryBalloonEnabled": false,
+     "export": {
+       "enabled": true
+     },
+     "balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
+     "legend": {
+       "align": "center",
+       "markerType": "circle"
+     }
 
-	 });
-    
-			  
-	 AmCharts.makeChart("divjeniskelamin", {
-		 "type": "pie",
-		 "theme": "light",
-		 "dataProvider":  <?php echo $jsonjk; ?>,
-		 "titleField": "Jenis_Kelamin",
-		 "valueField": "jumlah",
-		 "labelsEnabled": true,
+   });
+chartAgama.addListener("clickSlice", function (event) {
+  let tingkat = event.dataItem.dataContext.label;
+  let tingkatName = event.dataItem.dataContext.label;
+  event.href = "<?php echo base_url(); ?>admin/kepegawaian/pegawai/listbyagama/"+tingkat;
+  event.tooltip = "Agama "+tingkatName;
+  showmodalnew("","",event);
+});  
+        
+var chartJk = AmCharts.makeChart("divjeniskelamin", {
+     "type": "pie",
+     "theme": "light",
+     "dataProvider":  <?php echo $jsonjk; ?>,
+     "titleField": "Jenis_Kelamin",
+     "valueField": "jumlah",
+     "labelsEnabled": true,
      "labelText": "[[title]]:[[value]]",
-		"labels": {
+    "labels": {
       "maxWidth": 130,
       "wrap": true
     },
@@ -609,73 +660,80 @@ for (i = 0; i < inputpendidikan.length; i++) {inputpendidikan[i].color = colors[
                 }]
             }]
         },
-		 "balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
-		 // "legend": {
-			//  "align": "center",
-			//  "markerType": "circle"
-		 // }
+     "balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
+     // "legend": {
+      //  "align": "center",
+      //  "markerType": "circle"
+     // }
 
-	 });
-	 // generasi
-	 
-	 var chartDivUmur = AmCharts.makeChart("divumur", {
-				  "type": "serial",
-				  "dataProvider":   <?php echo $jsonumur; ?>,
-				   "theme": "light",
-				  "categoryField": "label",
-				  "rotate": false,
-				  "startDuration": 0,
-				  "depth3D": 2,
-				  "angle": 30,
-				  
-				  "chartCursor": {
-					  "categoryBalloonEnabled": false,
-					  "cursorAlpha": 0,
-					  "zoomable": false,
-				  },    
-				   "categoryAxis": {
-					 "gridPosition": "start",
-					 "labelRotation": 45,
-					 "axisAlpha": 0,
-					 "autoWrap":false,
-					 minHorizontalGap:0,
-				   },
-				   
-					"titles" : [{
-						  "text": "label"
-					  }, {
-						  "text": "",
-						  "bold": false
-					  }],
-				  "trendLines": [],
-				  "graphs": [
-					  {
-						  "balloonText": "<b>[[category]]: [[value]]</b>",
-						  "colorField": "color",
-						  "fillAlphas": 0.8,
-						  "id": "AmGraph-1",
-						  "lineAlpha": 0.2,
-						  "type": "column",
-						  "valueField": "jumlah",
+   });
+chartJk.addListener("clickSlice", function (event) {
+  let tingkat = event.dataItem.dataContext.Jenis_Kelamin;
+  let tingkatName = event.dataItem.dataContext.Jenis_Kelamin;
+  event.href = "<?php echo base_url(); ?>admin/kepegawaian/pegawai/listbyjeniskelamin/"+tingkat;
+  event.tooltip = "Status "+tingkatName;
+  showmodalnew("","",event);
+});
+   // generasi
+   
+var chartDivUmur = AmCharts.makeChart("divumur", {
+          "type": "serial",
+          "dataProvider":   <?php echo $jsonumur; ?>,
+           "theme": "light",
+          "categoryField": "label",
+          "rotate": false,
+          "startDuration": 0,
+          "depth3D": 2,
+          "angle": 30,
+          
+          "chartCursor": {
+            "categoryBalloonEnabled": false,
+            "cursorAlpha": 0,
+            "zoomable": false,
+          },    
+           "categoryAxis": {
+           "gridPosition": "start",
+           "labelRotation": 45,
+           "axisAlpha": 0,
+           "autoWrap":false,
+           minHorizontalGap:0,
+           },
+           
+          "titles" : [{
+              "text": "label"
+            }, {
+              "text": "",
+              "bold": false
+            }],
+          "trendLines": [],
+          "graphs": [
+            {
+              "balloonText": "<b>[[category]]: [[value]]</b>",
+              "colorField": "color",
+              "fillAlphas": 0.8,
+              "id": "AmGraph-1",
+              "lineAlpha": 0.2,
+              "type": "column",
+              "valueField": "jumlah",
               "labelText": "[[value]]",
               "labelPosition": "top",
-					  } 
-				  ],
-				  "guides": [],
-				  "valueAxes": [
-					  {
-						  "id": "ValueAxis-1",
-						  "position": "top",
-						  "axisAlpha": 0
-					  }
-				  ],
-				  "allLabels": [],
-				  "balloon": {},
-				  "titles": [],
-				  
-				  "export": {
-					  "enabled": true
-				   },
+            } 
+          ],
+          "guides": [],
+          "valueAxes": [
+            {
+              "id": "ValueAxis-1",
+              "position": "top",
+              "axisAlpha": 0
+            }
+          ],
+          "allLabels": [],
+          "balloon": {},
+          "titles": [],
+          
+          "export": {
+            "enabled": true
+           },
            "exportConfig": {
                 "menuTop": "20px",
                 "menuBottom": "auto",
@@ -700,66 +758,72 @@ for (i = 0; i < inputpendidikan.length; i++) {inputpendidikan[i].color = colors[
                 }]
             }
 
-	});
-	
-	 var chartRekapGolongan =  AmCharts.makeChart("chartgolongan", {
-				  "type": "serial",
-				  "dataProvider":   <?php echo $data_jumlah_pegawai_per_golongan; ?>,
-				   "theme": "light",
-				  "categoryField": "nama",
-				  "rotate": false,
-				  "startDuration": 0,
-				  "depth3D": 2,
-				  "angle": 30,
-				  
-				  "chartCursor": {
-					  "categoryBalloonEnabled": false,
-					  "cursorAlpha": 0,
-					  "zoomable": false,
-				  },    
-				   "categoryAxis": {
-					 "gridPosition": "start",
-					 "labelRotation": 45,
-					 "axisAlpha": 0,
-					 "autoWrap":false,
-					 minHorizontalGap:0,
-				   },
-				   
-					"titles" : [{
-						  "text": "nama"
-					  }, {
-						  "text": "",
-						  "bold": false
-					  }],
-				  "trendLines": [],
-				  "graphs": [
-					  {
-						  "balloonText": "<b>[[category]]: [[value]]</b>",
-						  "colorField": "color",
-						  "fillAlphas": 0.8,
-						  "id": "AmGraph-1",
-						  "lineAlpha": 0.2,
-						  "type": "column",
-						  "valueField": "total",
+});
+chartDivUmur.addListener("clickGraphItem", function (event) {
+  let tingkat = event.item.dataContext.label;
+  let tingkatName = event.item.dataContext.label;
+  event.href = "<?php echo base_url(); ?>admin/kepegawaian/pegawai/listbyumur/"+tingkat;
+  event.tooltip = "Pegawai Umur "+tingkatName;
+  showmodalnew("","",event);
+});
+  var chartRekapGolongan =  AmCharts.makeChart("chartgolongan", {
+          "type": "serial",
+          "dataProvider":   <?php echo $data_jumlah_pegawai_per_golongan; ?>,
+           "theme": "light",
+          "categoryField": "nama",
+          "rotate": false,
+          "startDuration": 0,
+          "depth3D": 2,
+          "angle": 30,
+          
+          "chartCursor": {
+            "categoryBalloonEnabled": false,
+            "cursorAlpha": 0,
+            "zoomable": false,
+          },    
+           "categoryAxis": {
+           "gridPosition": "start",
+           "labelRotation": 45,
+           "axisAlpha": 0,
+           "autoWrap":false,
+           minHorizontalGap:0,
+           },
+           
+          "titles" : [{
+              "text": "nama"
+            }, {
+              "text": "",
+              "bold": false
+            }],
+          "trendLines": [],
+          "graphs": [
+            {
+              "balloonText": "<b>[[category]]: [[value]]</b>",
+              "colorField": "color",
+              "fillAlphas": 0.8,
+              "id": "AmGraph-1",
+              "lineAlpha": 0.2,
+              "type": "column",
+              "valueField": "total",
               "labelText": "[[value]]",
               "labelPosition": "top",
-					  } 
-				  ],
-				  "guides": [],
-				  "valueAxes": [
-					  {
-						  "id": "ValueAxis-1",
-						  "position": "top",
-						  "axisAlpha": 0
-					  }
-				  ],
-				  "allLabels": [],
-				  "balloon": {},
-				  "titles": [],
-				  
-				  "export": {
-					  "enabled": true
-				   },
+            } 
+          ],
+          "guides": [],
+          "valueAxes": [
+            {
+              "id": "ValueAxis-1",
+              "position": "top",
+              "axisAlpha": 0
+            }
+          ],
+          "allLabels": [],
+          "balloon": {},
+          "titles": [],
+          
+          "export": {
+            "enabled": true
+           },
            "exportConfig": {
                 "menuTop": "20px",
                 "menuBottom": "auto",
@@ -784,65 +848,73 @@ for (i = 0; i < inputpendidikan.length; i++) {inputpendidikan[i].color = colors[
                 }]
             }
 
-	});
-	 var input_kategorijabatan = <?php echo $json_kategori_jabatan; ?>;
-for (i = 0; i < input_kategorijabatan.length; i++) {input_kategorijabatan[i].color = colors[i];}	
-	 var chart_kategori_jabatan =  AmCharts.makeChart("divkategori_jabatan", {
-				  "type": "serial",
-				  "dataProvider":   input_kategorijabatan,
-				   "theme": "light",
-				  "categoryField": "KATEGORI_JABATAN",
-				  "rotate": false,
-				  "startDuration": 0,
-				  "depth3D": 2,
-				  "angle": 30,
-				  
-				  "chartCursor": {
-					  "categoryBalloonEnabled": false,
-					  "cursorAlpha": 0,
-					  "zoomable": false,
-				  },    
-				   "categoryAxis": {
-					 "gridPosition": "start",
-					 "labelRotation": 45,
-					 "axisAlpha": 0,
-					 "autoWrap":false,
-					 minHorizontalGap:0,
-				   },
-				   
-					"titles" : [{
-						  "text": "KATEGORI_JABATAN"
-					  }, {
-						  "text": "",
-						  "bold": false
-					  }],
-				  "trendLines": [],
-				  "graphs": [
-					  {
-						  "balloonText": "<b>[[category]]: [[value]]</b>",
-						  "colorField": "color",
-						  "fillAlphas": 0.8,
-						  "id": "AmGraph-1",
-						  "lineAlpha": 0.2,
-						  "type": "column",
-						  "valueField": "jumlah",
+  });
+chartRekapGolongan.addListener("clickGraphItem", function (event) {
+  let tingkat = event.item.dataContext.id;
+  let tingkatName = event.item.dataContext.nama;
+  event.href = "<?php echo base_url(); ?>admin/kepegawaian/pegawai/listbygolongan/"+tingkat;
+  event.tooltip = "Golongan "+tingkatName;
+  showmodalnew("","",event);
+});
+
+var input_kategorijabatan = <?php echo $json_kategori_jabatan; ?>;
+for (i = 0; i < input_kategorijabatan.length; i++) {input_kategorijabatan[i].color = colors[i];}  
+   var chart_kategori_jabatan =  AmCharts.makeChart("divkategori_jabatan", {
+          "type": "serial",
+          "dataProvider":   input_kategorijabatan,
+           "theme": "light",
+          "categoryField": "KATEGORI_JABATAN",
+          "rotate": false,
+          "startDuration": 0,
+          "depth3D": 2,
+          "angle": 30,
+          
+          "chartCursor": {
+            "categoryBalloonEnabled": false,
+            "cursorAlpha": 0,
+            "zoomable": false,
+          },    
+           "categoryAxis": {
+           "gridPosition": "start",
+           "labelRotation": 45,
+           "axisAlpha": 0,
+           "autoWrap":false,
+           minHorizontalGap:0,
+           },
+           
+          "titles" : [{
+              "text": "KATEGORI_JABATAN"
+            }, {
+              "text": "",
+              "bold": false
+            }],
+          "trendLines": [],
+          "graphs": [
+            {
+              "balloonText": "<b>[[category]]: [[value]]</b>",
+              "colorField": "color",
+              "fillAlphas": 0.8,
+              "id": "AmGraph-1",
+              "lineAlpha": 0.2,
+              "type": "column",
+              "valueField": "jumlah",
               "labelText": "[[value]]",
               "labelPosition": "top",
-					  } 
-				  ],
-				  "guides": [],
-				  "valueAxes": [
-					  {
-						  "id": "ValueAxis-1",
-						  "position": "top",
-						  "axisAlpha": 0
-					  }
-				  ],
-				  "allLabels": [],
-				  "balloon": {},
-				  "titles": [],
-				  
-				  "export": {
+            } 
+          ],
+          "guides": [],
+          "valueAxes": [
+            {
+              "id": "ValueAxis-1",
+              "position": "top",
+              "axisAlpha": 0
+            }
+          ],
+          "allLabels": [],
+          "balloon": {},
+          "titles": [],
+          
+          "export": {
             "enabled": true,
           }
           ,"exportConfig": {
@@ -869,65 +941,72 @@ for (i = 0; i < input_kategorijabatan.length; i++) {input_kategorijabatan[i].col
                 }]
             }
 
-	});
-	var input_kelompokjabatan = <?php echo $json_kelompok_jabatan; ?>;
-for (i = 0; i < input_kelompokjabatan.length; i++) {input_kelompokjabatan[i].color = colors[i];}	
-	 var chart_kelompok_jabatan =  AmCharts.makeChart("divkelompok_jabatan", {
-				  "type": "serial",
-				  "dataProvider":   input_kelompokjabatan,
-				   "theme": "light",
-				  "categoryField": "keterangan",
-				  "rotate": false,
-				  "startDuration": 0,
-				  "depth3D": 2,
-				  "angle": 30,
-				  
-				  "chartCursor": {
-					  "categoryBalloonEnabled": false,
-					  "cursorAlpha": 0,
-					  "zoomable": false,
-				  },    
-				   "categoryAxis": {
-					 "gridPosition": "start",
-					 "labelRotation": 45,
-					 "axisAlpha": 0,
-					 "autoWrap":false,
-					 minHorizontalGap:0,
-				   },
-				   
-					"titles" : [{
-						  "text": "Kelompok Jabatan"
-					  }, {
-						  "text": "",
-						  "bold": false
-					  }],
-				  "trendLines": [],
-				  "graphs": [
-					  {
-						  "balloonText": "<b>[[category]]: [[value]]</b>",
-						  "colorField": "color",
-						  "fillAlphas": 0.8,
-						  "id": "AmGraph-1",
-						  "lineAlpha": 0.2,
-						  "type": "column",
-						  "valueField": "jumlah",
+  });
+chart_kategori_jabatan.addListener("clickGraphItem", function (event) {
+  let tingkat = event.item.dataContext.KATEGORI_JABATAN;
+  let tingkatName = event.item.dataContext.KATEGORI_JABATAN;
+  event.href = "<?php echo base_url(); ?>admin/kepegawaian/pegawai/listbykatjabatan/"+tingkat;
+  event.tooltip = "Jabatan "+tingkatName;
+  showmodalnew("","",event);
+});
+var input_kelompokjabatan = <?php echo $json_kelompok_jabatan; ?>;
+for (i = 0; i < input_kelompokjabatan.length; i++) {input_kelompokjabatan[i].color = colors[i];}  
+   var chart_kelompok_jabatan =  AmCharts.makeChart("divkelompok_jabatan", {
+          "type": "serial",
+          "dataProvider":   input_kelompokjabatan,
+           "theme": "light",
+          "categoryField": "keterangan",
+          "rotate": false,
+          "startDuration": 0,
+          "depth3D": 2,
+          "angle": 30,
+          
+          "chartCursor": {
+            "categoryBalloonEnabled": false,
+            "cursorAlpha": 0,
+            "zoomable": false,
+          },    
+           "categoryAxis": {
+           "gridPosition": "start",
+           "labelRotation": 45,
+           "axisAlpha": 0,
+           "autoWrap":false,
+           minHorizontalGap:0,
+           },
+           
+          "titles" : [{
+              "text": "Kelompok Jabatan"
+            }, {
+              "text": "",
+              "bold": false
+            }],
+          "trendLines": [],
+          "graphs": [
+            {
+              "balloonText": "<b>[[category]]: [[value]]</b>",
+              "colorField": "color",
+              "fillAlphas": 0.8,
+              "id": "AmGraph-1",
+              "lineAlpha": 0.2,
+              "type": "column",
+              "valueField": "jumlah",
               "labelText": "[[value]]",
               "labelPosition": "top",
-					  } 
-				  ],
-				  "guides": [],
-				  "valueAxes": [
-					  {
-						  "id": "ValueAxis-1",
-						  "position": "top",
-						  "axisAlpha": 0
-					  }
-				  ],
-				  "allLabels": [],
-				  "balloon": {},
-				  "titles": [],
-				  
-				  "export": {
+            } 
+          ],
+          "guides": [],
+          "valueAxes": [
+            {
+              "id": "ValueAxis-1",
+              "position": "top",
+              "axisAlpha": 0
+            }
+          ],
+          "allLabels": [],
+          "balloon": {},
+          "titles": [],
+          
+          "export": {
             "enabled": true,
           }
           ,"exportConfig": {
@@ -954,5 +1033,64 @@ for (i = 0; i < input_kelompokjabatan.length; i++) {input_kelompokjabatan[i].col
                 }]
             }
 
-	});
+  });
+chart_kelompok_jabatan.addListener("clickGraphItem", function (event) {
+  let tingkat = event.item.dataContext.keterangan;
+  let tingkatName = event.item.dataContext.keterangan;
+  event.href = "<?php echo base_url(); ?>admin/kepegawaian/pegawai/listbykeljabatan/"+tingkat;
+  event.tooltip = "Jabatan "+tingkatName;
+  showmodalnew("","",event);
+});
+var chartStatusPegawai =  AmCharts.makeChart("divstatus_pegawai", {
+     "type": "pie",
+     "theme": "light",
+     "dataProvider":  <?php echo $jsonstatus_pegawai; ?>,
+     "titleField": "status_pegawai",
+     "valueField": "jumlah",
+     "labelsEnabled": true,
+     "labelText": "[[title]]:[[value]]",
+    "labels": {
+      "maxWidth": 130,
+      "wrap": true
+    },
+     "export": {
+            "enabled": true
+           },
+       "exportConfig": {
+            "menuTop": "20px",
+            "menuBottom": "auto",
+            "menuRight": "0px",
+            "backgroundColor": "#efefef",
+
+           "menuItemStyle"  : {
+            "backgroundColor"           : '#EFEFEF',
+            "rollOverBackgroundColor"   : '#DDDDDD'},
+
+            "menuItems": [{
+                "textAlign": 'center',
+                "icon": 'http://www.amcharts.com/lib/3/images/export.png',
+                "onclick":function(){},
+                "items": [{
+                    "title": 'JPG',
+                    "format": 'jpg'
+                }, {
+                    "title": 'PNG',
+                    "format": 'png'
+                }]
+            }]
+        },
+     "balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>",
+     // "legend": {
+      //  "align": "center",
+      //  "markerType": "circle"
+     // }
+
+   });
+chartStatusPegawai.addListener("clickSlice", function (event) {
+  let tingkat = event.dataItem.dataContext.status_pegawai;
+  let tingkatName = event.dataItem.dataContext.status_pegawai;
+  event.href = "<?php echo base_url(); ?>admin/kepegawaian/pegawai/listbystatuspegawai/"+tingkat;
+  event.tooltip = "Status "+tingkatName;
+  showmodalnew("","",event);
+});
 </script>
