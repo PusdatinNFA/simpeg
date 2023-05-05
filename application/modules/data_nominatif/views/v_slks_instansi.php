@@ -34,22 +34,6 @@
                 <td colspan=2><select id="filter_unit_kerja" name="filter_unit_kerja" width="100%" class=" col-md-10 format-control"></select></td>
             </tr>
             <tr>
-                <td width="150px"><label for="example-text-input" class="col-form-label">Kawasan</label></td>
-                <td colspan=2>
-                    <select name="kawasans[]" id="kawasans" multiple="multiple" class="select2 col-md-10 form-control">
-                        <?php
-                        if (isset($kawasans) && is_array($kawasans) && count($kawasans)) :
-                            foreach ($kawasans as $kawasan) :
-                                $selected = '';
-                                echo "<option $selected value='$kawasan->id'>" . strtoupper($kawasan->name) . "</option>";
-                            endforeach;
-                        endif;
-                        ?>                     
-                    </select>
-                </td>
-            </tr>
-
-            <tr>
                 <td><label for="example-text-input" class="col-form-label">Bulan Cutoff</label></td>
                 <td style="padding-right:10px;" width="200px">
                     <select class="form-control select2" name="filter_bulan">
@@ -87,22 +71,6 @@
                 </td>
             <tr>
             <tr>
-					<td width="200px"><label for="example-text-input" class="col-form-label">Pengelola Kawasan SDM</label></td>
-					<td colspan=2>
-						<select class="form-control select2" name="pengelolasdm">
-						<?php
-							if (isset($pengelolasdms) && is_array($pengelolasdms) && count($pengelolasdms)) :
-								echo '<option value="">-- Silahkan Pilih --</option>';
-								foreach ($pengelolasdms as $pengelolasdm) :
-									$selected = '';
-									echo "<option $selected value='$pengelolasdm->id'>".strtoupper($pengelolasdm->nama)."</option>";
-								endforeach;
-							endif;
-							?>
-						</select>
-					</td>
-				</tr>
-                <tr>
                 <td colspan=4>
                     <div class=" pull-right">
                         <button type="submit" class="btn btn-warning"><i class="fa fa-search"></i> Cari</button>

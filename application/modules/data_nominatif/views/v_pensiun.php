@@ -53,23 +53,7 @@
 					</td>
 					<td ><input class="form-control" type="text" name="filter_tahun" value="<?php echo date('Y');?>" ></td>
 				</tr>
-                <tr>
-					<td width="200px"><label for="example-text-input" class="col-form-label">Pengelola Kawasan SDM</label></td>
-					<td colspan=2>
-						<select class="form-control select2" name="pengelolasdm">
-						<?php
-							if (isset($pengelolasdms) && is_array($pengelolasdms) && count($pengelolasdms)) :
-								echo '<option value="">-- Silahkan Pilih --</option>';
-								foreach ($pengelolasdms as $pengelolasdm) :
-									$selected = '';
-									echo "<option $selected value='$pengelolasdm->id'>".strtoupper($pengelolasdm->nama)."</option>";
-								endforeach;
-							endif;
-							?>
-						</select>
-					</td>
-				</tr>
-					<td colspan=4>
+				<td colspan=4>
                         <div class="pull-right">
 						<button type="submit" class="btn btn-success"><i class="fa fa-search"></i> Cari</button>
 						<button type="button" id="download" class="btn btn-info" target="_blank"><i class="fa fa-download"></i> Download Nominatif</button>
