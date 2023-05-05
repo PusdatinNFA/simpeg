@@ -153,13 +153,12 @@ class Kepegawaian extends Admin_Controller
     }
     public function ppnpn()
     {	
-    	$this->auth->restrict($this->permissionView);
+    	$this->auth->restrict($this->permissionViewPpnpn);
         Template::set('toolbar_title', "Pegawai Non ASN");		
         Template::render();
     }
     public function pensiun()
     {	
-
     	$this->auth->restrict($this->permissionView);
         Template::set('toolbar_title',"Pegawai Pensiun");
 		
