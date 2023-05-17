@@ -1609,16 +1609,16 @@ class Bkn extends Admin_Controller
 				$idPns 		= $row->idPns;
 				if (!isset($data_riwayat->ID)) {
 					$data = array();
-					if ($row->jenisJabatan == "FUNGSIONAL_TERTENTU") {
+					if ($row->jenisJabatan == "2") {
 						$recjabatan = $this->jabatan_model->find_by("KODE_BKN", TRIM($row->jabatanFungsionalId));
 
 						$data["ID_JENIS_JABATAN"]      = 2;
 						$data["JENIS_JABATAN"]      = "Jabatan Fungsional Tertentu";
 						$data["ID_JABATAN_BKN"]     = $row->jabatanFungsionalId;
 						$data["NAMA_JABATAN"]   = $row->jabatanFungsionalNama;
-						$data["ID_JABATAN"]   = isset($recjabatan->KODE_JABATAN) ? $recjabatan->KODE_JABATAN : "";
+						$data["ID_JABATAN"]   = isset($recjabatan->ID) ? $recjabatan->ID : "";
 					}
-					if ($row->jenisJabatan == "FUNGSIONAL_UMUM") {
+					if ($row->jenisJabatan == "3") {
 						$recjabatan = $this->jabatan_model->find_by("KODE_BKN", TRIM($row->jabatanFungsionalUmumId));
 						$data["ID_JENIS_JABATAN"]   = 4;
 						$data["JENIS_JABATAN"]      = "Jabatan Fungsional Umum";
@@ -1626,7 +1626,7 @@ class Bkn extends Admin_Controller
 						$data["NAMA_JABATAN"]       = $row->jabatanFungsionalUmumNama;
 						$data["ID_JABATAN"]         = isset($recjabatan->KODE_JABATAN) ? $recjabatan->KODE_JABATAN : "";
 					}
-					if ($row->jenisJabatan == "STRUKTURAL") {
+					if ($row->jenisJabatan == "1") {
 						$recjabatan = $this->jabatan_model->find_by("KODE_BKN", TRIM($row->unorId));
 						$data["ID_JENIS_JABATAN"]      = 1;
 						$data["JENIS_JABATAN"]      = "Struktural";
@@ -2682,13 +2682,13 @@ class Bkn extends Admin_Controller
                     //if(isset($pegawai_lokal->TK_PENDIDIKAN) and $pegawai_lokal->TK_PENDIDIKAN == "") 
                         $data["TK_PENDIDIKAN"]  =   isset($pegawai->tkPendidikanTerakhirId) ?   $pegawai->tkPendidikanTerakhirId :  "";
                     if(isset($pegawai_lokal->TMT_CPNS) and $pegawai_lokal->TMT_CPNS == "") 
-                        $data["TMT_CPNS"]   =   isset($pegawai->tmtCpns)    ?   $pegawai->tmtCpns :     "";
+                        $data["TMT_CPNS"]   =   isset($pegawai->tmtCpns)    ?   $pegawai->tmtCpns :     null;
                     if(isset($pegawai_lokal->TGL_SK_CPNS) and $pegawai_lokal->TGL_SK_CPNS == "") 
-                        $data["TGL_SK_CPNS"]    =   isset($pegawai->tglSkCpns)  ?   $pegawai->tglSkCpns :   "";
+                        $data["TGL_SK_CPNS"]    =   isset($pegawai->tglSkCpns)  ?   $pegawai->tglSkCpns :   null;
                     if(isset($pegawai_lokal->TMT_GOLONGAN) and $pegawai_lokal->TMT_GOLONGAN == "") 
-                        $data["TMT_GOLONGAN"]   =   isset($pegawai->tmtGolAkhir)    ?   $pegawai->tmtGolAkhir :     "";
+                        $data["TMT_GOLONGAN"]   =   isset($pegawai->tmtGolAkhir)    ?   $pegawai->tmtGolAkhir :     null;
                     if(isset($pegawai_lokal->TMT_JABATAN) and $pegawai_lokal->TMT_JABATAN == "") 
-                        $data["TMT_JABATAN"]    =   isset($pegawai->tmtJabatan) ?   $pegawai->tmtJabatan :  "";
+                        $data["TMT_JABATAN"]    =   isset($pegawai->tmtJabatan) ?   $pegawai->tmtJabatan :  null;
                     //if(isset($pegawai_lokal->LOKASI_KERJA_ID) and $pegawai_lokal->LOKASI_KERJA_ID == "") 
                         $data["LOKASI_KERJA_ID"]    =   isset($pegawai->lokasiKerjaId)  ?   $pegawai->lokasiKerjaId :   "";
                     //if(isset($pegawai_lokal->UNOR_ID) and $pegawai_lokal->UNOR_ID == "") 
@@ -2819,7 +2819,7 @@ class Bkn extends Admin_Controller
                         $data["TMT_CPNS"]   =   isset($pegawai->tmtPns) ?   date('Y-m-d', strtotime($pegawai->tmtPns)) :    "";
                     if($pegawai->tmtCpns != "")
                         $data["TMT_CPNS"]   =   isset($pegawai->tmtCpns)    ?   date('Y-m-d', strtotime($pegawai->tmtCpns)) :   "";
-                    $data["TGL_SK_CPNS"]    =   isset($pegawai->tglSkCpns)  ?   date('Y-m-d', strtotime($pegawai->tglSkCpns)) :     "";
+                    $data["TGL_SK_CPNS"]    =   isset($pegawai->tglSkCpns)  ?   date('Y-m-d', strtotime($pegawai->tglSkCpns)) :     null;
                         $data["GOL_ID"] =   isset($pegawai->golRuangAkhirId)    ?   $pegawai->golRuangAkhirId :     "";
                     $data["TMT_GOLONGAN"]   =   isset($pegawai->tmtGolAkhir)    ?   date('Y-m-d', strtotime($pegawai->tmtGolAkhir)) :   "";
                     $data["TMT_JABATAN"]    =   isset($pegawai->tmtJabatan) ?   date('Y-m-d', strtotime($pegawai->tmtJabatan)) :    "";
@@ -2831,7 +2831,7 @@ class Bkn extends Admin_Controller
                         $data["JENIS_JABATAN_IDx"]  =   isset($pegawai->jenisJabatanId) ?   $pegawai->jenisJabatanId :  "";
 
                     $data["status_pegawai"] =   1;
-
+print_r($data);
                     if($id = $this->pegawai_model->insert($data))
                     {
                         $hasil = true;
