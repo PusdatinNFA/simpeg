@@ -33,6 +33,9 @@
                     <?php
                         $no = 1; 
                         foreach ($data_jabatan as $row) {
+                          echo "<pre>";
+                          print_r($row);
+                          echo "</pre>";
                         ?>
                         <tr>
                           <td><?php echo $no; ?></td>
