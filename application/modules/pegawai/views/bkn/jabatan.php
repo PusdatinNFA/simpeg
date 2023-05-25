@@ -33,17 +33,19 @@
                     <?php
                         $no = 1; 
                         foreach ($data_jabatan as $row) {
-                          echo "<pre>";
-                          print_r($row);
-                          echo "</pre>";
+                          // echo "<pre>";
+                          // print_r($row);
+                          // echo "</pre>";
                         ?>
                         <tr>
                           <td><?php echo $no; ?></td>
                           <td>
-                            <?php echo $row->jenisJabatan; ?><br>
+                            Jenis Jabatan : <?php echo $row->jenisJabatan; ?><br>
                             <?php echo $row->jabatanFungsionalUmumNama != "" ? "<b>JFU : </b>".$row->jabatanFungsionalUmumNama : ""; ?>    
                             <?php echo $row->jabatanFungsionalNama != "" ? "<b>JFT : </b>".$row->jabatanFungsionalNama : ""; ?>    
                             <?php echo $row->namaJabatan != "" ? "<br><b>ST : </b>".$row->namaJabatan : ""; ?>    
+                            <?php echo $row->jabatanFungsionalId != "" ? "<br><b>jabatanFungsionalId : </b>".$row->jabatanFungsionalId : ""; ?>
+                            <?php echo $row->jabatanFungsionalUmumId != "" ? "<br><b>jabatanFungsionalUmumId : </b>".$row->jabatanFungsionalUmumId : ""; ?>
                           </td>
                           <td><?php echo $row->unorNama; ?></td>
                           <td><?php echo $row->unorIndukNama; ?></td>
