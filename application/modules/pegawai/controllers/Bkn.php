@@ -2831,7 +2831,6 @@ class Bkn extends Admin_Controller
                         $data["JENIS_JABATAN_IDx"]  =   isset($pegawai->jenisJabatanId) ?   $pegawai->jenisJabatanId :  "";
 
                     $data["status_pegawai"] =   1;
-print_r($data);
                     if($id = $this->pegawai_model->insert($data))
                     {
                         $hasil = true;
