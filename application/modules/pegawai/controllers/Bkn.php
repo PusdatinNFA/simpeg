@@ -2144,7 +2144,7 @@ class Bkn extends Admin_Controller
 					$data["PNS_ID"] = trim($pegawai_lokal->PNS_ID);
 					$data["NIP"] 	= $pegawai_lokal->NIP_BARU;
 					$data["NAMA"] 	= ucwords(strtolower(trim($row->nama)));
-					$data["JENIS_KELAMIN"] 	= trim($row->jenisKelamin) == "Pria" ? "M" : (trim($row->jenisKelamin) == "Wanita" ? "F" : null);
+					$data["JENIS_KELAMIN"] 	= trim($row->jenisKelamin) == "M" ? "M" : (trim($row->jenisKelamin) == "F" ? "F" : null);
 					$data["TANGGAL_LAHIR"] 	= date("Y-m-d", strtotime(trim($row->tglLahir)));//trim($row->tglLahir) ? convertDate($row->tglLahir, 'd-m-Y', 'Y-m-d') : null;
 					$data["TEMPAT_LAHIR"] 	= ucwords(strtolower(trim($row->tempatLahir)));
 					$data["STATUS_ANAK"] 	= $row->jenisAnak;
