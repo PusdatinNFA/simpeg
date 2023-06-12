@@ -410,7 +410,7 @@ class Bkn extends Admin_Controller
 		$data_ortu = $this->getdata_ortu(trim($pegawai_lokal->NIP_BARU));
 		$result = false;
 		$id = "";
-		if ($data_ortu != null) {
+		if ($data_ortu != null and $data_ortu != "Data tidak ditemukan") {
 			$result = true;
 		}
 		if ($result) {
@@ -422,7 +422,7 @@ class Bkn extends Admin_Controller
 		} else {
 			$response['success'] = false;
 			$response['nip'] = trim($pegawai_lokal->NIP_BARU);
-			$response['msg'] = "Data tidak ada";
+			$response['msg'] = "Data tidak ditemukan";
 			$response['konten'] = "";
 		}
 		echo json_encode($response);
@@ -2085,7 +2085,7 @@ class Bkn extends Admin_Controller
 		if ($data_cache != null) {
 			foreach ($data_cache->listPasangan as $row) {
 				$this->db->group_start();
-				$this->istri_model->where("\"NAMA\" ilike '" . trim($row->dataOrang->nama) . "'");
+				$this->istri_model->where("\"NAMA\" ilike '" . trim($row->orang->nama) . "'");
 				$this->db->group_end();
 				$data_riwayat = $this->istri_model->find_by("NIP", trim($nip_baru));
 				$idPns 		= $row->idPns;
@@ -2093,10 +2093,10 @@ class Bkn extends Admin_Controller
 					$data = array();
 					$data["PNS_ID"] = trim($pegawai_lokal->PNS_ID);
 					$data["NIP"] 	= $pegawai_lokal->NIP_BARU;
-					$data["NAMA"] 	= ucwords(strtolower(trim($row->dataOrang->nama)));
+					$data["NAMA"] 	= ucwords(strtolower(trim($row->orang->nama)));
 					$data["TANGGAL_MENIKAH"] 	= trim($row->dataPernikahan->tgglMenikah);
 					$data["AKTE_NIKAH"] 	= trim($row->dataPernikahan->aktaMenikah);
-					$data["STATUS"] 	= $row->dataPernikahan->status;
+					$data["STATUS"] 	= $row->statusNikah == "Menikah" ? 1 : null;
 					$data["PNS"] 	= $row->dataPernikahan->isPns ? 1 : 0;
 					$data["HUBUNGAN"] 	= $pegawai_lokal->JENIS_KELAMIN == 'M' ? 1 : 2;
 					$data["AKTE_CERAI"] 	= trim($row->dataPernikahan->aktaCerai);
@@ -2132,6 +2132,7 @@ class Bkn extends Admin_Controller
 		$result = true;
 		if ($data_cache != null) {
 			foreach ($data_cache->listAnak as $row) {
+				print_r($row);
 				$this->db->group_start();
 				$this->anak_model->where("\"NAMA\" ilike '" . trim($row->nama) . "'");
 				$this->db->group_end();
@@ -2144,12 +2145,10 @@ class Bkn extends Admin_Controller
 					$data["NIP"] 	= $pegawai_lokal->NIP_BARU;
 					$data["NAMA"] 	= ucwords(strtolower(trim($row->nama)));
 					$data["JENIS_KELAMIN"] 	= trim($row->jenisKelamin) == "Pria" ? "M" : (trim($row->jenisKelamin) == "Wanita" ? "F" : null);
-					$data["TANGGAL_LAHIR"] 	= trim($row->tglLahir) ? convertDate($row->tglLahir, 'd-m-Y', 'Y-m-d') : null;
+					$data["TANGGAL_LAHIR"] 	= date("Y-m-d", strtotime(trim($row->tglLahir)));//trim($row->tglLahir) ? convertDate($row->tglLahir, 'd-m-Y', 'Y-m-d') : null;
 					$data["TEMPAT_LAHIR"] 	= ucwords(strtolower(trim($row->tempatLahir)));
-					$data["STATUS_ANAK"] 	= trim($row->jenisAnak) == "-" ? null : (trim($row->jenisAnak) == "KANDUNG" ? 1 : 2);
+					$data["STATUS_ANAK"] 	= $row->jenisAnak;
 					$data["PASANGAN"] 	= $pasangan->ID ? $pasangan->ID : null;
-
-
 					$this->anak_model->skip_validation(true);
 					$result = $this->anak_model->insert($data);
 					log_activity_pegawai($nip_baru, $this->auth->user_id(), "sinkron data anak dari BKN " . $data["NAMA"], 'pegawai');

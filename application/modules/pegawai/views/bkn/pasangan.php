@@ -22,8 +22,8 @@
                 <thead>
                     <tr>
                         <th width='15px'>No</th>
-                        <th>Pasangan Ke</th>
                         <th>Nama</th>
+                        <th>Tgl Lahir</th>
                         <th>Status</th>
                         <th>PNS</th>
                     </tr>
@@ -35,9 +35,9 @@
                     ?>
                         <tr>
                             <td><?php echo $no; ?></td>
-                            <td><?php echo $no; ?></td>
-                            <td><?php echo $row->dataOrang->nama; ?></td>
-                            <td><?php echo $row->dataPernikahan->status; ?></td>
+                            <td><?php echo $row->orang->nama; ?></td>
+                            <td><?php echo $row->orang->tglLahir; ?></td>
+                            <td><?php echo $row->statusNikah; ?></td>
                             <td><?php echo $row->dataPernikahan->isPns?"PNS":"Bukan"; ?></td>
                         </tr>
                     <?php
