@@ -2132,7 +2132,7 @@ class Bkn extends Admin_Controller
 		$result = true;
 		if ($data_cache != null) {
 			foreach ($data_cache->listAnak as $row) {
-				print_r($row);
+				// print_r($row);
 				$this->db->group_start();
 				$this->anak_model->where("\"NAMA\" ilike '" . trim($row->nama) . "'");
 				$this->db->group_end();
