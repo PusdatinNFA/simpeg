@@ -245,7 +245,7 @@ class Bkn extends Admin_Controller
 
 		$result = false;
 		$id = "";
-		if ($data_pendidikan != null) {
+		if ($data_pendidikan != null && $data_pendidikan != "record not found") {
 			$result = true;
 		}
 		if ($result) {
@@ -257,7 +257,7 @@ class Bkn extends Admin_Controller
 		} else {
 			$response['success'] = false;
 			$response['nip'] = trim($pegawai_lokal->NIP_BARU);
-			$response['msg'] = "Data tidak ada";
+			$response['msg'] = "Data tidak ditemukan";
 			$response['konten'] = "";
 		}
 		echo json_encode($response);
@@ -272,7 +272,7 @@ class Bkn extends Admin_Controller
 		$data_golongan = $this->getdata_riwayat_golongan_bkn(trim($pegawai_lokal->NIP_BARU));
 		$result = false;
 		$id = "";
-		if ($data_golongan != null) {
+		if ($data_golongan != null && $data_golongan != "Data tidak ditemukan") {
 			$result = true;
 		}
 		if ($result) {
@@ -284,7 +284,7 @@ class Bkn extends Admin_Controller
 		} else {
 			$response['success'] = false;
 			$response['nip'] = trim($pegawai_lokal->NIP_BARU);
-			$response['msg'] = "Data tidak ada";
+			$response['msg'] = "Data tidak ditemukan";
 			$response['konten'] = "";
 		}
 		echo json_encode($response);
@@ -298,7 +298,7 @@ class Bkn extends Admin_Controller
 		$data_cltn = $this->getdata_riwayat_cltn(trim($pegawai_lokal->NIP_BARU));
 		$result = false;
 		$id = "";
-		if ($data_cltn != null) {
+		if ($data_cltn != null && $data_cltn != "Data tidak ditemukan") {
 			$result = true;
 		}
 		if ($result) {
@@ -310,7 +310,7 @@ class Bkn extends Admin_Controller
 		} else {
 			$response['success'] = false;
 			$response['nip'] = trim($pegawai_lokal->NIP_BARU);
-			$response['msg'] = "Data tidak ada";
+			$response['msg'] = "Data tidak ditemukan";
 			$response['konten'] = "";
 		}
 		echo json_encode($response);
@@ -325,7 +325,7 @@ class Bkn extends Admin_Controller
 
 		$result = false;
 		$id = "";
-		if ($data_jabatan != null) {
+		if ($data_jabatan != null && $data_jabatan != "record not found") {
 			$result = true;
 		}
 		if ($result) {
@@ -343,7 +343,7 @@ class Bkn extends Admin_Controller
 		} else {
 			$response['success'] = false;
 			$response['nip'] = trim($pegawai_lokal->NIP_BARU);
-			$response['msg'] = "Data tidak ada";
+			$response['msg'] = "Data tidak ditemukan";
 			$response['konten'] = "";
 		}
 		echo json_encode($response);
@@ -358,7 +358,7 @@ class Bkn extends Admin_Controller
 
 		$result = false;
 		$id = "";
-		if ($data_diklat != null) {
+		if ($data_diklat != null && $data_diklat != "record not found") {
 			$result = true;
 		}
 		if ($result) {
@@ -370,7 +370,7 @@ class Bkn extends Admin_Controller
 		} else {
 			$response['success'] = false;
 			$response['nip'] = trim($pegawai_lokal->NIP_BARU);
-			$response['msg'] = "Data tidak ada";
+			$response['msg'] = "Data tidak ditemukan";
 			$response['konten'] = "";
 		}
 		echo json_encode($response);
@@ -384,7 +384,7 @@ class Bkn extends Admin_Controller
 		$data_penghargaan = $this->getdata_penghargaan(trim($pegawai_lokal->NIP_BARU));
 		$result = false;
 		$id = "";
-		if ($data_penghargaan != null) {
+		if ($data_penghargaan != null && $data_penghargaan != "Data tidak ditemukan") {
 			$result = true;
 		}
 		if ($result) {
@@ -396,7 +396,7 @@ class Bkn extends Admin_Controller
 		} else {
 			$response['success'] = false;
 			$response['nip'] = trim($pegawai_lokal->NIP_BARU);
-			$response['msg'] = "Data tidak ada";
+			$response['msg'] = "Data tidak ditemukan";
 			$response['konten'] = "";
 		}
 		echo json_encode($response);
@@ -436,7 +436,7 @@ class Bkn extends Admin_Controller
 		$data_pasangan = $this->getdata_pasangan(trim($pegawai_lokal->NIP_BARU));
 		$result = false;
 		$id = "";
-		if ($data_pasangan != null) {
+		if ($data_pasangan != null && $data_pasangan != "Data tidak ditemukan") {
 			$result = true;
 		}
 		if ($result) {
@@ -448,7 +448,7 @@ class Bkn extends Admin_Controller
 		} else {
 			$response['success'] = false;
 			$response['nip'] = trim($pegawai_lokal->NIP_BARU);
-			$response['msg'] = "Data tidak ada";
+			$response['msg'] = "Data tidak ditemukan";
 			$response['konten'] = "";
 		}
 		echo json_encode($response);
@@ -462,7 +462,7 @@ class Bkn extends Admin_Controller
 		$data_anak = $this->getdata_anak(trim($pegawai_lokal->NIP_BARU));
 		$result = false;
 		$id = "";
-		if ($data_anak != null) {
+		if ($data_anak != null && $data_anak != "Data tidak ditemukan") {
 			$result = true;
 		}
 		if ($result) {
@@ -474,7 +474,7 @@ class Bkn extends Admin_Controller
 		} else {
 			$response['success'] = false;
 			$response['nip'] = trim($pegawai_lokal->NIP_BARU);
-			$response['msg'] = "Data tidak ada";
+			$response['msg'] = "Data tidak ditemukan";
 			$response['konten'] = "";
 		}
 		echo json_encode($response);
@@ -514,7 +514,7 @@ class Bkn extends Admin_Controller
 		$data_hukdis = $this->getdata_rwt_hukdis(trim($pegawai_lokal->NIP_BARU));
 		$result = false;
 		$id = "";
-		if ($data_hukdis != null) {
+		if ($data_hukdis != null && $data_hukdis != "record not found") {
 			$result = true;
 		}
 		if ($result) {
@@ -526,7 +526,7 @@ class Bkn extends Admin_Controller
 		} else {
 			$response['success'] = false;
 			$response['nip'] = trim($pegawai_lokal->NIP_BARU);
-			$response['msg'] = "Data tidak ada";
+			$response['msg'] = "Data tidak ditemukan";
 			$response['konten'] = "";
 		}
 		echo json_encode($response);
@@ -702,7 +702,7 @@ class Bkn extends Admin_Controller
 		$data_skp = $this->getdata_rwt_skp(trim($pegawai_lokal->NIP_BARU));
 		$result = false;
 		$id = "";
-		if ($data_skp != null) {
+		if ($data_skp != null && $data_skp != "record not found") {
 			$result = true;
 		}
 		if ($result) {
@@ -728,7 +728,7 @@ class Bkn extends Admin_Controller
 		$data_skp = $this->getdata_rwt_kinerja(trim($pegawai_lokal->NIP_BARU));
 		$result = false;
 		$id = "";
-		if ($data_skp != null) {
+		if ($data_skp != null && $data_skp != "record not found") {
 			$result = true;
 		}
 		if ($result) {
@@ -740,7 +740,7 @@ class Bkn extends Admin_Controller
 		} else {
 			$response['success'] = false;
 			$response['nip'] = trim($pegawai_lokal->NIP_BARU);
-			$response['msg'] = "Data tidak ada";
+			$response['msg'] = "Data tidak ditemukan";
 			$response['konten'] = "";
 		}
 		echo json_encode($response);

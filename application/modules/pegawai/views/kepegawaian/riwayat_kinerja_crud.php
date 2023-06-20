@@ -29,7 +29,7 @@ if ($mandiri) { ?>
                             </div>
                             <div class="form-row">
                                 <div class="col">
-                                    <input disabled="" type="text" class="form-control" value="<?= $detail_riwayat->tahun ?>">
+                                    <input type="text" class="form-control" name="tahun" value="<?= $detail_riwayat->tahun ?>">
                                 </div>
                             </div>
                         </div>
@@ -46,7 +46,7 @@ if ($mandiri) { ?>
                             </div>
                             <div class="form-row">
                                 <div class="col">
-                                    <input disabled="" type="text" class="form-control" value="<?= $detail_riwayat->nip ?>">
+                                    <input type="text" class="form-control" value="<?= $NIP_BARU ?>">
                                 </div>
                             </div>
                         </div>
@@ -60,7 +60,7 @@ if ($mandiri) { ?>
                             </div>
                             <div class="form-row">
                                 <div class="col">
-                                    <input disabled="" type="text" class="form-control" value="<?= $detail_riwayat->nama ?>">
+                                    <input type="text" class="form-control" value="<?= $nama ?>">
                                 </div>
                             </div>
                         </div>
@@ -76,7 +76,7 @@ if ($mandiri) { ?>
                             </div>
                             <div class="form-row">
                                 <div class="col">
-                                    <input disabled="" type="text" class="form-control" value="<?= isset($detail_riwayat->instansi) ? $detail_riwayat->instansi : 'Badan Riset dan Inovasi Nasional' ?>">
+                                    <input type="text" class="form-control" value="<?= isset($detail_riwayat->instansi) ? $detail_riwayat->instansi : 'Badan Pembinaan Ideologi Pancasila' ?>">
                                 </div>
                             </div>
                         </div>
@@ -90,7 +90,7 @@ if ($mandiri) { ?>
                             </div>
                             <div class="form-row">
                                 <div class="col">
-                                    <input disabled="" type="text" class="form-control" value="<?= $detail_riwayat->unit_kerja_realisasi ?>">
+                                    <input type="text" class="form-control" value="<?= $detail_riwayat->unit_kerja_realisasi ?>">
                                 </div>
                             </div>
                         </div>
@@ -109,7 +109,7 @@ if ($mandiri) { ?>
                             </div>
                             <div class="form-row">
                                 <div class="col">
-                                    <input disabled="" type="text" class="form-control" value="<?= $detail_riwayat->rating_hasil_kerja ?>">
+                                    <input type="text" class="form-control" name="rating_hasil_kerja" value="<?= $detail_riwayat->rating_hasil_kerja ?>">
                                 </div>
                             </div>
                         </div>
@@ -123,7 +123,7 @@ if ($mandiri) { ?>
                             </div>
                             <div class="form-row">
                                 <div class="col">
-                                    <input disabled="" type="text" class="form-control" value="<?= $detail_riwayat->rating_perilaku_kerja ?>">
+                                    <input type="text" name="rating_perilaku_kerja" class="form-control" value="<?= $detail_riwayat->rating_perilaku_kerja ?>">
                                 </div>
                             </div>
                         </div>
@@ -139,7 +139,7 @@ if ($mandiri) { ?>
                             </div>
                             <div class="form-row">
                                 <div class="col">
-                                    <input disabled="" type="text" class="form-control" value="<?= $detail_riwayat->predikat_kinerja ?>">
+                                    <input type="text" class="form-control" name="predikat_kinerja" value="<?= $detail_riwayat->predikat_kinerja ?>">
                                 </div>
                             </div>
                         </div>
@@ -158,7 +158,7 @@ if ($mandiri) { ?>
                             </div>
                             <div class="form-row">
                                 <div class="col">
-                                    <input disabled="" type="text" class="form-control" value="ASN">
+                                    <input type="text" class="form-control" value="ASN">
                                 </div>
                             </div>
                         </div>
@@ -172,7 +172,7 @@ if ($mandiri) { ?>
                             </div>
                             <div class="form-row">
                                 <div class="col">
-                                    <input disabled="" type="text" class="form-control" value="<?= $detail_riwayat->nip_penilai_realisasi ?>">
+                                    <input type="text" class="form-control" name="nip_penilai_realisasi" value="<?= $detail_riwayat->nip_penilai_realisasi ?>">
                                 </div>
                             </div>
                         </div>
@@ -188,7 +188,7 @@ if ($mandiri) { ?>
                             </div>
                             <div class="form-row">
                                 <div class="col">
-                                    <input disabled="" type="text" class="form-control" value="<?= $detail_riwayat->nama_penilai_realisasi ?>">
+                                    <input type="text" name="nama_penilai_realisasi" class="form-control" value="<?= $detail_riwayat->nama_penilai_realisasi ?>">
                                 </div>
                             </div>
                         </div>
@@ -205,7 +205,7 @@ if ($mandiri) { ?>
                             </div>
                             <div class="form-row">
                                 <div class="col">
-                                    <input disabled="" type="text" class="form-control" value="<?= $detail_riwayat->unit_kerja_penilai_realisasi ?>">
+                                    <input type="text" name="unit_kerja_penilai_realisasi" class="form-control" value="<?= $detail_riwayat->unit_kerja_penilai_realisasi ?>">
                                 </div>
                             </div>
                         </div>
@@ -219,7 +219,7 @@ if ($mandiri) { ?>
                             </div>
                             <div class="form-row">
                                 <div class="col">
-                                    <input disabled="" type="text" class="form-control" value="<?= $detail_riwayat->jabatan_penilai_realisasi ?>">
+                                    <input type="text" name="jabatan_penilai_realisasi" class="form-control" value="<?= $detail_riwayat->jabatan_penilai_realisasi ?>">
                                 </div>
                             </div>
                         </div>
@@ -251,9 +251,7 @@ if ($mandiri) { ?>
                         </div>
                     </div>
                 </div>
-
                 <input type="text" class="hide" name='nip' value="<?= $NIP_BARU?>">
-                <input type="text" class="hide" name='tahun' value="<?= $detail_riwayat->tahun?>">
                 <input type="text" class="hide" name='ref' value="<?= $detail_riwayat->ref?>">
                 <input type="text" class="hide" name='mandiri' value="<?= $mandiri ? $mandiri : '' ?>">
                 <input type="text" class="hide" name='id_update_mandiri' value="<?= $id_update_mandiri ? $id_update_mandiri : '' ?>">
