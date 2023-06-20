@@ -53,7 +53,7 @@
 
 	(function($){
 		var $container = $("#<?php echo $TAB_ID;?>");
-		$grid_daftar_skp = $(".table-datatable",$container).DataTable({
+		$grid_daftar_kinerja = $(".table-datatable",$container).DataTable({
 				ordering: false,
 				processing: true,
 				"bFilter": false,
@@ -72,7 +72,7 @@
 		});
 		$container.on('click','.show-modal-custom',function(event){
 			showModalX.call(this,'sukses-tambah-riwayat-kinerja',function(){
-				$grid_daftar_skp.ajax.reload();
+				$grid_daftar_kinerja.ajax.reload();
 			},this);
 			event.preventDefault();
 		});
@@ -101,7 +101,7 @@
 								timeout:180000,
 								success: function (result) {
 									swal("Data berhasil di hapus!", result, "success");
-									$grid_daftar_skp.ajax.reload();
+									$grid_daftar_kinerja.ajax.reload();
 							},
 							error : function(error) {
 								alert(error);
@@ -136,7 +136,7 @@
 								timeout:180000,
 								success: function (result) {
 									swal("Data berhasil di upload!", result, "success");
-									$grid_daftar_skp.ajax.reload();
+									$grid_daftar_kinerja.ajax.reload();
 							},
 							error : function(error) {
 								alert(error);

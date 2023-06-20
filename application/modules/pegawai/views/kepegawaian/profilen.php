@@ -140,6 +140,9 @@ endif;
                 <?php if ($this->auth->has_permission('Pegawai.Downloaddrh.View')) : ?>
                 <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/download_drh/<?php echo $pegawai->PNS_ID; ?>" class="btn btn-success btn-block" target="_BLANK"><i class="fa fa-download"></i> Download DRH Lengkap</a>
                 <?php endif; ?>
+                <?php if ($this->auth->has_permission('Pegawai.SinkronBkn.View')){ ?>
+                <button tooltip="Singkron data Pribadi" class="btn btn-success btn-block generatedatabkn" kode="<?=$pegawai->NIP_BARU?>"><i class="fa fa-gear"></i> Sinkron data Pribadi</button>
+                <?php } ?>
                 <br>
                 <?php if ($this->auth->has_permission('Pegawai.Pindahprofile.View')) : ?>
                 <p>Ke Profile Pegawai Lain :</p>
@@ -311,4 +314,45 @@ endif;
       //   event.preventDefault();
       // });
     });
-    </script>
+$('body').on('click','.generatedatabkn',function () { 
+  var kode =$(this).attr("kode");
+  swal({
+    title: "Anda Yakin?",
+    text: "Sinkronisasi data pribadi!",
+    type: "warning",
+    showCancelButton: true,
+    confirmButtonClass: 'btn-danger',
+    confirmButtonText: 'Ya!',
+    cancelButtonText: "Tidak, Batalkan!",
+    showLoaderOnConfirm: true,
+    closeOnConfirm: false,
+    closeOnCancel: false
+  },
+  function (isConfirm) {
+    if (isConfirm) {
+      var post_data = "nip_bkn="+kode;
+      $.ajax({
+          url: "<?php echo base_url() ?>pegawai/bkn/getpegawaibknnew",
+          type:"POST",
+          data: post_data,
+          dataType: "json",
+          timeout:180000,
+          success: function (result) {
+            if(result.success){
+              swal("Pemberitahuan!", result.msg, "success");
+            }
+            else {
+              swal("Pemberitahuan!", result.msg, "error");
+            }
+        },
+        error : function(error) {
+          alert(error);
+        } 
+      });        
+      
+    } else {
+      swal("Batal", "", "error");
+    }
+  });
+});
+</script>

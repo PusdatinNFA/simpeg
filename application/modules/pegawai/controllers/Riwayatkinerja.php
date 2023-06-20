@@ -86,17 +86,17 @@ class Riwayatkinerja extends Admin_Controller
                 if ($record->id_arsip != "") {
                     $btn_actions[] = "<a href='" . base_url() . "admin/arsip/arsip_digital/viewdoc2/" . $record->id_arsip . "' data-toggle='tooltip' title='Lihat Dokumen' tooltip='Lihat Dokumen' class='btn btn-sm btn-info modal-custom-global'><i class='glyphicon glyphicon-eye-open'></i> </a>";
                 }
-                $btn_actions[] = "<a href='" . base_url() . "pegawai/riwayatkinerja/show/" . $record->ref . "' data-toggle='tooltip' title='Detail data' tooltip='Detail data' class='btn btn-sm btn-default show-modal-custom'><i class='glyphicon glyphicon-eye-open'></i> </a>";
+                
                 if ($this->auth->has_permission($this->permissionUpdateMandiri)) {
                     $btn_actions[] = "<a href='" . base_url() . "pegawai/riwayatkinerja/editmandiri/" . $record->ref . "' data-toggle='tooltip' title='Ubah data mandiri' tooltip='Ubah data' class='btn btn-sm btn-warning show-modal-custom'><i class='fa fa-pencil'></i> </a>";
                 }
                 if ($this->auth->has_permission($this->permissionEdit)) {
-                    $btn_actions[] = "<a href='" . base_url() . "pegawai/riwayatkinerja/edit/" . $record->ref . "' data-toggle='tooltip' title='Ubah data' tooltip='Ubah data' class='btn btn-sm btn-success show-modal-custom'><i class='fa fa-pencil'></i> </a>";
+                    $btn_actions[] = "<a href='" . base_url() . "pegawai/riwayatkinerja/edit/" . $pegawai_data->PNS_ID . "/" . $record->ref . "' data-toggle='tooltip' title='Ubah data' tooltip='Ubah data' class='btn btn-sm btn-success show-modal-custom'><i class='fa fa-pencil'></i> </a>";
                 }
 
-                // if ($this->auth->has_permission($this->permissionDelete)) {
-                //     $btn_actions[] = "<a href='#' kode='$record->id' data-toggle='tooltip' title='Hapus Data' class='btn btn-sm btn-danger btn-hapus'><i class='fa fa-trash-o'></i> </a>";
-                // }
+                if ($this->auth->has_permission($this->permissionDelete)) {
+                    $btn_actions[] = "<a href='#' kode='$record->ref' data-toggle='tooltip' title='Hapus Data' class='btn btn-sm btn-danger btn-hapus'><i class='fa fa-trash-o'></i> </a>";
+                }
                 $row[] = "<div class='btn-group'>" . implode(" ", $btn_actions) . "</div>";
                 $output['data'][] = $row;
                 $nomor_urut++;
@@ -105,30 +105,8 @@ class Riwayatkinerja extends Admin_Controller
         echo json_encode($output);
         die();
     }
-    public function show($ref, $view = true, $mandiri = 0, $NIP_BARU = null)
-    {
-        $detailRiwayat = null;
-        if ($ref) {
-            $detailRiwayat = $this->riwayat_kinerja_model->find($ref);
-            $NIP_BARU = $detailRiwayat->nip;
-        }
-        Template::set('mandiri', $mandiri);
-        Template::set('detail_riwayat', $detailRiwayat);
-        Template::set('NIP_BARU', $NIP_BARU);
-        Template::set('toolbar_title', "Detail Kinerja");
-        if ($view)
-            Template::set_view("kepegawaian/riwayat_kinerja_detil");
-        else
-            Template::set_view("kepegawaian/riwayat_kinerja_crud");
-
-
-        Template::render();
-    }
-    public function edit($ref)
-    {
-        $this->show($ref, false);
-    }
-
+    
+    
     public function editmandiri($ref)
     {
         $this->show($ref, false, 1);
@@ -169,6 +147,7 @@ class Riwayatkinerja extends Admin_Controller
         $file_tmp   = "";
         $pegawai = $this->pegawai_model->find_by('NIP_BARU', $this->input->post('nip'));     
         $data['nip'] = $pegawai->NIP_BARU;
+        $data['nama'] = $pegawai->NAMA;
         if (isset($_FILES['file_dokumen']) && $_FILES['file_dokumen']['name']) {
             $errors = array();
             $allowed_ext = array('pdf');
@@ -360,6 +339,40 @@ class Riwayatkinerja extends Admin_Controller
         Template::set_view("kepegawaian/tab_pane_riwayat_kinerja");
         Template::set('NIP_BARU', $NIP_BARU);
         Template::set('TAB_ID', uniqid("TAB_CONTOH"));
+        Template::render();
+    }
+    public function add($PNS_ID){
+        $this->show($PNS_ID,"",false);
+    }
+    public function edit($PNS_ID,$record_id=''){
+        $this->show($PNS_ID,$record_id,false);
+    }
+    public function show($pns_id,$ref = "", $view = true, $mandiri = 0, $NIP_BARU = null)
+    {
+        $detailRiwayat = null;
+        if ($ref) {
+            $detailRiwayat = $this->riwayat_kinerja_model->find($ref);
+            $pegawai = $this->pegawai_model->find_by("PNS_ID",$pns_id);
+            $NIP_BARU = $pegawai->NIP_BARU;
+            $nama = $pegawai->NAMA;
+        }else{
+            $pegawai = $this->pegawai_model->find_by("PNS_ID",$pns_id);
+            $NIP_BARU = $pegawai->NIP_BARU;
+            $nama = $pegawai->NAMA;
+        }
+        Template::set('mandiri', $mandiri);
+        Template::set('detail_riwayat', $detailRiwayat);
+        Template::set('NIP_BARU', $NIP_BARU);
+        Template::set('nama', $nama);
+        Template::set('PNS_ID', $pns_id);
+        Template::set('toolbar_title', "Detail Kinerja");
+        if ($view)
+            Template::set_view("kepegawaian/riwayat_kinerja_detil");
+        else{
+            Template::set_view("kepegawaian/riwayat_kinerja_crud");
+        }
+
+
         Template::render();
     }
 }
