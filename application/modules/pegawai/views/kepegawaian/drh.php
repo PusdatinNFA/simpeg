@@ -273,12 +273,11 @@ function rupiah($angka)
                                 <thead>
                                     <tr class="table-danger">
                                         <th>No</th>
-                                        <th>Jenis Diklat</th>
                                         <th>Nama Diklat</th>
+                                        <th>Nomor</th>
                                         <th>Tanggal</th>
                                         <th>Tahun</th>
-                                        <th>Institusi <BR> Penyelenggara</th>
-                                        <th>Nomor<BR> Sertifikat</th>
+                                        <th>Lama Jam</th>
                                     </tr>
                                 </thead>
                                 <?php if ($rwt_diklat_struktural) { ?>
@@ -286,8 +285,11 @@ function rupiah($angka)
                                         <?php for ($i = 0; $i < count($rwt_diklat_struktural); $i++) { ?>
                                             <tr>
                                                 <td class="text-center"><?= $i + 1 ?></td>
-                                                <td><?= $rwt_diklat_struktural[$i]->JENIS_DIKLAT ?></td>
-                                                <td class="text-center"><?= $rwt_diklat_struktural[$i]->NAMA_KURSUS ?></td>
+                                                <td><?= $rwt_diklat_struktural[$i]->NAMA_DIKLAT ?></td>
+                                                <td class="text-center"><?= $rwt_diklat_struktural[$i]->NOMOR ?></td>
+                                                <td class="text-center"><?= getIndonesiaFormat($rwt_diklat_struktural[$i]->TANGGAL) ?> - <?= getIndonesiaFormat($rwt_diklat_struktural[$i]->TANGGAL_SELESAI) ?></td>
+                                                <td class="text-center"><?= $rwt_diklat_struktural[$i]->TAHUN ?></td>
+                                                <td class="text-center"><?= $rwt_diklat_struktural[$i]->LAMA ?></td>
                                             </tr>
                                         <?php } ?>
 

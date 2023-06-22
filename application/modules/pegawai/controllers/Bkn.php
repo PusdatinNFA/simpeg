@@ -1618,7 +1618,7 @@ class Bkn extends Admin_Controller
 						$data["NAMA_JABATAN"]   = $row->jabatanFungsionalNama;
 						$data["ID_JABATAN"]   = isset($recjabatan->ID) ? $recjabatan->ID : "";
 					}
-					if ($row->jenisJabatan == "3") {
+					if ($row->jenisJabatan == "4") {
 						$recjabatan = $this->jabatan_model->find_by("KODE_BKN", TRIM($row->jabatanFungsionalUmumId));
 						$data["ID_JENIS_JABATAN"]   = 4;
 						$data["JENIS_JABATAN"]      = "Jabatan Fungsional Umum";
