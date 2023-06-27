@@ -285,10 +285,10 @@
         <div class="form-group col-sm-12">
             <div class="row">
                 <div class="col-sm-4">
-                    Status Kepegawaian
+                    Status CPNS/PNS
                 </div>
                 <div class="col-sm-8">
-                    <b><?php echo isset($pegawai->STATUS_CPNS_PNS) ? $pegawai->STATUS_CPNS_PNS == "P" ? "PNS" : "" : ''; ?>   (<?php echo $this->convert->fmtDate($pegawai->TMT_PNS,"dd month yyyy"); ?>)</b>
+                    <b><?php echo isset($pegawai->STATUS_CPNS_PNS) ? $pegawai->STATUS_CPNS_PNS == "P" ? "PNS" : $pegawai->STATUS_CPNS_PNS : ''; ?>   (<?php echo $this->convert->fmtDate($pegawai->TMT_PNS,"dd month yyyy"); ?>)</b>
                 </div>
             </div>
         </div>
