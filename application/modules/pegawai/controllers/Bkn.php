@@ -2667,16 +2667,16 @@ class Bkn extends Admin_Controller
                     //if(isset($pegawai_lokal->TEMPAT_LAHIR_ID) and trim($pegawai_lokal->TEMPAT_LAHIR_ID) == "") 
                         $data["TEMPAT_LAHIR_ID"]    =   isset($pegawai->tempatLahirId)  ?   $pegawai->tempatLahirId :   "";
                     if(isset($pegawai_lokal->TGL_BEBAS_NARKOBA) and $pegawai_lokal->TGL_BEBAS_NARKOBA == "") 
-                        $data["TGL_BEBAS_NARKOBA"]  =   isset($pegawai->tglSuratKeteranganBebasNarkoba) ?   date('Y-m-d', strtotime($pegawai->tglSuratKeteranganBebasNarkoba)) :    "";
-                    if(isset($pegawai_lokal->TGL_CATATAN_POLISI) and $pegawai_lokal->TGL_CATATAN_POLISI == "") 
-                        $data["TGL_CATATAN_POLISI"] =   isset($pegawai->tglSkck)    ?   $pegawai->tglSkck :     "";
-                    if(isset($pegawai_lokal->TGL_LAHIR) and $pegawai_lokal->TGL_LAHIR == "") 
-                        $data["TGL_LAHIR"]  =   isset($pegawai->tglLahir)   ?   $pegawai->tglLahir :    "";
+                        $data["TGL_BEBAS_NARKOBA"]  =   isset($pegawai->tglSuratKeteranganBebasNarkoba) ?   date('Y-m-d', strtotime($pegawai->tglSuratKeteranganBebasNarkoba)) :    null;
+                    if(isset($pegawai_lokal->TGL_CATATAN_POLISI)) 
+                        $data["TGL_CATATAN_POLISI"] =   isset($pegawai->tglSkck)    ?   $pegawai->tglSkck :     null;
+                    if($pegawai->tglLahir != "")
+                        $data["TGL_LAHIR"]  =   isset($pegawai->tglLahir)   ?   date('Y-m-d', strtotime($pegawai->tglLahir)) :  null;
                     if(isset($pegawai_lokal->TGL_MENINGGAL) and $pegawai_lokal->TGL_MENINGGAL == "") 
-                        $data["TGL_MENINGGAL"]  =   isset($pegawai->tglMeninggal)   ?   $pegawai->tglMeninggal :    "";
+                        $data["TGL_MENINGGAL"]  =   isset($pegawai->tglMeninggal)   ?   $pegawai->tglMeninggal :    null;
                     if(isset($pegawai_lokal->TGL_NPWP) and $pegawai_lokal->TGL_NPWP == "") 
-                        $data["TGL_NPWP"]   =   isset($pegawai->tglNpwp)    ?   $pegawai->tglNpwp :     "";
-                    if(isset($pegawai_lokal->TGL_SURAT_DOKTER) and $pegawai_lokal->TGL_SURAT_DOKTER == "") 
+                        $data["TGL_NPWP"]   =   isset($pegawai->tglNpwp)    ?   $pegawai->tglNpwp :     null;
+                    if(isset($pegawai_lokal->TGL_SURAT_DOKTER) and $pegawai_lokal->TGL_SURAT_DOKTER == null) 
                         $data["TGL_SURAT_DOKTER"]   =   isset($pegawai->tglSuratKeteranganDokter)   ?   $pegawai->tglSuratKeteranganDokter :    "";
                     //if(isset($pegawai_lokal->TK_PENDIDIKAN) and $pegawai_lokal->TK_PENDIDIKAN == "") 
                     $data["TK_PENDIDIKAN"]  =   isset($pegawai->tkPendidikanTerakhirId) ?   $pegawai->tkPendidikanTerakhirId :  "";
@@ -2801,17 +2801,17 @@ class Bkn extends Admin_Controller
                     if($pegawai->tempatLahirId != "")
                         $data["TEMPAT_LAHIR_ID"]    =   isset($pegawai->tempatLahirId)  ?   $pegawai->tempatLahirId :   "";
                     if($pegawai->tglSuratKeteranganBebasNarkoba != "")
-                        $data["TGL_BEBAS_NARKOBA"]  =   isset($pegawai->tglSuratKeteranganBebasNarkoba) ?   date('Y-m-d', strtotime($pegawai->tglSuratKeteranganBebasNarkoba)) :    "";
+                        $data["TGL_BEBAS_NARKOBA"]  =   isset($pegawai->tglSuratKeteranganBebasNarkoba) ?   date('Y-m-d', strtotime($pegawai->tglSuratKeteranganBebasNarkoba)) :    null;
                     if($pegawai->tglSkck != "")
-                        $data["TGL_CATATAN_POLISI"] =   isset($pegawai->tglSkck)    ?   date('Y-m-d', strtotime($pegawai->tglSkck)) :   "";
+                        $data["TGL_CATATAN_POLISI"] =   isset($pegawai->tglSkck)    ?   date('Y-m-d', strtotime($pegawai->tglSkck)) :   null;
                     if($pegawai->tglLahir != "")
-                        $data["TGL_LAHIR"]  =   isset($pegawai->tglLahir)   ?   date('Y-m-d', strtotime($pegawai->tglLahir)) :  "";
+                        $data["TGL_LAHIR"]  =   isset($pegawai->tglLahir)   ?   date('Y-m-d', strtotime($pegawai->tglLahir)) :  null;
                     if($pegawai->tglMeninggal != "")
-                        $data["TGL_MENINGGAL"]  =   isset($pegawai->tglMeninggal)   ?   date('Y-m-d', strtotime($pegawai->tglMeninggal)) :  "";
+                        $data["TGL_MENINGGAL"]  =   isset($pegawai->tglMeninggal)   ?   date('Y-m-d', strtotime($pegawai->tglMeninggal)) :  null;
                     if($pegawai->tglNpwp != "")
-                        $data["TGL_NPWP"]   =   isset($pegawai->tglNpwp)    ?   date('Y-m-d', strtotime($pegawai->tglNpwp)) :   "";
+                        $data["TGL_NPWP"]   =   isset($pegawai->tglNpwp)    ?   date('Y-m-d', strtotime($pegawai->tglNpwp)) :   null;
                     if($pegawai->tglSuratKeteranganDokter != "")
-                        $data["TGL_SURAT_DOKTER"]   =   isset($pegawai->tglSuratKeteranganDokter)   ?   date('Y-m-d', strtotime($pegawai->tglSuratKeteranganDokter)) :  "";
+                        $data["TGL_SURAT_DOKTER"]   =   isset($pegawai->tglSuratKeteranganDokter)   ?   date('Y-m-d', strtotime($pegawai->tglSuratKeteranganDokter)) :  null;
                     if($pegawai->tkPendidikanTerakhirId != "")
                     $data["TK_PENDIDIKAN"]  =   isset($pegawai->tkPendidikanTerakhirId) ?   $pegawai->tkPendidikanTerakhirId :  "";
                     if($pegawai->tmtPns != "")
