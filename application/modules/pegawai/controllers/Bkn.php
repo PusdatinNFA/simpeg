@@ -2679,15 +2679,15 @@ class Bkn extends Admin_Controller
                     if(isset($pegawai_lokal->TGL_SURAT_DOKTER) and $pegawai_lokal->TGL_SURAT_DOKTER == "") 
                         $data["TGL_SURAT_DOKTER"]   =   isset($pegawai->tglSuratKeteranganDokter)   ?   $pegawai->tglSuratKeteranganDokter :    "";
                     //if(isset($pegawai_lokal->TK_PENDIDIKAN) and $pegawai_lokal->TK_PENDIDIKAN == "") 
-                        $data["TK_PENDIDIKAN"]  =   isset($pegawai->tkPendidikanTerakhirId) ?   $pegawai->tkPendidikanTerakhirId :  "";
-                    if(isset($pegawai_lokal->TMT_CPNS) and $pegawai_lokal->TMT_CPNS == "") 
-                        $data["TMT_CPNS"]   =   isset($pegawai->tmtCpns)    ?   $pegawai->tmtCpns :     null;
-                    if(isset($pegawai_lokal->TGL_SK_CPNS) and $pegawai_lokal->TGL_SK_CPNS == "") 
-                        $data["TGL_SK_CPNS"]    =   isset($pegawai->tglSkCpns)  ?   $pegawai->tglSkCpns :   null;
-                    if(isset($pegawai_lokal->TMT_GOLONGAN) and $pegawai_lokal->TMT_GOLONGAN == "") 
-                        $data["TMT_GOLONGAN"]   =   isset($pegawai->tmtGolAkhir)    ?   $pegawai->tmtGolAkhir :     null;
-                    if(isset($pegawai_lokal->TMT_JABATAN) and $pegawai_lokal->TMT_JABATAN == "") 
-                        $data["TMT_JABATAN"]    =   isset($pegawai->tmtJabatan) ?   $pegawai->tmtJabatan :  null;
+                    $data["TK_PENDIDIKAN"]  =   isset($pegawai->tkPendidikanTerakhirId) ?   $pegawai->tkPendidikanTerakhirId :  "";
+                 	if($pegawai->tmtPns != "")
+                        $data["TMT_PNS"]   =   isset($pegawai->tmtPns) ?   date('Y-m-d', strtotime($pegawai->tmtPns)) :    null;
+                    if($pegawai->tmtCpns != "")
+                        $data["TMT_CPNS"]   =   isset($pegawai->tmtCpns)    ?   date('Y-m-d', strtotime($pegawai->tmtCpns)) :   null;
+                    $data["TGL_SK_CPNS"]    =   isset($pegawai->tglSkCpns)  ?   date('Y-m-d', strtotime($pegawai->tglSkCpns)) :     null;
+                        $data["GOL_ID"] =   isset($pegawai->golRuangAkhirId)    ?   $pegawai->golRuangAkhirId :     "";
+                    $data["TMT_GOLONGAN"]   =   isset($pegawai->tmtGolAkhir)    ?   date('Y-m-d', strtotime($pegawai->tmtGolAkhir)) :   null;
+                    $data["TMT_JABATAN"]    =   isset($pegawai->tmtJabatan) ?   date('Y-m-d', strtotime($pegawai->tmtJabatan)) :    null;
                     //if(isset($pegawai_lokal->LOKASI_KERJA_ID) and $pegawai_lokal->LOKASI_KERJA_ID == "") 
                         $data["LOKASI_KERJA_ID"]    =   isset($pegawai->lokasiKerjaId)  ?   $pegawai->lokasiKerjaId :   "";
                     //if(isset($pegawai_lokal->UNOR_ID) and $pegawai_lokal->UNOR_ID == "") 
@@ -2815,13 +2815,13 @@ class Bkn extends Admin_Controller
                     if($pegawai->tkPendidikanTerakhirId != "")
                     $data["TK_PENDIDIKAN"]  =   isset($pegawai->tkPendidikanTerakhirId) ?   $pegawai->tkPendidikanTerakhirId :  "";
                     if($pegawai->tmtPns != "")
-                        $data["TMT_CPNS"]   =   isset($pegawai->tmtPns) ?   date('Y-m-d', strtotime($pegawai->tmtPns)) :    "";
+                        $data["TMT_PNS"]   =   isset($pegawai->tmtPns) ?   date('Y-m-d', strtotime($pegawai->tmtPns)) :    null;
                     if($pegawai->tmtCpns != "")
-                        $data["TMT_CPNS"]   =   isset($pegawai->tmtCpns)    ?   date('Y-m-d', strtotime($pegawai->tmtCpns)) :   "";
+                        $data["TMT_CPNS"]   =   isset($pegawai->tmtCpns)    ?   date('Y-m-d', strtotime($pegawai->tmtCpns)) :   null;
                     $data["TGL_SK_CPNS"]    =   isset($pegawai->tglSkCpns)  ?   date('Y-m-d', strtotime($pegawai->tglSkCpns)) :     null;
                         $data["GOL_ID"] =   isset($pegawai->golRuangAkhirId)    ?   $pegawai->golRuangAkhirId :     "";
-                    $data["TMT_GOLONGAN"]   =   isset($pegawai->tmtGolAkhir)    ?   date('Y-m-d', strtotime($pegawai->tmtGolAkhir)) :   "";
-                    $data["TMT_JABATAN"]    =   isset($pegawai->tmtJabatan) ?   date('Y-m-d', strtotime($pegawai->tmtJabatan)) :    "";
+                    $data["TMT_GOLONGAN"]   =   isset($pegawai->tmtGolAkhir)    ?   date('Y-m-d', strtotime($pegawai->tmtGolAkhir)) :   null;
+                    $data["TMT_JABATAN"]    =   isset($pegawai->tmtJabatan) ?   date('Y-m-d', strtotime($pegawai->tmtJabatan)) :    null;
                     $data["LOKASI_KERJA_ID"]    =   isset($pegawai->lokasiKerjaId)  ?   $pegawai->lokasiKerjaId :   "";
                     $data["UNOR_ID"]    =   isset($adataunor[$pegawai->unorId]) ?   $adataunor[$pegawai->unorId]->ID :  "";
                     $data["UNOR_INDUK_ID"]  =   isset($adataunor[$pegawai->unorIndukId]) ?   $adataunor[$pegawai->unorIndukId]->ID :  "";
