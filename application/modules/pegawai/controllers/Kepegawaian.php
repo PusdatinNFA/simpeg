@@ -418,6 +418,7 @@ class Kepegawaian extends Admin_Controller
 			$extra_unique_rule = ',pegawai.ID';
 		}else{
 			$this->form_validation->set_rules('PNS_ID','KODE','required|max_length[30]|unique[pegawai.PNS_ID' . $extra_unique_rule . ']');
+			$this->form_validation->set_rules('username_intra','Username Intra','required|max_length[8]');
 		}
         //$this->form_validation->set_rules('JENIS_KELAMIN','JENIS_KELAMIN','required|max_length[30]');
         if ($this->form_validation->run() === FALSE)
@@ -449,6 +450,7 @@ class Kepegawaian extends Admin_Controller
 			$data['PENDIDIKAN']	= $recpendidikan->NAMA;
 			
 			$data['PNS_ID']	= $this->input->post('PNS_ID');
+			$data['NIP_BARU']	= $this->input->post('PNS_ID');
 	        $data['AGAMA_ID']	= $this->input->post('AGAMA_ID') ? $this->input->post('AGAMA_ID') : null;
 			$data['TGL_LAHIR']	= $this->input->post('TGL_LAHIR') ? $this->input->post('TGL_LAHIR') : null;
 			$data['TGL_NPWP']	= $this->input->post('TGL_NPWP') ? $this->input->post('TGL_NPWP') : null;
@@ -3438,6 +3440,7 @@ class Kepegawaian extends Admin_Controller
 		}
 		$id_data = $this->input->post('ID');
         $this->form_validation->set_rules($this->pegawai_model->get_validation_rules());
+        $this->form_validation->set_rules('username_intra','Username Intra','required|max_length[8]');
         $extra_unique_rule = '';
 		if ($id_data != '')
 		{
