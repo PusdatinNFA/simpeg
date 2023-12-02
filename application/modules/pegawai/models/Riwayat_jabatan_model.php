@@ -379,4 +379,38 @@ class Riwayat_jabatan_model extends BF_Model
 		$this->db->order_by("rwt_jabatan.ID","DESC");
 		return parent::find_all();
 	}
+	public function find_jabatan_orang()
+	{
+		$this->db->select('rwt_jabatan.*, p.NAMA, p.PNS_ID');
+		$this->db->join('hris.pegawai p','p.NIP_BARU = rwt_jabatan.PNS_NIP','INNER');
+		return parent::find_all();
+	}
+	public function getUnsyncBkn($id_table = null)
+	{
+		if ($id_table){
+			$this->db->where('id_tabel', $id_table);
+		}
+		$result = $this->db->from('hris.vw_jabatan_integrasi')->get()->result();
+		return $result;
+	}
+	public function countUnsyncBkn($id_table = null)
+	{
+		if ($id_table){
+			$this->db->where('id_tabel', $id_table);
+		}
+		$this->db->select('id_tabel');
+		$result = $this->db->from('hris.vw_jabatan_integrasi')->get()->num_rows();
+		return $result;
+	}
+	public function find_detil()
+	{
+		$result = $this->db->from('hris.vw_jabatan')->get()->result();
+		return $result;
+	}
+	public function count_detil()
+	{
+		$this->db->select('ID');
+		$result = $this->db->from('hris.vw_jabatan')->get()->num_rows();
+		return $result;
+	}
 }

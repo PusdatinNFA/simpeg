@@ -72,11 +72,12 @@ class Riwayat_kursus_model extends BF_Model
 		
 		if(empty($this->selects))
 		{
-			$this->select($this->table_name .'.*,initcap(j.nama) "JENIS_KURSUS"');
+			$this->select($this->table_name .'.*,initcap(j.nama) "JENIS_KURSUS", jd.jenis_diklat as "TIPE_KURSUS"');
 		}
 		if($PNS_ID!=""){
 			$this->db->where('PNS_ID',$PNS_ID);
 		}
+		$this->db->join('hris.jenis_diklat jd', 'jd.id = rwt_kursus."TIPE_KURSUS"', 'left');
 		$this->db->join('hris.jenis_kursus j', 'j.id::varchar(30) = rwt_kursus."JENIS_KURSUS"', 'left');
 		$this->db->order_by("TANGGAL_KURSUS","ASC");
 		return parent::find_all();
@@ -89,7 +90,7 @@ class Riwayat_kursus_model extends BF_Model
 			$this->select($this->table_name .'.ID,
 			TRIM("PNS_NIP") PNS_ID,
 			TRIM("PNS_NIP") pns_nip,
-			TRIM("TIPE_KURSUS") TIPE_KURSUS,
+			jd.jenis_diklat TIPE_KURSUS,
 			TRIM(j.nama) JENIS_KURSUS,
 			TRIM("NAMA_KURSUS") LAMA_KURSUS,
 			"LAMA_KURSUS" lama_kursus,
@@ -100,6 +101,7 @@ class Riwayat_kursus_model extends BF_Model
 				');
 		}
 		$this->db->join('hris.jenis_kursus j', 'j.id::varchar(30) = rwt_kursus."JENIS_KURSUS"', 'left');
+		$this->db->join('hris.jenis_diklat jd', 'jd.id = rwt_kursus."TIPE_KURSUS"', 'left');
 		if($PNS_ID!=""){
 			$this->db->where('PNS_ID',$PNS_ID);
 		}
@@ -116,5 +118,25 @@ class Riwayat_kursus_model extends BF_Model
 			$this->db->where('PNS_ID',$PNS_ID);
 		}
 		return parent::count_all();
+	}
+	public function getUnsyncBkn($id = null)
+	{
+		$this->db->select('k.*, p.pengelola_sdm_kawasan_id')->from('hris.vw_kursus k');
+		$this->db->join('hris.pegawai p','p.NIP_BARU = k.nip','INNER');
+		$this->db->where('coalesce(sync_bkn,0)',0);
+		if ($id){
+			$this->db->where('k.ID', $id);
+		}
+		return $this->db->get()->result();
+	}
+
+	public function countUnsyncBkn($id = null)
+	{
+		$this->db->select('k.ID')->from('hris.vw_kursus k');
+		$this->db->join('hris.pegawai p','p.NIP_BARU = k.nip','INNER');
+		if ($id){
+			$this->db->where('k.ID', $id);
+		}
+		return $this->db->where('coalesce(k.sync_bkn,0)',0)->get()->num_rows();
 	}
 }

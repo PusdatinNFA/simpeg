@@ -105,4 +105,22 @@ class Riwayat_huk_dis_model extends BF_Model
 		}
 		return parent::count_all();
 	}
+
+	public function getUnsyncBkn($id_table = null)
+	{
+		if ($id_table){
+			$this->db->where('id_tabel', $id_table);
+		}
+		$result = $this->db->from('hris.vw_hukdis')->get()->result();
+		return $result;
+	}
+	public function countUnsyncBkn($id_table = null)
+	{
+		if ($id_table){
+			$this->db->where('id_tabel', $id_table);
+		}
+		$this->db->select('id_tabel');
+		$result = $this->db->from('hris.vw_hukdis')->get()->num_rows();
+		return $result;
+	}
 }

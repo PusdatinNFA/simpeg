@@ -84,4 +84,22 @@ class Diklat_struktural_model extends BF_Model
 		//$this->db->join('tkpendidikan', 'tkpendidikan.ID = rwt_pendidikan.PENDIDIKAN_ID', 'left');
 		return parent::find_all();
 	}
+	public function getUnsyncBkn($id = null)
+	{
+		$this->db->select('k.*')->from('hris.vw_diklat_struktural k');
+		$this->db->where('coalesce(k.sync_bkn,0)',0);
+		if ($id){
+			$this->db->where('k.ID', $id);
+		}
+		return $this->db->get()->result();
+	}
+
+	public function countUnsyncBkn($id = null)
+	{
+		$this->db->select('k.ID')->from('hris.vw_diklat_struktural k');
+		if ($id){
+			$this->db->where('k.ID', $id);
+		}
+		return $this->db->where('coalesce(k.sync_bkn,0)',0)->get()->num_rows();
+	}
 }
