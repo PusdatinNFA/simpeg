@@ -2345,7 +2345,7 @@ class Bkn extends Admin_Controller
 				$param['statusPenilai'] = $result->PENILAI_PNS == 1 ? "PNS" : "";
 				$param['statusAtasanPenilai'] = $result->ATASAN_PENILAI_PNS == 1 ? "PNS" : "";
 				$param['jenisJabatan'] = $result->JABATAN_TIPE;
-				$param['pnsUserId'] = "A8ACA74839063912E040640A040269BB";
+				$param['pnsUserId'] = "A8ACA7EA0CCB3912E040640A040269BB";
 
 
 				$this->load->library('Api_bkn');
@@ -2498,7 +2498,7 @@ class Bkn extends Admin_Controller
 				$param['id'] = $result->bknId;
 				$param['instansiId'] = $result->instansiId;
 				$param['institusiPenyelenggara'] = $result->institusiPenyelenggara;
-				$param['jenisDiklatId'] = $result->jenisDiklatId;
+				$param['jenisDiklatId'] = strval($result->jenisDiklatId);
 				$param['jenisKursus'] = $result->jenisKursus;
 				$param['jenisKursusSertipikat'] = $result->jenisKursusSertipikat;
 				$param['jumlahJam'] = $result->jumlahJam ? intval($result->jumlahJam) : 0;
@@ -3169,7 +3169,7 @@ class Bkn extends Admin_Controller
 			$param['rwJabatanId'] = $result->rwt_jabatan_id;
 			$param['isAngkaKreditPertama'] = $result->ak_pertama;
 			$param['namaJabatan'] = $result->ak_pertama;
-			$param['pnsUserId'] = "A8ACA74839063912E040640A040269BB";
+			$param['pnsUserId'] = "A8ACA7EA0CCB3912E040640A040269BB";
 			if (is_object($path))
 				$param['path'] =  array($path);
 
