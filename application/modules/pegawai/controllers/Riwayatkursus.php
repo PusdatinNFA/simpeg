@@ -27,6 +27,11 @@ class Riwayatkursus extends Admin_Controller
         $this->load->model('pegawai/Jenis_kursus_model');
         $this->Jenis_kursus_model->where('jenis is null');
         Template::set('jenis', $this->Jenis_kursus_model->find_all());
+        $this->load->model('pegawai/jenis_diklat_model');
+        $this->jenis_diklat_model->where('status',1);
+        $this->jenis_diklat_model->where_not_in('id',[1,2]);
+        $diklats = $this->jenis_diklat_model->find_all();
+        Template::set('jenis_diklat', $diklats);
     }
     public function verifikasi($ID,$read_only = false){
         $data = $this->update_mandiri_model->find($ID);

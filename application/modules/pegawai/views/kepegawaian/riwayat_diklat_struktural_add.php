@@ -79,6 +79,13 @@
                     <span class='help-inline'><?php echo form_error('NOMOR'); ?></span>
                 </div>
             </div>
+            <div class="control-group<?php echo form_error('INSTITUSI_PENYELENGGARA') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label("INSTITUSI PENYELENGGARA", 'INSTITUSI PENYELENGGARA', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <input id='INSTITUSI_PENYELENGGARA' type='text' class="form-control" name='INSTITUSI_PENYELENGGARA' maxlength='255' value="<?php echo set_value('INSTITUSI_PENYELENGGARA', isset($detail_riwayat->INSTITUSI_PENYELENGGARA) ? $detail_riwayat->INSTITUSI_PENYELENGGARA : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('INSTITUSI_PENYELENGGARA'); ?></span>
+                </div>
+            </div>
             <div class="control-group col-sm-8">
                 <label for="inputNAMA" class="control-label">Berkas</label>
                 <div class='controls'>

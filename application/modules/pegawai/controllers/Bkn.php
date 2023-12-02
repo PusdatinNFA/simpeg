@@ -60,6 +60,7 @@ class Bkn extends Admin_Controller
 		$this->load->model('pegawai/riwayat_huk_dis_model');
 		$this->load->model('pegawai/riwayat_kursus_model');
 		$this->load->model('pegawai/riwayat_kinerja_model');
+		$this->load->model('pegawai/diklat_fungsional_model');
 		$this->load->helper('aplikasi');
 		Assets::add_css('flick/jquery-ui-1.8.13.custom.css');
 		Assets::add_js('jquery-ui-1.8.13.min.js');
@@ -2439,7 +2440,87 @@ class Bkn extends Admin_Controller
 		}
 		return $response;
 	}
+	public function uploadRwJabatanMultiple()
+	{
+		$ids = $this->input->post('id_data');
+		if ($this->auth->has_permission('riwayatjabatan.Kepegawaian.UploadBkn')) {
+			$error = array();
+			foreach ($ids as $id) {
+				$result = $this->uploadRwJabatan($id, true);
+				if (!$result['success']) {
+					$error[] = $result;
+				}
+			}
 
+			if (sizeof($error) > 0) {
+				$response['success'] = false;
+				$msg = "";
+				foreach ($error as $er) {
+					$msg .= $er['msg'] . '\\n';
+				}
+				$response['msg'] = $msg;
+			} else {
+				$response['success'] = true;
+				$response['msg'] = "Berhasil upload data ke BKN";
+			}
+			echo json_encode($response);
+		}
+	}
+	public function uploadRwJabatan($id, $is_multiple = false)
+	{
+		$response = array();
+		$response['success'] = false;
+		$response['id'] = $id;
+		$response['msg'] = "";
+		// if ($this->auth->has_permission('Riwayatangkakredit.Kepegawaian.UploadBkn')) {
+		$data = $this->riwayat_jabatan_model->getUnsyncBkn($id);
+		if (sizeof($data) > 0) {
+			$data = $data[0];
+			$this->load->library('Api_bkn');
+			$api_bkn = new Api_bkn;
+			$path = null;
+			if ($data->id_arsip) {
+				$arsip = $this->arsip_digital_model->find($result->id_arsip);
+				$upload_result = $api_bkn->uploadDokumen($arsip->name, 874, $result->bknId,$arsip->NIP);
+				if (isset($upload_result->data)) {
+					$path = $upload_result->data;
+				}
+			}
+			$data->tmtJabatan = convertDate($data->tmtJabatan, 'Y-m-d', 'd-m-Y');
+			$data->tanggalSk = convertDate($data->tanggalSk, 'Y-m-d', 'd-m-Y');
+			$data->tmtPelantikan = $data->tmtPelantikan ?  convertDate($data->tmtPelantikan, 'Y-m-d', 'd-m-Y') : "";
+			if (is_object($path)) {
+				$data->path = array($path);
+			}
+
+			$result = $api_bkn->postData('jabatan', $data);
+			$response['success'] = $result->success;
+			$response['msg'] = $data->skNomor . ' ' . isset($result->message) ? $result->message : "gagal";
+			if ($result->success) {
+				$data_update = array(
+					'sync_bkn' => 1,
+					'ID_BKN' => $result->mapData->rwJabatanId
+				);
+				$this->riwayat_jabatan_model->update($id, $data_update);
+				$response['id'] = $result->mapData->rwJabatanId;
+			} else if ($result->code == 0) {
+				if ($result->message == 'Riwayat Hukdis tidak ditemukan') {
+					$data_update = array(
+						'sync_bkn' => 0,
+						'ID_BKN' => null
+					);
+					$this->riwayat_jabatan_model->update($id, $data_update);
+				}
+			}
+			log_activity($this->auth->user_id(), 'Integrasi data Jabatan ke BKN ' . json_encode($data) . ' response ' . json_encode($result), 'Integrasi');
+		}
+		if ($is_multiple)
+			return $response;
+		else
+			echo json_encode($response);
+		// }
+		return $response;
+	}
 	public function uploadRwKursusMultiple()
 	{
 		$ids = $this->input->post('id_data');
@@ -2480,9 +2561,7 @@ class Bkn extends Admin_Controller
 				$path = null;
 				if ($result->id_arsip) {
 					$arsip = $this->arsip_digital_model->find($result->id_arsip);
-					$aws = new Api_s3_aws;
-					$url = $aws->preSignUrl('simpeg', $arsip->location . $arsip->name);
-					$upload_result = $api_bkn->uploadDokumen($url, 874);
+					$upload_result = $api_bkn->uploadDokumen($arsip->name, 874, $result->bknId,$arsip->NIP);
 					if (isset($upload_result->data)) {
 						$path = $upload_result->data;
 					}
@@ -2501,7 +2580,8 @@ class Bkn extends Admin_Controller
 				$param['tahunKursus'] = intval($result->tahunKursus);
 				$param['tanggalKursus'] = convertDate($result->tanggalKursus, 'Y-m-d', 'd-m-Y'); //reformat d-m-Y
 				$param['tanggalSelesaiKursus'] = convertDate($result->tanggalSelesaiKursus, 'Y-m-d', 'd-m-Y'); //reformat d-m-Y
-				$param['path'] = $path;
+				if (is_object($path))
+					$param['path'] =  array($path);
 
 				$post_result = $api_bkn->postData('kursus', $param);
 				$response['success'] = $post_result->success;
@@ -2942,4 +3022,415 @@ class Bkn extends Admin_Controller
         }
         return $agolongan;        
     }
+    public function uploadRwDiklatFungsionalMultiple()
+	{
+		$ids = $this->input->post('id_data');
+		if ($this->auth->has_permission('DiklatFungsional.Kepegawaian.UploadBkn')) {
+			$error = array();
+			foreach ($ids as $id) {
+				$result = $this->uploadRwDiklatFungsional($id, true);
+				if (!$result['success']) {
+					$error[] = $result;
+				}
+			}
+
+			if (sizeof($error) > 0) {
+				$response['success'] = false;
+				$msg = "";
+				foreach ($error as $er) {
+					$msg .= $er['msg'] . '\\n';
+				}
+				$response['msg'] = $msg;
+			} else {
+				$response['success'] = true;
+				$response['msg'] = "Berhasil upload data ke BKN";
+			}
+			echo json_encode($response);
+		}
+	}
+	public function uploadRwDiklatFungsional($id, $is_multiple = false)
+	{
+		$response = array();
+		$response['success'] = false;
+		$response['id'] = $id;
+		$response['msg'] = "Masih dalam pengembangan";
+		if ($this->auth->has_permission('DiklatFungsional.Kepegawaian.UploadBkn')) {
+			$result = $this->diklat_fungsional_model->getUnsyncBkn($id);
+			if (sizeof($result) > 0) {
+				$result = $result[0];
+				$api_bkn = new Api_bkn;
+				$path = null;
+				if ($result->id_arsip) {
+					$arsip = $this->arsip_digital_model->find($result->id_arsip);
+					$upload_result = $api_bkn->uploadDokumen($arsip->name, 874, $result->bknId,$arsip->NIP);
+					if (isset($upload_result->data)) {
+						$path = $upload_result->data;
+					}
+				}
+				$param['id'] = $result->bknId;
+				$param['instansiId'] = $result->instansiId;
+				$param['institusiPenyelenggara'] = $result->institusiPenyelenggara;
+				$param['jenisDiklatId'] = $result->jenisDiklatId;
+				$param['jenisKursus'] = $result->jenisKursus;
+				$param['jenisKursusSertipikat'] = $result->jenisKursusSertipikat;
+				$param['jumlahJam'] = $result->jumlahJam ? intval($result->jumlahJam) : 0;
+				$param['lokasiId'] = $result->lokasiId;
+				$param['namaKursus'] = $result->namaKursus;
+				$param['nomorSertipikat'] = $result->nomorSertipikat;
+				$param['pnsOrangId'] = $result->pnsOrangId;
+				$param['tahunKursus'] = intval($result->tahunKursus);
+				$param['tanggalKursus'] = convertDate($result->tanggalKursus, 'Y-m-d', 'd-m-Y'); //reformat d-m-Y
+				$param['tanggalSelesaiKursus'] = convertDate($result->tanggalSelesaiKursus, 'Y-m-d', 'd-m-Y'); //reformat d-m-Y
+				if (is_object($path))
+					$param['path'] =  array($path);
+
+				$post_result = $api_bkn->postData('kursus', $param);
+				$response['success'] = $post_result->success;
+				$response['msg'] = $param['nomorSk'] . ' ' . isset($post_result->message) ? $post_result->message : "gagal";
+				if ($post_result->success) {
+					$data_update = array(
+						'sync_bkn' => 1,
+						'bkn_id' => $post_result->mapData->rwKursusId
+					);
+					$this->diklat_fungsional_model->update($result->ID, $data_update);
+					$response['id'] = $post_result->mapData->rwKursusId;
+					log_activity($this->auth->user_id(), 'Integrasi data Diklat Fungsional ke BKN ' . json_encode($param) . ' response ' . json_encode($result), 'Integrasi');
+				}
+			}
+			if ($is_multiple)
+				return $response;
+			else
+				echo json_encode($response);
+		}
+		return $response;
+	}
+	public function uploadRwDiklatStrukturalMultiple()
+	{
+		$ids = $this->input->post('id_data');
+		if ($this->auth->has_permission('DiklatStruktural.Kepegawaian.UploadBkn')) {
+			$error = array();
+			foreach ($ids as $id) {
+				$result = $this->uploadRwDiklatStruktural($id, true);
+				if (!$result['success']) {
+					$error[] = $result;
+				}
+			}
+
+			if (sizeof($error) > 0) {
+				$response['success'] = false;
+				$msg = "";
+				foreach ($error as $er) {
+					$msg .= $er['msg'] . '\\n';
+				}
+				$response['msg'] = $msg;
+			} else {
+				$response['success'] = true;
+				$response['msg'] = "Berhasil upload data ke BKN";
+			}
+			echo json_encode($response);
+		}
+	}
+	public function uploadRwDiklatStruktural($id, $is_multiple = false)
+	{
+		$response = array();
+		$response['success'] = false;
+		$response['id'] = $id;
+		$response['msg'] = "Masih dalam pengembangan";
+		if ($this->auth->has_permission('DiklatStruktural.Kepegawaian.UploadBkn')) {
+			$result = $this->diklat_struktural_model->getUnsyncBkn($id);
+			if (sizeof($result) > 0) {
+				$result = $result[0];
+				$api_bkn = new Api_bkn;
+				$path = null;
+				if ($result->id_arsip) {
+					$arsip = $this->arsip_digital_model->find($result->id_arsip);
+					$upload_result = $api_bkn->uploadDokumen($arsip->name, 874, $result->bknId,$arsip->NIP);
+					if (isset($upload_result->data)) {
+						$path = $upload_result->data;
+					}
+				}
+				$param['id'] = $result->bknId;
+				$param['institusiPenyelenggara'] = $result->institusiPenyelenggara;
+				$param['latihanStrukturalId'] = $result->latihanStrukturalId;
+				$param['jumlahJam'] = $result->jumlahJam ? intval($result->jumlahJam) : 0;
+				$param['nomor'] = $result->nomor;
+				$param['pnsOrangId'] = $result->pnsOrangId;
+				$param['tahun'] = intval($result->tahun);
+				$param['tanggal'] = convertDate($result->tanggal, 'Y-m-d', 'd-m-Y'); //reformat d-m-Y
+				$param['tanggalSelesai'] = convertDate($result->tanggalSelesai, 'Y-m-d', 'd-m-Y'); //reformat d-m-Y
+				if (is_object($path))
+					$param['path'] =  array($path);
+
+				$post_result = $api_bkn->postData('diklat', $param);
+				$response['success'] = $post_result->success;
+				$response['msg'] = $param['nomorSk'] . ' ' . isset($post_result->message) ? $post_result->message : "gagal";
+				if ($post_result->success) {
+					$data_update = array(
+						'sync_bkn' => 1,
+						'bkn_id' => $post_result->mapData->rwDiklatId
+					);
+					$this->diklat_struktural_model->update($result->ID, $data_update);
+					$response['id'] = $post_result->mapData->rwDiklatId;
+					log_activity($this->auth->user_id(), 'Integrasi data Diklat Struktural ke BKN ' . json_encode($param) . ' response ' . json_encode($result), 'Integrasi');
+				}
+			}
+			if ($is_multiple)
+				return $response;
+			else
+				echo json_encode($response);
+		}
+		return $response;
+	}
+	public function uploadRwAngkaKreditMultiple()
+	{
+		$ids = $this->input->post('id_data');
+		if ($this->auth->has_permission('Riwayatangkakredit.Kepegawaian.UploadBkn')) {
+			$error = array();
+			foreach ($ids as $id) {
+				$result = $this->uploadRwAngkaKredit($id, true);
+				if (!$result['success']) {
+					$error[] = $result;
+				}
+			}
+
+			if (sizeof($error) > 0) {
+				$response['success'] = false;
+				$msg = "";
+				foreach ($error as $er) {
+					$msg .= $er['msg'] . '\\n';
+				}
+				$response['msg'] = $msg;
+			} else {
+				$response['success'] = true;
+				$response['msg'] = "Berhasil upload data ke BKN";
+			}
+			echo json_encode($response);
+		}
+	}
+	public function uploadRwAngkaKredit($id, $is_multiple = false)
+	{
+		$response = array();
+		$response['success'] = false;
+		$response['id'] = $id;
+		$response['msg'] = "Masih dalam pengembangan";
+		// if ($this->auth->has_permission('Riwayatangkakredit.Kepegawaian.UploadBkn')) {
+		$result = $this->riwayat_angka_kredit_model->find($id);
+		if ($result) {
+			$this->load->library('Api_bkn');
+			$api_bkn = new Api_bkn;
+			$path = null;
+			if ($result->id_arsip) {
+				$arsip = $this->arsip_digital_model->find($result->id_arsip);
+				$upload_result = $api_bkn->uploadDokumen($arsip->name, 874, $result->bknId,$arsip->NIP);
+				if (isset($upload_result->data)) {
+					$path = $upload_result->data;
+				}
+			}
+			$param['id'] = $result->bkn_id;
+			$param['pnsId'] = $result->pns_id;
+			$param['nomorSk'] = $result->no_sk;
+			$param['tanggalSk'] = convertDate($result->tgl_sk, 'Y-m-d', 'd-m-Y'); //reformat d-m-Y
+			$param['bulanMulaiPenailan'] = $result->bln_mulai;
+			$param['tahunMulaiPenailan'] = $result->thn_mulai;
+			$param['bulanSelesaiPenailan'] = $result->bln_selesai;
+			$param['tahunSelesaiPenailan'] = $result->thn_selesai;
+			$param['kreditUtamaBaru'] = $result->ak_utama_baru;
+			$param['kreditPenunjangBaru'] = $result->ak_penunjang_baru ? $result->ak_penunjang_baru : '0';
+			$param['kreditBaruTotal'] = $result->ak_baru_total;
+			$param['rwJabatanId'] = $result->rwt_jabatan_id;
+			$param['isAngkaKreditPertama'] = $result->ak_pertama;
+			$param['namaJabatan'] = $result->ak_pertama;
+			$param['pnsUserId'] = "A8ACA74839063912E040640A040269BB";
+			if (is_object($path))
+				$param['path'] =  array($path);
+
+			$result = $api_bkn->postData('angkakredit', $param);
+			$response['success'] = $result->success;
+			$response['msg'] = $param['nomorSk'] . ' ' . isset($result->message) ? $result->message : "gagal";
+			if ($result->success) {
+				$data_update = array(
+					'is_sync_bkn' => 1,
+					'bkn_id' => $result->mapData->rwAngkaKreditId
+				);
+				$this->riwayat_angka_kredit_model->update($id, $data_update);
+				$response['id'] = $result->mapData->rwAngkaKreditId;
+			} else if ($result->code == 0) {
+				if ($result->message == 'Riwayat Angka Kredit tidak ditemukan') {
+					$data_update = array(
+						'is_sync_bkn' => 0,
+						'bkn_id' => null
+					);
+					$this->riwayat_angka_kredit_model->update($id, $data_update);
+				}
+			}
+			log_activity($this->auth->user_id(), 'Integrasi data AK ke BKN ' . json_encode($param) . ' response ' . json_encode($result), 'Integrasi');
+		}
+		if ($is_multiple)
+			return $response;
+		else
+			echo json_encode($response);
+		// }
+		return $response;
+	}
+	public function uploadRwPenghargaanMultiple()
+	{
+		$ids = $this->input->post('id_data');
+		if ($this->auth->has_permission('Riwayatpenghargaan.Kepegawaian.UploadBkn')) {
+			$error = array();
+			foreach ($ids as $id) {
+				$result = $this->uploadRwPenghargaan($id, true);
+				if (!$result['success']) {
+					$error[] = $result;
+				}
+			}
+
+			if (sizeof($error) > 0) {
+				$response['success'] = false;
+				$msg = "";
+				foreach ($error as $er) {
+					$msg .= $er['msg'] . '\\n';
+				}
+				$response['msg'] = $msg;
+			} else {
+				$response['success'] = true;
+				$response['msg'] = "Berhasil upload data ke BKN";
+			}
+			echo json_encode($response);
+		}
+	}
+	public function uploadRwPenghargaan($id, $is_multiple = false)
+	{
+		$response = array();
+		$response['success'] = false;
+		$response['id'] = $id;
+		$response['msg'] = "";
+		// if ($this->auth->has_permission('Riwayatangkakredit.Kepegawaian.UploadBkn')) {
+		$data = $this->riwayat_penghargaan_model->getUnsyncBkn($id);
+		if (sizeof($data) > 0) {
+			$data = $data[0];
+			$this->load->library('Api_bkn');
+			$api_bkn = new Api_bkn;
+			$path = null;
+			if ($data->id_arsip) {
+				$arsip = $this->arsip_digital_model->find($result->id_arsip);
+				$upload_result = $api_bkn->uploadDokumen($arsip->name, 874, $result->bknId,$arsip->NIP);
+				if (isset($upload_result->data)) {
+					$path = $upload_result->data;
+				}
+			}
+			$data->skDate = convertDate($data->skDate, 'Y-m-d', 'd-m-Y');
+			if (is_object($path)) {
+				$data->path = array($path);
+			}
+			$data->tahun = intval($data->tahun);
+
+			$result = $api_bkn->postData('penghargaan', $data);
+			$response['success'] = $result->success;
+			$response['msg'] = $data->skNomor . ' ' . isset($result->message) ? $result->message : "gagal";
+			if ($result->success) {
+				$data_update = array(
+					'sync_bkn' => 1,
+					'ID_BKN' => $result->mapData->rwPenghargaanId
+				);
+				$this->riwayat_penghargaan_model->update($id, $data_update);
+				$response['id'] = $result->mapData->rwPenghargaanId;
+			} else if ($result->code == 0) {
+				if ($result->message == 'Riwayat Penghargaan tidak ditemukan') {
+					$data_update = array(
+						'sync_bkn' => 0,
+						'ID_BKN' => null
+					);
+					$this->riwayat_penghargaan_model->update($id, $data_update);
+				}
+			}
+			log_activity($this->auth->user_id(), 'Integrasi data Penghargaan ke BKN ' . json_encode($data) . ' response ' . json_encode($result), 'Integrasi');
+		}
+		if ($is_multiple)
+			return $response;
+		else
+			echo json_encode($response);
+		// }
+		return $response;
+	}
+	public function uploadRwHukdisMultiple()
+	{
+		$ids = $this->input->post('id_data');
+		if ($this->auth->has_permission('Riwayathukdis.Kepegawaian.UploadBkn')) {
+			$error = array();
+			foreach ($ids as $id) {
+				$result = $this->uploadRwHukdis($id, true);
+				if (!$result['success']) {
+					$error[] = $result;
+				}
+			}
+
+			if (sizeof($error) > 0) {
+				$response['success'] = false;
+				$msg = "";
+				foreach ($error as $er) {
+					$msg .= $er['msg'] . '\\n';
+				}
+				$response['msg'] = $msg;
+			} else {
+				$response['success'] = true;
+				$response['msg'] = "Berhasil upload data ke BKN";
+			}
+			echo json_encode($response);
+		}
+	}
+	public function uploadRwHukdis($id, $is_multiple = false)
+	{
+		$response = array();
+		$response['success'] = false;
+		$response['id'] = $id;
+		$response['msg'] = "";
+		// if ($this->auth->has_permission('Riwayatangkakredit.Kepegawaian.UploadBkn')) {
+		$data = $this->riwayat_huk_dis_model->getUnsyncBkn($id);
+		if (sizeof($data) > 0) {
+			$data = $data[0];
+			$this->load->library('Api_bkn');
+			$api_bkn = new Api_bkn;
+			$path = null;
+			if ($data->id_arsip) {
+				$arsip = $this->arsip_digital_model->find($result->id_arsip);
+				$upload_result = $api_bkn->uploadDokumen($arsip->name, 874, $result->bknId,$arsip->NIP);
+				if (isset($upload_result->data)) {
+					$path = $upload_result->data;
+				}
+			}
+			$data->hukumanTanggal = convertDate($data->hukumanTanggal, 'Y-m-d', 'd-m-Y');
+			$data->skTanggal = convertDate($data->skTanggal, 'Y-m-d', 'd-m-Y');
+			$data->skPembatalanTanggal = $data->skPembatalanTanggal ? convertDate($data->skPembatalanTanggal, 'Y-m-d', 'd-m-Y') : "";
+			if (is_object($path)) {
+				$data->path = array($path);
+			}
+
+			$result = $api_bkn->postData('hukdis', $data);
+			$response['success'] = $result->success;
+			$response['msg'] = $data->skNomor . ' ' . isset($result->message) ? $result->message : "gagal";
+			if ($result->success) {
+				$data_update = array(
+					'sync_bkn' => 1,
+					'bkn_id' => $result->mapData
+				);
+				$this->riwayat_huk_dis_model->update($id, $data_update);
+				$response['id'] = $result->mapData;
+			} else if ($result->code == 0) {
+				if ($result->message == 'Riwayat Hukdis tidak ditemukan') {
+					$data_update = array(
+						'sync_bkn' => 0,
+						'bkn_id' => null
+					);
+					$this->riwayat_huk_dis_model->update($id, $data_update);
+				}
+			}
+			log_activity($this->auth->user_id(), 'Integrasi data Hukdis ke BKN ' . json_encode($data) . ' response ' . json_encode($result), 'Integrasi');
+		}
+		if ($is_multiple)
+			return $response;
+		else
+			echo json_encode($response);
+		// }
+		return $response;
+	}
 }

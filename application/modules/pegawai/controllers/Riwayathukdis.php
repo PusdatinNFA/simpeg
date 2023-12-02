@@ -24,9 +24,21 @@ class Riwayathukdis extends Admin_Controller
         $jenis_hukumans = $this->jenis_hukuman_model->find_all();
 		Template::set('jenis_hukumans', $jenis_hukumans);
 		
+        $this->load->model('masters/pp_hukdis_model');
+        $pp_hukdis = $this->pp_hukdis_model->find_all();
+        Template::set('pp_hukdis', $pp_hukdis);
+
         $this->load->model('pegawai/golongan_model');
         $golongans = $this->golongan_model->find_all();
         Template::set('golongans', $golongans);
+
+        $this->load->model('pegawai/kedudukan_hukum_model');
+        $kedudukan_hukum = $this->kedudukan_hukum_model->find_all();
+        Template::set('kedudukan_hukum', $kedudukan_hukum);
+
+        $this->load->model('pegawai/alasan_hukdis_model');
+        $alasan_hukdis = $this->alasan_hukdis_model->find_all();
+        Template::set('alasan_hukdis', $alasan_hukdis);
     }
     public function ajax_list(){
         $this->load->library('convert');
@@ -271,8 +283,11 @@ class Riwayathukdis extends Admin_Controller
         if(empty($data["TANGGAL_AKHIR_HUKUMAN"])){
             unset($data["TANGGAL_AKHIR_HUKUMAN"]);
         }
-        $data["MASA_TAHUN"]     = isset($pegawai_data->MASA_TAHUN) ? $pegawai_data->MASA_TAHUN : null;
-        $data["MASA_BULAN"]     = isset($pegawai_data->MASA_BULAN) ? $pegawai_data->MASA_BULAN : null;
+        if(empty($data["tanggal_penyampaian"])){
+            unset($data["tanggal_penyampaian"]);
+        }
+        // $data["MASA_TAHUN"]     = isset($pegawai_data->MASA_TAHUN) ? $pegawai_data->MASA_TAHUN : null;
+        // $data["MASA_BULAN"]     = isset($pegawai_data->MASA_BULAN) ? $pegawai_data->MASA_BULAN : null;
         if(empty($data["id_arsip"]))
             unset($data['id_arsip']);
         $id_data = $this->input->post("ID");

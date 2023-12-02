@@ -96,4 +96,24 @@ class Diklat_fungsional_model extends BF_Model
 		$this->db->order_by('TAHUN',"ASC");
 		return parent::find_all();
 	}
+	public function getUnsyncBkn($id = null)
+	{
+		$this->db->select('k.*, p.pengelola_sdm_kawasan_id')->from('hris.vw_diklat_fungsional k');
+		$this->db->join('hris.pegawai p','p.NIP_BARU = k.nip','INNER');
+		$this->db->where('coalesce(k.sync_bkn,0)',0);
+		if ($id){
+			$this->db->where('k.ID', $id);
+		}
+		return $this->db->get()->result();
+	}
+
+	public function countUnsyncBkn($id = null)
+	{
+		$this->db->select('k.ID')->from('hris.vw_diklat_fungsional k');
+		$this->db->join('hris.pegawai p','p.NIP_BARU = k.nip','INNER');
+		if ($id){
+			$this->db->where('k.ID', $id);
+		}
+		return $this->db->where('coalesce(k.sync_bkn,0)',0)->get()->num_rows();
+	}
 }

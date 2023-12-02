@@ -4,15 +4,15 @@
 <?php
 $id = isset($detail_riwayat->ID) ? $detail_riwayat->ID : '';
 if ($mandiri) { ?>
-	<div class="callout callout-info">
-		<h4>Perhatian</h4>
-            <ul>
-                <li>Data yang anda masukan tidak otomatis mengubah data simpeg dan akan diverifikasi terlebih dahulu oleh kepegawaian.<br>
-                    Anda dapat mengecek pengajuan perubahan pada menu <b><a href="<?=base_url()?>admin/kepegawaian/pegawai/peremajaan" target="_BLANK">Peremajaan Data</a></b></li>
-                <li>Maksimal ukuran berkas yang diunggah sebesar 2MB.</li>
-            </ul>
-        </div>
-	</div>
+    <div class="callout callout-info">
+        <h4>Perhatian</h4>
+        <ul>
+            <li>Data yang anda masukan tidak otomatis mengubah data simpeg dan akan diverifikasi terlebih dahulu oleh kepegawaian.<br>
+                Anda dapat mengecek pengajuan perubahan pada menu <b><a href="<?= base_url() ?>admin/kepegawaian/pegawai/peremajaan" target="_BLANK">Peremajaan Data</a></b></li>
+            <li>Maksimal ukuran berkas yang diunggah sebesar 2MB.</li>
+        </ul>
+    </div>
+    </div>
 <?php } ?>
 <div class='box box-danger' id="form-riwayat-angka-kredit-add">
     <div class="box-body">
@@ -23,7 +23,7 @@ if ($mandiri) { ?>
             <input type='hidden' class="form-control" name='id' maxlength='32' value="<?php echo set_value('id', isset($detail_riwayat->id) ? trim($detail_riwayat->id) : ''); ?>" />
             <input id='pns_id' type='hidden' class="form-control" name='pns_id' maxlength='32' value="<?php echo set_value('pns_id', isset($PNS_ID) ? trim($PNS_ID) : ''); ?>" />
             <input id='nip' type='hidden' class="form-control" name='nip' maxlength='18' value="<?php echo set_value('nip', isset($PNS_NIP) ? trim($PNS_NIP) : ''); ?>" />
-            
+
             <div class="control-group<?php echo form_error('no_sk') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label("SK NOMOR", 'SK NOMOR', array('class' => 'control-label')); ?>
                 <div class='controls'>
@@ -47,7 +47,7 @@ if ($mandiri) { ?>
                     <div class="input-group-addon">
                         <i class="fa fa-calendar"></i>
                     </div>
-                    <input type='text' class="form-control pull-right datepicker" name='tanggal_awal' value="<?php echo set_value('tanggal_awal', isset($detail_riwayat->bln_mulai) && isset($detail_riwayat->thn_mulai) ? $detail_riwayat->thn_mulai.'-'.$detail_riwayat->bln_mulai : ''); ?>" />
+                    <input type='text' class="form-control pull-right datepicker" name='tanggal_awal' value="<?php echo set_value('tanggal_awal', isset($detail_riwayat->bln_mulai) && isset($detail_riwayat->thn_mulai) ? $detail_riwayat->thn_mulai . '-' . $detail_riwayat->bln_mulai : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('tanggal_awal'); ?></span>
                 </div>
             </div>
@@ -57,7 +57,7 @@ if ($mandiri) { ?>
                     <div class="input-group-addon">
                         <i class="fa fa-calendar"></i>
                     </div>
-                    <input type='text' class="form-control pull-right datepicker" name='tanggal_akhir' value="<?php echo set_value('tanggal_akhir', isset($detail_riwayat->bln_selesai) && isset($detail_riwayat->thn_selesai) ? $detail_riwayat->thn_selesai.'-'.$detail_riwayat->bln_selesai : ''); ?>" />
+                    <input type='text' class="form-control pull-right datepicker" name='tanggal_akhir' value="<?php echo set_value('tanggal_akhir', isset($detail_riwayat->bln_selesai) && isset($detail_riwayat->thn_selesai) ? $detail_riwayat->thn_selesai . '-' . $detail_riwayat->bln_selesai : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('tanggal_akhir'); ?></span>
                 </div>
             </div>
@@ -72,15 +72,19 @@ if ($mandiri) { ?>
                 <?php echo form_label("Riwayat Jabatan", 'rwt_jabatan_id', array('class' => 'control-label')); ?>
                 <div class='controls'>
                     <select class="form-control select2" id="rwt_jabatan_id" name='rwt_jabatan_id'>
-                        <?php if ($detail_riwayat->rwt_jabatan_id){ ?>
-                            <option value="<?=$detail_riwayat->rwt_jabatan_id?>" selected><?=$detail_riwayat->nama_jabatan?></option>
+                        <?php if ($detail_riwayat->rwt_jabatan_id) { ?>
+                            <option value="<?= $detail_riwayat->rwt_jabatan_id ?>" selected><?= $detail_riwayat->nama_jabatan ?></option>
                         <?php } ?>
                     </select>
                     <span class='help-inline'><?php echo form_error('rwt_jabatan_id'); ?></span>
                 </div>
             </div>
-            </fieldset>
-            <fieldset style="margin-top: 20px;">
+            <div class="control-group col-sm-3">
+                <?php echo form_label("", 'rwt_jabatan_id', array('class' => 'control-label')); ?>
+                <a href="#" kode='<?= $PNS_ID ?>' class="btn btn-info btn-sync-jabatan">Sinkron Jabatan BKN</a>
+            </div>
+        </fieldset>
+        <fieldset style="margin-top: 20px;">
             <legend>ANGKA KREDIT LAMA</legend>
             <div class="control-group<?php echo form_error('ak_utama_lama') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label("Angka Kredit Utama", 'ak_utama_lama', array('class' => 'control-label')); ?>
@@ -103,8 +107,8 @@ if ($mandiri) { ?>
                     <span class='help-inline'><?php echo form_error('ak_lama_total'); ?></span>
                 </div>
             </div>
-            </fieldset>
-            <fieldset style="margin-top: 20px;">
+        </fieldset>
+        <fieldset style="margin-top: 20px;">
             <legend>ANGKA KREDIT BARU</legend>
             <div class="control-group<?php echo form_error('ak_utama_baru') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label("Angka Kredit Utama", 'ak_utama_baru', array('class' => 'control-label')); ?>
@@ -127,8 +131,8 @@ if ($mandiri) { ?>
                     <span class='help-inline'><?php echo form_error('ak_baru_total'); ?></span>
                 </div>
             </div>
-            </fieldset>
-            <fieldset style="margin-top: 20px;">
+        </fieldset>
+        <fieldset style="margin-top: 20px;">
             <legend>ANGKA KREDIT AKHIR</legend>
             <div class="control-group<?php echo form_error('total_ak_utama') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label("Angka Kredit Utama", 'total_ak_utama', array('class' => 'control-label')); ?>
@@ -154,92 +158,172 @@ if ($mandiri) { ?>
             <div class="control-group<?php echo form_error('ak_pertama') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label("Angka Kredit Pertama", 'ak_pertama', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                    <input id='ak_baru_total' type='checkbox' name='ak_pertama' value="1" <?php echo isset($detail_riwayat->ak_pertama) && $detail_riwayat->ak_pertama == 1 ? 'checked' : ''; ?> />
+                    <input id='ak_pertama' type='checkbox' name='ak_pertama' value="1" <?php echo isset($detail_riwayat->ak_pertama) && $detail_riwayat->ak_pertama == 1 ? 'checked' : ''; ?> />
                     <span class='help-inline'><?php echo form_error('ak_pertama'); ?></span>
                 </div>
             </div>
-            
-            <?php if ($detail_riwayat->id_bkn){ ?>
-            <div class="control-group col-sm-9">
-                <label for="inputNAMA" class="control-label">ID BKN</label>
+
+            <?php if ($detail_riwayat->id_bkn) { ?>
+                <div class="control-group col-sm-9">
+                    <label for="inputNAMA" class="control-label">ID BKN</label>
+                    <div class='controls'>
+                        <input type='text' class="form-control pull-right" name='id_bkn' readonly value="<?php echo set_value('id_bkn', isset($detail_riwayat->id_bkn) ? $detail_riwayat->id_bkn : ''); ?>" />
+                        <span class='help-inline'><?php echo form_error('id_bknv'); ?></span>
+                    </div>
+                </div>
+            <?php } ?>
+        </fieldset>
+        <fieldset style="margin-top: 20px;">
+            <legend>Rekomendasi</legend>
+
+            <div class="control-group<?php echo form_error('naik_pangkat') ? ' error' : ''; ?> col-sm-6">
+                <?php echo form_label("Dapat dipertimbangkan untuk naik pangkat", 'naik_pangkat', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                    <input type='text' class="form-control pull-right" name='id_bkn' readonly value="<?php echo set_value('id_bkn', isset($detail_riwayat->id_bkn) ? $detail_riwayat->id_bkn : ''); ?>" />
-                    <span class='help-inline'><?php echo form_error('id_bknv'); ?></span>
+                    <input id='naik_pangkat' type='checkbox' name='naik_pangkat' value="1" <?php echo isset($detail_riwayat->naik_pangkat) && $detail_riwayat->naik_pangkat == 1 ? 'checked' : ''; ?> />
+                    <span class='help-inline'><?php echo form_error('naik_pangkat'); ?></span>
                 </div>
             </div>
-            <?php } ?>
-            </fieldset>
-            
 
-            <fieldset style="margin-top: 20px;">
+
+            <div class="control-group<?php echo form_error('naik_jenjang') ? ' error' : ''; ?> col-sm-6">
+                <?php echo form_label("Dapat dipertimbangkan untuk naik jenjang jabatan", 'naik_pangkat', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <input id='naik_jenjang' type='checkbox' name='naik_jenjang' value="1" <?php echo isset($detail_riwayat->naik_jenjang) && $detail_riwayat->naik_jenjang == 1 ? 'checked' : ''; ?> />
+                    <span class='help-inline'><?php echo form_error('naik_jenjang'); ?></span>
+                </div>
+            </div>
+            <div class="control-group<?php echo form_error('rekomendasi') ? ' error' : ''; ?> col-sm-12">
+                <?php echo form_label("Detail Rekomendasi", 'rekomendasi', array('class' => 'control-label')); ?>
+                <div class='controls'>
+                    <textarea id='rekomendasi' class="form-control" name='rekomendasi'><?php echo set_value('rekomendasi', isset($detail_riwayat->rekomendasi) ? trim($detail_riwayat->rekomendasi) : ''); ?></textarea>
+                    <span class='help-inline'><?php echo form_error('rekomendasi'); ?></span>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset style="margin-top: 20px;">
             <legend>BERKAS PAK</legend>
             <div class="control-group col-sm-8">
                 <label for="inputNAMA" class="control-label">Berkas</label>
                 <div class='controls'>
                     <div id="form_upload">
-                      <input id="file_dokumen" name="file_dokumen" class="file" type="file" data-show-upload="false" data-preview-file-type="pdf">
+                        <input id="file_dokumen" name="file_dokumen" class="file" type="file" data-show-upload="false" data-preview-file-type="pdf">
                     </div>
-                    
+
                 </div>
-            </div> 
+            </div>
             <div class="control-group col-sm-4">
                 <label for="inputNAMA" class="control-label"><br></label>
                 <div class='controls'>
                     <div class=" btn-group">
-                    <?php if (!$read_only){ ?>
-                        <?php $kode_arsip = uniqid(); ?>
-                        <a href="#" kode='<?=$kode_arsip?>' class="btn btn-sm btn-success btn-daftar-arsip" data-toggle='tooltip' tooltip="Pilih dokumen" title="Pilih dokumen"><span class="fa fa-search"></span> pilih</a>
-                        <a href="#" id='view_<?=$kode_arsip?>' class="btn btn-sm btn-info show-modal hide" data-toggle='tooltip' tooltip="Lihat dokumen baru" title="Lihat dokumen baru"><span class="fa fa-file-o"></span> lihat</a>
-                    <?php } ?>
-                        <input type="text" name='id_arsip' id='<?=$kode_arsip?>' class="hide" value="<?= $detail_riwayat->id_arsip ?>">
+                        <?php if (!$read_only) { ?>
+                            <?php $kode_arsip = uniqid(); ?>
+                            <a href="#" kode='<?= $kode_arsip ?>' class="btn btn-sm btn-success btn-daftar-arsip" data-toggle='tooltip' tooltip="Pilih dokumen" title="Pilih dokumen"><span class="fa fa-search"></span> pilih</a>
+                            <a href="#" id='view_<?= $kode_arsip ?>' class="btn btn-sm btn-info show-modal hide" data-toggle='tooltip' tooltip="Lihat dokumen baru" title="Lihat dokumen baru"><span class="fa fa-file-o"></span> lihat</a>
+                        <?php } ?>
+                        <input type="text" name='id_arsip' id='<?= $kode_arsip ?>' class="hide" value="<?= $detail_riwayat->id_arsip ?>">
                         <?php if (isset($detail_riwayat->id_arsip)) { ?>
                             <a href="<?php echo base_url(); ?>admin/arsip/arsip_digital/viewdoc2/<?php echo $detail_riwayat->id_arsip; ?>" data-toggle='tooltip' class="btn btn-sm btn-warning show-modal" tooltip="Lihat dokumen" title="Lihat dokumen"><span class="fa fa-file-o"></span> Lihat</a>
                         <?php } ?>
                     </div>
                 </div>
             </div>
-            <input type="text" class="hide" name='mandiri' value="<?=$mandiri?$mandiri:''?>">
-            <input type="text" class="hide" name='id_update_mandiri' value="<?=$id_update_mandiri?$id_update_mandiri:''?>">
+            <input type="text" class="hide" name='mandiri' value="<?= $mandiri ? $mandiri : '' ?>">
+            <input type="text" class="hide" name='id_update_mandiri' value="<?= $id_update_mandiri ? $id_update_mandiri : '' ?>">
         </fieldset>
-        <?php if (!$read_only){ ?>
         <div class="box-footer">
-            <div class="messages">
-            </div>
-            <a href="javascript:;" id="btnsave_riwayatangkakredit" class="btn green btn-primary button-submit"> Simpan Data
-                <i class="fa fa-save"></i>
-            </a>
+            <button type="button" class="btn btn-warning pull-left" id="btnclose" data-dismiss="modal">Tutup</button>
+            <?php if (!$read_only) { ?>
+                <div class="messages">
+                </div>
+                <a href="javascript:;" id="btnsave_riwayatangkakredit" class="btn green btn-primary pull-right button-submit"> Simpan Data
+                    <i class="fa fa-save"></i>
+                </a>
+            <?php } ?>
         </div>
-        <?php } ?>
         <?php echo form_close(); ?>
     </div>
     <script src="<?php echo base_url(); ?>themes/admin/plugins/datepicker/bootstrap-datepicker.js"></script>
     <script src="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/themes/explorer/theme.js" type="text/javascript"></script>
     <script src="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/js/fileinput.js" type="text/javascript"></script>
     <script>
+        debugger;
         var form = $("#form-riwayat-angka-kredit-add");
         //Date picker
         $('.datepicker').datepicker({
-        autoclose: true,format: 'yyyy-mm'
-        }).on("input change", function (e) {
+            autoclose: true,
+            format: 'yyyy-mm'
+        }).on("input change", function(e) {
             var date = $(this).datepicker('getDate');
         });
         $('.datepicker2').datepicker({
-        autoclose: true,format: 'yyyy-mm-dd'
-        }).on("input change", function (e) {
+            autoclose: true,
+            format: 'yyyy-mm-dd'
+        }).on("input change", function(e) {
             var date = $(this).datepicker('getDate');
         });
-    </script>
-    <script>
         hitung_ak();
         $("#btnsave_riwayatangkakredit").click(function() {
             $('#btnsave_riwayatangkakredit').text('Sedang Mengirim...');
-            $('#btnsave_riwayatangkakredit').prop('disabled',true);
+            $('#btnsave_riwayatangkakredit').prop('disabled', true);
             submitdatafrmriwayatangkakredit();
             return false;
         });
         $("#frmA").submit(function() {
             submitdatafrmriwayatangkakredit();
             return false;
+        });
+        $('.btn-sync-jabatan').click(function(event) {
+            event.preventDefault()
+            var kode = $(this).attr("kode");
+            swal({
+                    title: "Anda Yakin?",
+                    text: "Lihat data riwayat jabatan berdasarkan data BKN!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonClass: 'btn-success',
+                    confirmButtonText: 'Ya!',
+                    cancelButtonText: "Tidak, Batalkan!",
+                    closeOnConfirm: false,
+                    showLoaderOnConfirm: true,
+                    closeOnCancel: false
+                },
+                function(isConfirm) {
+                    if (isConfirm) {
+                        var post_data = "kode=" + kode;
+                        $.ajax({
+                            url: "<?php echo base_url() ?>pegawai/bkn/viewjabatan",
+                            type: "POST",
+                            data: post_data,
+                            dataType: "json",
+                            timeout: 180000,
+                            success: function(result) {
+                                if (result.success) {
+                                    swal({
+                                        title: "Selamat!",
+                                        text: result.msg,
+                                        type: "success",
+                                        timer: 4000,
+                                        showConfirmButton: true
+                                    }, function() {
+                                        $("#modal-body").html(result.konten);
+                                        $("#myModalLabel").html("Riwayat Jabatan BKN");
+                                        $("#modal-global").modal('show');
+                                    });
+                                } else {
+                                    swal("Perhatian", result.msg, "error");
+                                }
+
+                            },
+                            error: function(error) {
+                                swal("Perhatian", "Ada masalah koneksi", "error");
+                            }
+                        });
+
+                    } else {
+                        swal("Batal", "", "error");
+                    }
+                });
         });
 
         function submitdatafrmriwayatangkakredit() {
@@ -258,10 +342,10 @@ if ($mandiri) { ?>
                         $("#modal-custom-global").trigger("sukses-tambah-riwayat-angka-kredit");
                         $("#modal-custom-global").modal("hide");
                         $("#modal-global").modal("hide");
-                        $('#btnsave_riwayatangkakredit').prop('disabled',false);
+                        $('#btnsave_riwayatangkakredit').prop('disabled', false);
                         $('#btnsave_riwayatangkakredit').text('Kirimkan Data');
                     } else {
-                        $('#btnsave_riwayatangkakredit').prop('disabled',false);
+                        $('#btnsave_riwayatangkakredit').prop('disabled', false);
                         $('#btnsave_riwayatangkakredit').text('Kirimkan Data');
                         $("#form-riwayat-angka-kredit-add .messages").empty().append(data.msg);
                     }
@@ -269,27 +353,28 @@ if ($mandiri) { ?>
             });
             return false;
         }
-        $('#ak_utama_baru').change(function(){
+        $('#ak_utama_baru').change(function() {
             hitung_ak();
         });
-        $('#ak_penunjang_baru').change(function(){
+        $('#ak_penunjang_baru').change(function() {
             hitung_ak();
         });
-        $('#ak_utama_lama').change(function(){
+        $('#ak_utama_lama').change(function() {
             hitung_ak();
         });
-        $('#ak_penunjang_lama').change(function(){
+        $('#ak_penunjang_lama').change(function() {
             hitung_ak();
         });
-        function hitung_ak(){
-            var ak_utama_baru = $('#ak_utama_baru').val()?$('#ak_utama_baru').val():0;
-            var ak_penunjang_baru = $('#ak_penunjang_baru').val()?$('#ak_penunjang_baru').val():0;
-            var ak_utama_lama = $('#ak_utama_lama').val()?$('#ak_utama_lama').val():0;
-            var ak_penunjang_lama = $('#ak_penunjang_lama').val()?$('#ak_penunjang_lama').val():0;
-            var ak_lama = parseFloat(ak_utama_lama)+parseFloat(ak_penunjang_lama);
-            var ak_baru = parseFloat(ak_utama_baru)+parseFloat(ak_penunjang_baru);
-            var ak_utama = parseFloat(ak_utama_lama)+parseFloat(ak_utama_baru);
-            var ak_penunjang = parseFloat(ak_penunjang_lama)+parseFloat(ak_penunjang_baru);
+
+        function hitung_ak() {
+            var ak_utama_baru = $('#ak_utama_baru').val() ? $('#ak_utama_baru').val() : 0;
+            var ak_penunjang_baru = $('#ak_penunjang_baru').val() ? $('#ak_penunjang_baru').val() : 0;
+            var ak_utama_lama = $('#ak_utama_lama').val() ? $('#ak_utama_lama').val() : 0;
+            var ak_penunjang_lama = $('#ak_penunjang_lama').val() ? $('#ak_penunjang_lama').val() : 0;
+            var ak_lama = parseFloat(ak_utama_lama) + parseFloat(ak_penunjang_lama);
+            var ak_baru = parseFloat(ak_utama_baru) + parseFloat(ak_penunjang_baru);
+            var ak_utama = parseFloat(ak_utama_lama) + parseFloat(ak_utama_baru);
+            var ak_penunjang = parseFloat(ak_penunjang_lama) + parseFloat(ak_penunjang_baru);
             var total_ak = ak_utama + ak_penunjang;
             $('#ak_baru_total').val(ak_baru);
             $('#ak_lama_total').val(ak_lama);
@@ -304,12 +389,12 @@ if ($mandiri) { ?>
             minimumInputLength: 0,
             allowClear: true,
             ajax: {
-                url: '<?php echo site_url("pegawai/riwayatjabatan/get_riwayat_sync");?>',
+                url: '<?php echo site_url("pegawai/riwayatjabatan/get_riwayat_sync"); ?>',
                 dataType: 'json',
-                method:'POST',
-                data : {
-						NIP_BARU:'<?php echo $PNS_NIP;?>'
-					},
+                method: 'POST',
+                data: {
+                    NIP_BARU: '<?php echo $PNS_NIP; ?>'
+                },
                 cache: true
             }
         });

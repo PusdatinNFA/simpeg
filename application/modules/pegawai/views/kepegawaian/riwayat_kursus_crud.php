@@ -17,29 +17,32 @@
         </div>
     <?php } ?>
 <div class='box box-warning' id="form-riwayat-kursus-add">
-	<div class="box-body">
+    <div class="box-body">
         <div class="messages">
         </div>
     <?php echo form_open($this->uri->uri_string(), 'id="frmkursus"'); ?>
     <fieldset>
             <input id='ID' type='hidden' class="form-control" name='ID' maxlength='32' value="<?php echo set_value('ID', isset($detail_riwayat->ID) ? trim($detail_riwayat->ID) : ''); ?>" />
             <input id='PNS_ID' type='hidden' class="form-control" name='PNS_ID' maxlength='32' value="<?php echo set_value('PNS_ID', isset($PNS_ID) ? trim($PNS_ID) : ''); ?>" />
-        	<div class="control-group<?php echo form_error('tipe_kursus') ? ' error' : ''; ?> col-sm-12">
+            <div class="control-group<?php echo form_error('tipe_kursus') ? ' error' : ''; ?> col-sm-12">
                 <?php echo form_label('TIPE PELATIHAN', 'Jenis ', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                	<select name="TIPE_KURSUS" id="TIPE_KURSUS" class="form-control">
-						<option value="">-- Silahkan Pilih --</option>
-						<option value="Seminar" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Seminar") ? "selected" : ""; ?> >Seminar/Workshop</option>
-						<option value="Kursus" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Kursus") ? "selected" : ""; ?> >Kursus <i>(Course)</i></option>
-						<option value="Bimtek" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Bimtek") ? "selected" : ""; ?> >Bimtek/Sosialisasi</option>
-						<option value="Coaching" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Coaching") ? "selected" : ""; ?> ><i>Coaching/Mentoring</i></option>
-						<option value="Magang" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Magang") ? "selected" : ""; ?> >Magang/Praktik Kerja <i>(On the Job Training)</i></option>
-						<option value="Postdoc" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Postdoc") ? "selected" : ""; ?> >Pascadoctoral</option>
-						<option value="Periset_Tamu" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Periset_tamu") ? "selected" : ""; ?> >Periset tamu</option>
-						<option value="Riset_Bersama" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Riset_Bersama") ? "selected" : ""; ?> >Riset Bersama</option>
-						<option value="Sertifikat" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Sertifikat") ? "selected" : ""; ?> >Sertifikat</option>
-						<option value="Pelatihan_Lainnya" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Pelatihan_Lainnya") ? "selected" : ""; ?> >Pelatihan Lainnya</option>
-					</select>
+                    <select name="TIPE_KURSUS" id="TIPE_KURSUS" class="form-control">
+                        <option value="">-- Silahkan Pilih --</option>
+                        <!-- <option value="Seminar" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Seminar") ? "selected" : ""; ?> >Seminar/Workshop</option>
+                        <option value="Kursus" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Kursus") ? "selected" : ""; ?> >Kursus <i>(Course)</i></option>
+                        <option value="Bimtek" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Bimtek") ? "selected" : ""; ?> >Bimtek/Sosialisasi</option>
+                        <option value="Coaching" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Coaching") ? "selected" : ""; ?> ><i>Coaching/Mentoring</i></option>
+                        <option value="Magang" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Magang") ? "selected" : ""; ?> >Magang/Praktik Kerja <i>(On the Job Training)</i></option>
+                        <option value="Postdoc" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Postdoc") ? "selected" : ""; ?> >Pascadoctoral</option>
+                        <option value="Periset_Tamu" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Periset_tamu") ? "selected" : ""; ?> >Periset tamu</option>
+                        <option value="Riset_Bersama" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Riset_Bersama") ? "selected" : ""; ?> >Riset Bersama</option>
+                        <option value="Sertifikat" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Sertifikat") ? "selected" : ""; ?> >Sertifikat</option>
+                        <option value="Pelatihan_Lainnya" <?php if(isset($detail_riwayat->TIPE_KURSUS))  echo  (TRIM($detail_riwayat->TIPE_KURSUS)=="Pelatihan_Lainnya") ? "selected" : ""; ?> >Pelatihan Lainnya</option> -->
+                        <?php foreach ($jenis_diklat as $diklat) { ?>
+                        <option value="<?=$diklat->id?>" <?=$detail_riwayat->TIPE_KURSUS==$diklat->id?'selected':''?>><?=$diklat->jenis_diklat?></option>
+                        <?php } ?>
+                    </select>
                     <span class='help-inline'><?php echo form_error('TIPE_KURSUS'); ?></span>
                 </div>
             </div>
@@ -47,11 +50,11 @@
                 <?php echo form_label("JENIS PELATIHAN", 'JENIS_KURSUS', array('class' => 'control-label')); ?>
                 <div class='controls'>
                 <select name="JENIS_KURSUS" id="JENIS_KURSUS" class="form-control select2">
-						<option value="">-- Silahkan Pilih --</option>
+                        <option value="">-- Silahkan Pilih --</option>
                         <?php foreach ($jenis as $record) { ?>                            
-						    <option value="<?=$record->id?>" <?php if(isset($detail_riwayat->JENIS_KURSUS))  echo  (TRIM($detail_riwayat->JENIS_KURSUS)== $record->id ) ? "selected" : ""; ?> ><?=$record->nama?></option>
+                            <option value="<?=$record->id?>" <?php if(isset($detail_riwayat->JENIS_KURSUS))  echo  (TRIM($detail_riwayat->JENIS_KURSUS)== $record->id ) ? "selected" : ""; ?> ><?=$record->nama?></option>
                         <?php } ?>
-					</select>
+                    </select>
                     <span class='help-inline'><?php echo form_error('JENIS_KURSUS'); ?></span>
                 </div>
             </div>
@@ -62,26 +65,26 @@
                     <span class='help-inline'><?php echo form_error('NAMA_KURSUS'); ?></span>
                 </div>
             </div>
-			<div class="control-group col-sm-6">
-				<label for="inputNAMA" class="control-label">TANGGAL MULAI</label>
-				<div class="input-group date">
-				  <div class="input-group-addon">
-					<i class="fa fa-calendar"></i>
-				  </div>
-					<input type='text' class="form-control pull-right datepicker" name='TANGGAL_KURSUS'  value="<?php echo set_value('TANGGAL_KURSUS', isset($detail_riwayat->TANGGAL_KURSUS) ? $detail_riwayat->TANGGAL_KURSUS : ''); ?>" />
-					<span class='help-inline'><?php echo form_error('TANGGAL_KURSUS'); ?></span>
-				</div>
-			</div> 
             <div class="control-group col-sm-6">
-				<label for="inputNAMA" class="control-label">TANGGAL SELESAI</label>
-				<div class="input-group date">
-				  <div class="input-group-addon">
-					<i class="fa fa-calendar"></i>
-				  </div>
-					<input type='text' class="form-control pull-right datepicker" name='TANGGAL_SELESAI'  value="<?php echo set_value('TANGGAL_SELESAI', isset($detail_riwayat->TANGGAL_SELESAI) ? $detail_riwayat->TANGGAL_SELESAI : ''); ?>" />
-					<span class='help-inline'><?php echo form_error('TANGGAL_SELESAI'); ?></span>
-				</div>
-			</div> 
+                <label for="inputNAMA" class="control-label">TANGGAL MULAI</label>
+                <div class="input-group date">
+                  <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                  </div>
+                    <input type='text' class="form-control pull-right datepicker" name='TANGGAL_KURSUS'  value="<?php echo set_value('TANGGAL_KURSUS', isset($detail_riwayat->TANGGAL_KURSUS) ? $detail_riwayat->TANGGAL_KURSUS : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('TANGGAL_KURSUS'); ?></span>
+                </div>
+            </div> 
+            <div class="control-group col-sm-6">
+                <label for="inputNAMA" class="control-label">TANGGAL SELESAI</label>
+                <div class="input-group date">
+                  <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                  </div>
+                    <input type='text' class="form-control pull-right datepicker" name='TANGGAL_SELESAI'  value="<?php echo set_value('TANGGAL_SELESAI', isset($detail_riwayat->TANGGAL_SELESAI) ? $detail_riwayat->TANGGAL_SELESAI : ''); ?>" />
+                    <span class='help-inline'><?php echo form_error('TANGGAL_SELESAI'); ?></span>
+                </div>
+            </div> 
             <div class="control-group<?php echo form_error('LAMA_KURSUS') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label("LAMA (JAM)", 'SK NOMOR', array('class' => 'control-label')); ?>
                 <div class='controls'>
@@ -132,11 +135,11 @@
             <input type="text" class="hide" name='mandiri' value="<?=$mandiri?$mandiri:''?>">
             <input type="text" class="hide" name='id_update_mandiri' value="<?=$id_update_mandiri?$id_update_mandiri:''?>">
         
-			</fieldset>
-			 
+            </fieldset>
+             
         </div>
         <?php if (!$read_only){ ?>
-  		<div class="box-footer">
+        <div class="box-footer">
             <input type='submit' name='save' id="btnsavekursus" class='btn btn-primary' value="Simpan Data" /> 
         </div>
         <?php } ?>
@@ -147,10 +150,11 @@
 <script src="<?php echo base_url(); ?>themes/admin/plugins/bootstrap-fileinput-master/js/fileinput.js" type="text/javascript"></script>
 
 <script>
-	 $(".select2").select2({width: '100%'});
+     $(".select2").select2({width: '100%'});
+     $("#TIPE_KURSUS").select2({width: '100%'});
 </script>
 <script>
- 	 
+     
     var form = $("#form-riwayat-kursus-add");
     //Date picker
     $('.datepicker').datepicker({
@@ -161,34 +165,34 @@
     });
 </script>
 <script>
-	$("#btnsavekursus").click(function(){
-		submitdatakursus();
-		return false; 
-	});	
-	$("#frmA").submit(function(){
-		submitdatakursus();
-		return false; 
-	});	
-	function submitdatakursus(){
-		var the_data = new FormData(document.getElementById("frmkursus"));
-		var json_url = "<?php echo base_url() ?>pegawai/riwayatkursus/save";
-		 $.ajax({    
-		 	type: "POST",
-			url: json_url,
-			data: the_data,
+    $("#btnsavekursus").click(function(){
+        submitdatakursus();
+        return false; 
+    }); 
+    $("#frmA").submit(function(){
+        submitdatakursus();
+        return false; 
+    }); 
+    function submitdatakursus(){
+        var the_data = new FormData(document.getElementById("frmkursus"));
+        var json_url = "<?php echo base_url() ?>pegawai/riwayatkursus/save";
+         $.ajax({    
+            type: "POST",
+            url: json_url,
+            data: the_data,
             dataType: "json",
             processData: false, // tell jQuery not to process the data
             contentType: false, // tell jQuery not to set contentType
-			success: function(data){ 
+            success: function(data){ 
                 if(data.success){
                     swal("Pemberitahuan!", data.msg, "success");
                     $("#modal-custom-global").trigger("sukses-tambah-riwayat-kursus");
-					$("#modal-custom-global").modal("hide");
+                    $("#modal-custom-global").modal("hide");
                 }
                 else {
                     $("#form-riwayat-kursus-add .messages").empty().append(data.msg);
                 }
-			}});
-		return false; 
-	}
+            }});
+        return false; 
+    }
 </script>
