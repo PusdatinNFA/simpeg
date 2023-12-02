@@ -2368,78 +2368,7 @@ class Bkn extends Admin_Controller
 	}
 	//end 
 
-	public function uploadRwAngkaKreditMultiple()
-	{
-		$ids = $this->input->post('id_data');
-		if ($this->auth->has_permission('Riwayatangkakredit.Kepegawaian.UploadBkn')) {
-			$error = array();
-			foreach ($ids as $id) {
-				$result = $this->uploadRwAngkaKredit($id, true);
-				if (!$result['success']) {
-					$error[] = $result;
-				}
-			}
-
-			if (sizeof($error) > 0) {
-				$response['success'] = false;
-				$msg = "";
-				foreach ($error as $er) {
-					$msg .= $er['msg'] . '\\n';
-				}
-				$response['msg'] = $msg;
-			} else {
-				$response['success'] = true;
-				$response['msg'] = "Berhasil upload data ke BKN";
-			}
-			echo json_encode($response);
-		}
-	}
-	public function uploadRwAngkaKredit($id, $is_multiple = false)
-	{
-		$response = array();
-		$response['success'] = false;
-		$response['id'] = $id;
-		$response['msg'] = "Masih dalam pengembangan";
-		if ($this->auth->has_permission('Riwayatangkakredit.Kepegawaian.UploadBkn')) {
-			$result = $this->riwayat_angka_kredit_model->find($id);
-			if ($result) {
-				$param['id'] = $result->bkn_id;
-				$param['pnsId'] = $result->pns_id;
-				$param['nomorSk'] = $result->no_sk;
-				$param['tanggalSk'] = convertDate($result->tgl_sk, 'Y-m-d', 'd-m-Y'); //reformat d-m-Y
-				$param['bulanMulaiPenilaian'] = $result->bln_mulai;
-				$param['tahunMulaiPenilaian'] = $result->thn_mulai;
-				$param['bulanSelesaiPenilaian'] = $result->bln_selesai;
-				$param['tahunSelesaiPenilaian'] = $result->thn_selesai;
-				$param['kreditUtamaBaru'] = $result->ak_utama_baru;
-				$param['kreditPenunjangBaru'] = $result->ak_penunjang_baru;
-				$param['kreditBaruTotal'] = $result->ak_baru_total;
-				$param['rwJabatanId'] = $result->rwt_jabatan_id;
-				$param['isAngkaKreditPertama'] = $result->ak_pertama;
-				$param['namaJabatan'] = $result->ak_pertama;
-				$param['pnsUserId'] = "A8ACA74839063912E040640A040269BB";
-				$this->load->library('Api_bkn');
-				$api_bkn = new Api_bkn;
-				$result = $api_bkn->postData('angkakredit', $param);
-				$response['success'] = $result->success;
-				$response['msg'] = $param['nomorSk'] . ' ' . isset($result->message) ? $result->message : "gagal";
-				if ($result->success) {
-					$data_update = array(
-						'is_sync_bkn' => 1,
-						'bkn_id' => $result->mapData->rwAngkaKreditId
-					);
-					$this->riwayat_angka_kredit_model->update($id, $data_update);
-					$response['id'] = $result->mapData->rwAngkaKreditId;
-				}
-				log_activity($this->auth->user_id(), 'Integrasi data AK ke BKN ' . json_encode($param) . ' response ' . json_encode($result), 'Integrasi');
-			}
-			if ($is_multiple)
-				return $response;
-			else
-				echo json_encode($response);
-		}
-		return $response;
-	}
+	
 	public function uploadRwJabatanMultiple()
 	{
 		$ids = $this->input->post('id_data');
