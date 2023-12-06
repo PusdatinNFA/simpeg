@@ -1978,6 +1978,7 @@ class Pegawai_model extends BF_Model
 		}
 		
 		// $where_clause .= 'AND pegawai."KEDUDUKAN_HUKUM_ID" <> \'99\' and pegawai."KEDUDUKAN_HUKUM_ID" <> \'66\' and pegawai."KEDUDUKAN_HUKUM_ID" <> \'52\' and pegawai."KEDUDUKAN_HUKUM_ID" <> \'20\' and pegawai."KEDUDUKAN_HUKUM_ID" <> \'04\' ';
+		$this->db->where_not_in("pegawai.KEDUDUKAN_HUKUM_ID",$this->STATUS_NON_ACTIVE);
 		$where_clause .= "AND pegawai.\"KEDUDUKAN_HUKUM_ID\" not in ('14','52','66','67','77','78','98','99')";
 		return $this->db->query('
 			select golongan."ID" as "id",golongan."NAMA" as "nama",count(golongan."ID") as total from hris.golongan
@@ -1985,6 +1986,7 @@ class Pegawai_model extends BF_Model
 			inner join hris.pns_aktif pa on pegawai."ID" = pa."ID" 
 			left join vw_unit_list vw on pegawai."UNOR_ID"= vw."ID" ' . $where_clause . '
 			where (status_pegawai != 3 or status_pegawai is null)
+			and pegawai."KEDUDUKAN_HUKUM_ID" not in(\'14\',\'52\',\'66\',\'67\',\'77\',\'78\',\'98\',\'99\')
 			group by golongan."ID",golongan."NAMA"
 			order by golongan."ID" asc
 		')->result('array');
