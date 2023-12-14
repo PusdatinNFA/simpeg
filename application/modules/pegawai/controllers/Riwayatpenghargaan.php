@@ -262,6 +262,7 @@ class Riwayatpenghargaan extends Admin_Controller
         $file_tmp   = "";
         $type       = "";
         $pegawai = $this->pegawai_model->find_by('PNS_ID',$this->input->post('PNS_ID'));
+        $data['PNS_NIP'] = $pegawai->NIP_BARU;
         if (isset($_FILES['file_dokumen']) && $_FILES['file_dokumen']['name']) 
         {
             $errors=array();
