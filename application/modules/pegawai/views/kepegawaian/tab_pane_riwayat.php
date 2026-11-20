@@ -99,6 +99,9 @@ $NIP_BARU = isset($pegawai->NIP_BARU) ? $pegawai->NIP_BARU : '';
         <div class="tab-content">
             <?php 
                 if($this->auth->has_permission("RiwayatKepangkatan.Kepegawaian.View")){
+                    if ($pegawai->status_pegawai == 2)
+                    $this->load->view('kepegawaian/tab_pane_riwayat_kepangkatan_pppk',array('TAB_ID'=>$tab_pane_kepangkatan_id,'NIP_BARU'=>$NIP_BARU));
+                    else
                     $this->load->view('kepegawaian/tab_pane_riwayat_kepangkatan',array('TAB_ID'=>$tab_pane_kepangkatan_id,'NIP_BARU'=>$NIP_BARU));
                 }
                 if($this->auth->has_permission("RiwayatPindahUnitKerja.Kepegawaian.View")){

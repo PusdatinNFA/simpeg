@@ -902,9 +902,12 @@ class Arsip extends Admin_Controller
             if ($this->auth->has_permission("Arsip_digital.Arsip.ViewAll") || $this->auth->username() == $arsip->NIP) {
                 echo '<embed src="'.trim($this->settings_lib->item('site.urluploaded')).$arsip->NIP."/".$arsip->name.'" width="100%" height="1000" alt="pdf">';
             } else {
+		die("Anda tidak memiliki akses");
                 log_activity($this->auth->user_id(), 'Not permit to View Dokumen id : ' . $id . ' - NIP '.$arsip->NIP.' ' . $this->input->ip_address(), 'arsip_digital');
             }
-        }
+        } else {
+	 die("File tidak ditemukan");
+	}
     }
 
     public function ajax_get_berkas_digital_pegawai()

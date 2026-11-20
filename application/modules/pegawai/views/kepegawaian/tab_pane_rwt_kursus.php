@@ -52,7 +52,7 @@
 
 	(function($){
 		var $container = $("#<?php echo $TAB_ID;?>");
-		var grid_daftar = $(".table-datatable",$container).DataTable({
+		$grid_daftar_kursus = $(".table-datatable",$container).DataTable({
 				ordering: false,
 				processing: true,
 				"bFilter": false,
@@ -72,7 +72,7 @@
 		});
 		$container.on('click','.show-modal-custom',function(event){
 			showModalX.call(this,'sukses-tambah-riwayat-kursus',function(){
-				grid_daftar.ajax.reload();
+				$grid_daftar_kursus.ajax.reload();
 			},this);
 			event.preventDefault();
 		});
@@ -96,14 +96,12 @@
 					if (isConfirm) {
 						var post_data = "kode="+kode;
 						$.ajax({
-								url: "<?php echo base_url() ?>pegawai/Riwayatkursus/delete/"+kode,
-								dataType: "html",
-								timeout:180000,
-								success: function (result) {
-									
-									
-									
-									grid_daftar.ajax.reload();
+							url: "<?php echo base_url() ?>pegawai/Riwayatkursus/delete/"+kode,
+							dataType: "html",
+							timeout:180000,
+							success: function (result) {
+								swal("Perhatian", "Data berhasil dihapus", "success");	
+								$grid_daftar_kursus.ajax.reload();
 							},
 							error : function(error) {
 								alert(error);

@@ -41,8 +41,12 @@
                             <select class="form-control select2" name="filter_bulan">
                                 <?php 
                                     $bulans = array(
+                                        '02'=>'Februari',
                                         '04'=>'April',
-                                        '10'=>'Oktober'
+                                        '06'=>'Juni',
+                                        '08'=>'Agustus',
+                                        '10'=>'Oktober',
+                                        '12'=>'Desember'
                                     );
                                     foreach($bulans as  $key=>$value){
                                         $bulan = date('m');

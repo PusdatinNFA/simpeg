@@ -42,7 +42,7 @@ class Pegawai_model extends BF_Model
 		array(
 			'field' => 'PNS_ID',
 			'label' => 'PNS ID',
-			'rules' => 'max_length[32]|required',
+			'rules' => 'max_length[36]|required',
 		),
 		array(
 			'field' => 'NIP_LAMA',
@@ -57,7 +57,7 @@ class Pegawai_model extends BF_Model
 		array(
 			'field' => 'NAMA',
 			'label' => 'lang:pegawai_field_NAMA',
-			'rules' => 'max_length[50]',
+			'rules' => 'max_length[255]',
 		),
 		array(
 			'field' => 'GELAR_DEPAN',
@@ -321,10 +321,13 @@ class Pegawai_model extends BF_Model
 		}
 		$this->db->select('pegawai."ID",pegawai."PNS_ID",pegawai."NIP_BARU",pegawai."NAMA",vw."NAMA_UNOR_FULL",
 			jabatan."NAMA_JABATAN",
-			golongan."NAMA" AS "NAMA_GOLONGAN","NAMA_PANGKAT","NAMA_UNOR_ESELON_4","NAMA_UNOR_ESELON_3",
-			"NAMA_UNOR_ESELON_2","NAMA_UNOR_ESELON_1","KATEGORI_JABATAN","PHOTO",ref,username_intra,pengelola_sdm_kawasan_id', false);
+			case when pegawai.status_pegawai = 2 then golongan_pppk."NAMA" else golongan."NAMA" end  AS "NAMA_GOLONGAN",
+			case when pegawai.status_pegawai = 2 then golongan_pppk."NAMA_PANGKAT" else golongan."NAMA_PANGKAT" end  AS "NAMA_PANGKAT",
+			"NAMA_UNOR_ESELON_4","NAMA_UNOR_ESELON_3",
+			"NAMA_UNOR_ESELON_2","NAMA_UNOR_ESELON_1","KATEGORI_JABATAN","PHOTO",ref,username_intra,pengelola_sdm_kawasan_id, status_pegawai', false);
 		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);
 		$this->db->join('golongan', 'pegawai.GOL_ID = golongan.ID', 'left');
+		$this->db->join('golongan_pppk', 'pegawai.GOL_ID = golongan_pppk.ID', 'left');
 		$this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "LEFT");
 		$this->db->join('jabatan', 'pegawai.JABATAN_INSTANSI_REAL_ID = jabatan.KODE_JABATAN', 'left');
 		if ($strict_in_satker) {
@@ -1403,7 +1406,7 @@ class Pegawai_model extends BF_Model
 			$where_clause = 'AND (vw."ESELON_1" = \'' . $unor_id . '\' OR vw."ESELON_2" = \'' . $unor_id . '\' OR vw."ESELON_3" = \'' . $unor_id . '\' OR vw."ESELON_4" = \'' . $unor_id . '\')';
 		}
 		if (empty($this->selects)) {
-			$this->select('COALESCE("pegawai"."JENIS_KELAMIN", \'\'),sum(case when COALESCE("pegawai"."JENIS_KELAMIN", \'\') <> \'\'  then 1 else 0  end) as jumlah');
+			$this->select('COALESCE("pegawai"."JENIS_KELAMIN", \'\') as "JENIS_KELAMIN" , sum(case when COALESCE("pegawai"."JENIS_KELAMIN", \'\') <> \'\'  then 1 else 0  end) as jumlah');
 		}
 		$this->db->join("pns_aktif pa", "pegawai.ID=pa.ID", "LEFT");
 		$this->db->join("vw_unit_list as vw", "pegawai.\"UNOR_ID\"=vw.\"ID\" $where_clause ", 'left', false);

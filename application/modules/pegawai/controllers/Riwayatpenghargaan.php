@@ -30,52 +30,52 @@ class Riwayatpenghargaan extends Admin_Controller
     }
     public function ajax_list(){
         $draw = $this->input->post('draw');
-		$iSortCol = $this->input->post('iSortCol_1');
-		$sSortCol = $this->input->post('sSortDir_1');
+        $iSortCol = $this->input->post('iSortCol_1');
+        $sSortCol = $this->input->post('sSortDir_1');
         $PNS_ID = $this->input->post('PNS_ID');
-		
-		$length= $this->input->post('length');
-		$start= $this->input->post('start');
+        
+        $length= $this->input->post('length');
+        $start= $this->input->post('start');
 
-		$search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
-		$this->riwayat_penghargaan_model->where("PNS_ID",$PNS_ID);
-		$total= $this->riwayat_penghargaan_model->count_all();;
-		$output=array();
-		$output['draw']=$draw;
+        $search = isset($_REQUEST['search']["value"]) ? $_REQUEST['search']["value"] : "";
+        $this->riwayat_penghargaan_model->where("rwt_penghargaan.PNS_ID",$PNS_ID);
+        $total= $this->riwayat_penghargaan_model->count_all();;
+        $output=array();
+        $output['draw']=$draw;
 
-		
-		$output['recordsTotal']= $output['recordsFiltered']=$total;
-		$output['data']=array();
+        
+        $output['recordsTotal']= $output['recordsFiltered']=$total;
+        $output['data']=array();
 
 
-		/*Jika $search mengandung nilai, berarti user sedang telah 
-		memasukan keyword didalam filed pencarian*/
-		if($search!=""){
-			$this->riwayat_penghargaan_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
-		}
-		$this->riwayat_penghargaan_model->limit($length,$start);
-		/*Urutkan dari alphabet paling terkahir*/
-		$kolom = $iSortCol != "" ? $iSortCol : "NAMA";
-		$sSortCol == "asc" ? "asc" : "desc";
-		$this->riwayat_penghargaan_model->order_by($iSortCol,$sSortCol);
+        /*Jika $search mengandung nilai, berarti user sedang telah 
+        memasukan keyword didalam filed pencarian*/
+        if($search!=""){
+            $this->riwayat_penghargaan_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+        }
+        $this->riwayat_penghargaan_model->limit($length,$start);
+        /*Urutkan dari alphabet paling terkahir*/
+        $kolom = $iSortCol != "" ? $iSortCol : "NAMA";
+        $sSortCol == "asc" ? "asc" : "desc";
+        $this->riwayat_penghargaan_model->order_by($iSortCol,$sSortCol);
         $this->riwayat_penghargaan_model->order_by("SK_TANGGAL","asc");
-        $this->riwayat_penghargaan_model->where("PNS_ID",$PNS_ID);    
-		$records=$this->riwayat_penghargaan_model->find_all();
+        $this->riwayat_penghargaan_model->where("rwt_penghargaan.PNS_ID",$PNS_ID);    
+        $records=$this->riwayat_penghargaan_model->find_all();
 
-		/*Ketika dalam mode pencarian, berarti kita harus
-		'recordsTotal' dan 'recordsFiltered' sesuai dengan jumlah baris
-		yang mengandung keyword tertentu
-		*/
-		if($search != "")
-		{
-			$this->riwayat_penghargaan_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
-			$jum	= $this->riwayat_penghargaan_model->count_all();
-			$output['recordsTotal']=$output['recordsFiltered']=$jum;
-		}
-		
-		$nomor_urut=$start+1;
-		if(isset($records) && is_array($records) && count($records)):
-			foreach ($records as $record) {
+        /*Ketika dalam mode pencarian, berarti kita harus
+        'recordsTotal' dan 'recordsFiltered' sesuai dengan jumlah baris
+        yang mengandung keyword tertentu
+        */
+        if($search != "")
+        {
+            $this->riwayat_penghargaan_model->where('upper("NAMA") LIKE \''.strtoupper($search).'%\'');
+            $jum    = $this->riwayat_penghargaan_model->count_all();
+            $output['recordsTotal']=$output['recordsFiltered']=$jum;
+        }
+        
+        $nomor_urut=$start+1;
+        if(isset($records) && is_array($records) && count($records)):
+            foreach ($records as $record) {
                 $row = array();
                 $row []  = $nomor_urut;
                 $row []  = $record->jenis_penghargaan_text;
@@ -102,6 +102,10 @@ class Riwayatpenghargaan extends Admin_Controller
                 // {    
                 //     $btn_actions  [] = "<a href='".base_url()."pegawai/Riwayatpenghargaan/verifikasi/".$PNS_ID."/".$record->ID."' data-toggle='tooltip' title='Verifikasi data' tooltip='Verifikasi data' class='btn btn-sm btn-warning show-modal-custom'><i class='fa fa-edit'></i> </a>";
                 // }
+                if(!$record->sync_bkn && $this->auth->has_permission($this->permissionUploadBkn))
+                {    
+                    $btn_actions  [] = "<a href='#' kode='{$record->ID}' data-toggle='tooltip' title='Upload BKN' tooltip='Sync Bkn' class='btn btn-sm btn-light btn-upload-bkn'><i class='fa fa-upload'></i> </a>";
+                }
                 if($this->auth->has_permission($this->permissionUpdmandiri))
                 {    
                     $btn_actions  [] = "<a href='".base_url()."pegawai/Riwayatpenghargaan/editmandiri/".$PNS_ID."/".$record->ID."' data-toggle='tooltip' title='Ubah data mandiri' tooltip='Ubah data mandiri' class='btn btn-sm btn-warning show-modal-custom'><i class='fa fa-pencil'></i> </a>";
@@ -120,11 +124,11 @@ class Riwayatpenghargaan extends Admin_Controller
                  
 
                 $output['data'][] = $row;
-				$nomor_urut++;
-			}
-		endif;
-		echo json_encode($output);
-		die();
+                $nomor_urut++;
+            }
+        endif;
+        echo json_encode($output);
+        die();
     }
     public function show($PNS_ID,$record_id='',$mandiri = null){
         $penghargaans = $this->jenis_penghargaan_model->find_all();

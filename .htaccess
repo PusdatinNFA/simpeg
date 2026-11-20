@@ -1,7 +1,16 @@
+# Blok akses ke folder .git
+RedirectMatch 404 ^/\.git
+
 IndexIgnore *
 Options -Indexes
 DirectoryIndex index.php
 RewriteEngine on
+
+# Block direct access to all PHP files except index.php in root directory
+RewriteCond %{REQUEST_URI} !^/index\.php$ [NC]
+RewriteRule ^.*\.php$ - [F]
+RewriteRule ^.*\.html$ - [F,L]
+
 RewriteCond %{REQUEST_URI} ^sys.*
 RewriteRule ^(.*)$ /index.php/$1 [L]
 RewriteCond %{REQUEST_URI} ^app.*
@@ -9,5 +18,4 @@ RewriteRule ^(.*)$ /index.php/$1 [L]
 RewriteCond $1 !^(index\.php|images|css|js|styles|robots\.txt|favicon\.ico)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ ./index.php/$1 [L,QSA] 
-
+RewriteRule ^(.*)$ ./index.php/$1 [L,QSA]

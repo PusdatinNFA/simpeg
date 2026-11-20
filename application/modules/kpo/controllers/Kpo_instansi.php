@@ -446,9 +446,6 @@ class Kpo_instansi extends Admin_Controller
             }
         }
         $tanggal        = $filters['filter_tahun']."-".$filters['filter_bulan']."-01";
-        if($this->auth->has_permission($this->permissionFiltersatker)){
-            $this->db->where('unitkerja."UNOR_INDUK"',$this->UNOR_INDUK);
-        }
         $this->db->stop_cache();
         $output         =array();
         $output['draw'] =$draw;
@@ -464,6 +461,10 @@ class Kpo_instansi extends Admin_Controller
         if(isset($records) && is_array($records) && count($records)):
             foreach ($records as $record) {
                 $rec_golongan = $this->golongan_model->getGolongan($record->golongan_id);
+                $maksimal_golongan = $record->golongan_maksimal;
+                $golongan_tujuan = $record->next_gol_id;
+                if((int)$maksimal_golongan < (int)$golongan_tujuan)
+                $keterangan = "<small class='label text-center bg-red'>Maksimal golongan,</small>";
                 $mk_tahun = $record->n_jml_bulan/12;
                 // print_r($record);
                 $btn_actions_array = array();
@@ -484,15 +485,14 @@ class Kpo_instansi extends Admin_Controller
                 else $informasi_hukdis = "-";
                 $row = array();
                 $row []  = $nomor_urut;
-                $row []  = $record->nama_pegawai." <br>".$record->pegawai_nip." <br><i>Pendidikan</i>: ".$record->tingkat_pendidikan;
+                $row []  = $record->nama_pegawai." <br>".$record->pegawai_nip." <br><i>Pendidikan</i>: ".$record->tingkat_pendidikan." <br><i>Jab</i>: ".$record->nama_jabatan." ".$record->jenis_jabatan;
                 $row []  = $rec_golongan->NAMA_PANGKAT." - ".$rec_golongan->NAMA." <br><b><i>Sk Terakhir:</i></b> ".date("d-m-Y", strtotime($record->tmt_sk))." <br><small class='label text-center bg-yellow'>".$record->riwayat."</small>";
-                $row []  = $this->golongan_model->getGolongan($this->golongan_model->getNextGolongan($rec_golongan->ID))->NAMA_PANGKAT." - ".$this->golongan_model->getGolongan($this->golongan_model->getNextGolongan($rec_golongan->ID))->NAMA." <br><b><i>Sk Baru:</i></b> ".date("d-m-Y", strtotime($record->dt_kp_yad))." <br><small class='label text-center bg-yellow'>".$record->riwayat."</small>";
+                $row []  = $record->next_gol_pangkat." - ".$record->next_gol_nama." <br><b><i>Sk Baru:</i></b> ".date("d-m-Y", strtotime($record->dt_kp_yad))." <br><small class='label text-center bg-yellow'>".$record->riwayat."</small>";
                 $row []  = "<b><i>Lama</i></b> ".$record->o_masa_kerja_thn."th ".$record->o_masa_kerja_bln."bln, <br><b><i>Baru </i></b>".($record->n_jml_bulan/12)."th 0bln";
                 $row []  = $record->ABBREVIATION;
-                
-                $row []  = $informasi_hukdis;
+                $row []  = $keterangan.$informasi_hukdis;
                 $btn_actions = array();
-                
+                $btn_actions  [] = "<a href='#' kode='{$record->PNS_ID}' next={$record->next_gol_id} class='btn btn-sm btn-warning btn-sync' data-toggle='tooltip' title='Sync data' tooltip='Sync data' ><i class='fa fa-refresh'></i> </a>";
                 $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref_pegawai."' class='btn btn-sm btn-info'  target='_BLANK'><i class='glyphicon glyphicon-user'></i> </a>"; 
                 $row[] = "<div class='btn-group'>".implode(" ",$btn_actions)."</div>";
 

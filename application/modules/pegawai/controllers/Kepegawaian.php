@@ -67,7 +67,11 @@ class Kepegawaian extends Admin_Controller
 		$this->load->model('pegawai/golongan_model');
         $golongans = $this->golongan_model->find_all();
 		Template::set('golongans', $golongans);
-		
+
+		$this->load->model('pegawai/golongan_pppk_model');
+        $golongans_pppk = $this->golongan_pppk_model->find_all();
+		Template::set('golongans_pppk', $golongans_pppk);	
+	
 		$this->load->model('pegawai/agama_model');
 		
         $agamas = $this->agama_model->find_all();
@@ -417,7 +421,7 @@ class Kepegawaian extends Admin_Controller
 			$_POST['id'] = $id;
 			$extra_unique_rule = ',pegawai.ID';
 		}else{
-			$this->form_validation->set_rules('PNS_ID','KODE','required|max_length[30]|unique[pegawai.PNS_ID' . $extra_unique_rule . ']');
+			$this->form_validation->set_rules('PNS_ID','KODE','required|max_length[36]|unique[pegawai.PNS_ID' . $extra_unique_rule . ']');
 			$this->form_validation->set_rules('username_intra','Username Intra','max_length[8]');
 		}
         //$this->form_validation->set_rules('JENIS_KELAMIN','JENIS_KELAMIN','required|max_length[30]');
@@ -935,10 +939,17 @@ class Kepegawaian extends Admin_Controller
 		// lokasi kerja
 		// cek dari riwayat golongan terakhir
 		// jika golongan riwayat lebih tinggi dengan golongan yang di pegawai maka pakai golongan yang di riwayat
-		$this->load->model('pegawai/riwayat_kepangkatan_model');
-		$this->riwayat_kepangkatan_model->order_by("TMT_GOLONGAN","desc");
-        $this->riwayat_kepangkatan_model->where("PNS_ID",$pegawai->PNS_ID);  
-        $recordrwtpangakats = $this->riwayat_kepangkatan_model->limit(1)->find_all();
+		if ($pegawai->status_pegawai == 2){
+			$this->load->model('pegawai/riwayat_kepangkatan_pppk_model');
+			$this->riwayat_kepangkatan_pppk_model->order_by("TMT_GOLONGAN","desc");
+			$this->riwayat_kepangkatan_pppk_model->where("PNS_ID",$pegawai->PNS_ID);  
+			$recordrwtpangakats = $this->riwayat_kepangkatan_pppk_model->limit(1)->find_all();
+		} else {
+			$this->load->model('pegawai/riwayat_kepangkatan_model');
+			$this->riwayat_kepangkatan_model->order_by("TMT_GOLONGAN","desc");
+        		$this->riwayat_kepangkatan_model->where("PNS_ID",$pegawai->PNS_ID);  
+        		$recordrwtpangakats = $this->riwayat_kepangkatan_model->limit(1)->find_all();
+		}
         $golonganriwayat = isset($recordrwtpangakats[0]->ID_GOLONGAN) ? trim($recordrwtpangakats[0]->ID_GOLONGAN) : "";
         $gol_id = $pegawai->GOL_ID;
         if((int)$golonganriwayat > (int)$pegawai->GOL_ID){
@@ -947,13 +958,27 @@ class Kepegawaian extends Admin_Controller
         // end riwayat golongan terakhir
         
 		
-		$recgolongan = $this->golongan_model->find(trim($gol_id));
-		Template::set('GOLONGAN_AKHIR', $recgolongan->NAMA);
-		
+		if($gol_id != ""){
+			if ($pegawai->status_pegawai == 2){
+				$recgolongan = $this->golongan_pppk_model->find(trim($gol_id));
+			} else {
+				$recgolongan = $this->golongan_model->find(trim($gol_id));
+			}
+			Template::set('GOLONGAN_AKHIR', $recgolongan->NAMA);
+			Template::set('NAMA_PANGKAT', $recgolongan->NAMA_PANGKAT);
+
+			
+		}
 		$gol_awal_id = $pegawai->GOL_AWAL_ID;
-		$recgolongan = $this->golongan_model->find($gol_awal_id);
-		Template::set('GOLONGAN_AWAL', $recgolongan->NAMA);
-		
+		if($gol_awal_id != ""){
+			if ($pegawai->status_pegawai == 2){
+				$recgolongan = $this->golongan_pppk_model->find(trim($gol_awal_id));
+			} else {
+				$recgolongan = $this->golongan_model->find(trim($gol_awal_id));
+			}
+			Template::set('GOLONGAN_AWAL', $recgolongan->NAMA);
+		}
+
 		$jenis_jabatan = $pegawai->JENIS_JABATAN_ID;
 		$recjenis_jabatan = $this->jenis_jabatan_model->find($jenis_jabatan);
 		Template::set('JENIS_JABATAN', $recjenis_jabatan->NAMA);
@@ -1109,14 +1134,23 @@ class Kepegawaian extends Admin_Controller
         }
         // end riwayat golongan terakhir
 		if($gol_id != ""){
-			$recgolongan = $this->golongan_model->find(trim($gol_id));
+			if ($pegawai->status_pegawai == 2){
+				$recgolongan = $this->golongan_pppk_model->find(trim($gol_id));
+			} else {
+				$recgolongan = $this->golongan_model->find(trim($gol_id));
+			}
 			Template::set('GOLONGAN_AKHIR', $recgolongan->NAMA);
 			Template::set('NAMA_PANGKAT', $recgolongan->NAMA_PANGKAT);
+
 			
 		}
 		$gol_awal_id = $pegawai->GOL_AWAL_ID;
 		if($gol_awal_id != ""){
-			$recgolongan = $this->golongan_model->find($gol_awal_id);
+			if ($pegawai->status_pegawai == 2){
+				$recgolongan = $this->golongan_pppk_model->find(trim($gol_awal_id));
+			} else {
+				$recgolongan = $this->golongan_model->find(trim($gol_awal_id));
+			}
 			Template::set('GOLONGAN_AWAL', $recgolongan->NAMA);
 		}
 		// kewasan dan tusi
@@ -1371,6 +1405,27 @@ class Kepegawaian extends Admin_Controller
         Template::set('pegawai', $pegawai);
         Template::set('PNS_ID', $pegawai->PNS_ID);
         Template::set_view('bkn/profile_bkn');
+
+        Template::render();
+    }
+	public function perbandingan($ref)
+    {	
+    	$this->load->model('pegawai/Pns_aktif_model');
+		$lokasis = $this->lokasi_model->find_all();
+
+        $pegawai = $this->pegawai_model->find_by("ref", $ref);
+		$id = isset($pegawai->ID) ? $pegawai->ID : "";
+		$nip_baru = isset($pegawai->NIP_BARU) ? $pegawai->NIP_BARU : "";
+
+        $pegawai = $this->pegawai_model->find_detil($id);
+
+		$data_utama_pegawai = Modules::run('pegawai/Bkn/getdata_utama_bkn', $nip_baru);
+		// $data_utama_pegawai = $this->cache->get('data_utama_'.$nip_baru);
+
+		Template::set('pegawai_bkn', $data_utama_pegawai);
+        Template::set('pegawai', $pegawai);
+        Template::set('lokasis', $lokasis);
+        Template::set_view('bkn/perbandingan_profile');
 
         Template::render();
     }
@@ -1692,7 +1747,7 @@ class Kepegawaian extends Admin_Controller
                 $row []  = "<img src='".$foto_pegawai."' width='90px'>";
                 $row []  = $record->NIP_BARU."<br><i><b>".$record->NAMA."</b></i>";
                 $row []  = $record->NAMA_JABATAN;
-                $row []  = $record->NAMA_PANGKAT."/".$record->NAMA_GOLONGAN;
+                $row []  = $record->status_pegawai == 2 ? $record->NAMA_GOLONGAN : $record->NAMA_PANGKAT."/".$record->NAMA_GOLONGAN;
                 $row []  = reverseUnor($record->NAMA_UNOR_FULL);
                 $btn_actions = array();
                 $btn_actions  [] = "<a href='".base_url()."admin/kepegawaian/pegawai/profilen/".$record->ref."' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-user'></i> </a>";
@@ -2729,8 +2784,8 @@ class Kepegawaian extends Admin_Controller
 		// $this->riwayat_kgb_model->where("pegawai_nip",$pegawai->NIP_BARU);
         $rwt_kgb = $this->riwayat_kgb_model->find_all($pegawai->NIP_BARU);
 
-		$this->riwayat_penghargaan_model->where("PNS_NIP",$pegawai->NIP_BARU); 
-		$this->riwayat_penghargaan_model->or_where("PNS_ID",$pegawai->PNS_ID);
+		$this->riwayat_penghargaan_model->where("rwt_penghargaan.PNS_NIP",$pegawai->NIP_BARU); 
+		$this->riwayat_penghargaan_model->or_where("rwt_penghargaan.PNS_ID",$pegawai->PNS_ID);
 		$rwt_penghargaan =$this->riwayat_penghargaan_model->find_all();
 
 		$this->riwayat_karyatulis_ilmiah_model->where("nip",$pegawai->NIP_BARU); 
@@ -3427,6 +3482,44 @@ class Kepegawaian extends Admin_Controller
         echo json_encode($response);
 		exit();
 	}
+	function save_profile_integrasi(){
+		try {			
+			date_default_timezone_set("Asia/Bangkok");
+			$this->load->helper('aplikasi');
+			if (!$this->input->is_ajax_request()) {
+				die("Only ajax request");
+			}
+			$response = array(
+				'success'=>false,
+				'msg'=>'Unknown error'
+			);
+			// Make sure we only pass in the fields we want
+			$data = $this->pegawai_model->prep_data($this->input->post());
+			
+			$PNS_ID = $this->input->post('PNS_ID');
+			$data_lama = $this->pegawai_model->find_by('PNS_ID',$PNS_ID);
+			$perubahan = array();
+			foreach ($data as $key => $value) {
+				if (empty($value)){
+					$data[$key] = null;
+				}
+			}
+			if ($data_lama){
+				$perubahan = arrDiff($data_lama, $data);
+				// die(json_encode($perubahan));
+				$this->pegawai_model->update($data_lama->ID, $data);	
+				log_activity($this->auth->user_id(),"Perubahan data pegawai : ".$data_lama->NIP_BARU.', data perubahan :'.json_encode($perubahan), 'pegawai');
+				$response = Modules::run('pegawai/Bkn/uploadDataUtama', $data_lama->NIP_BARU);
+				if ($response['success']){
+					return $this->print_success_json('Berhasil');
+				} else {
+					return $this->print_error_json($response['msg']);
+				}
+			}
+		} catch (Exception $e) {
+			return $this->print_error_json($e->getMessage());
+		}
+	}
 	public function save_pegawai()
     {
     	if (!($this->auth->has_permission($this->permissionCreate) 
@@ -3447,9 +3540,9 @@ class Kepegawaian extends Admin_Controller
 			$_POST['id'] = $id_data;
 			$extra_unique_rule = ',pegawai.ID';
 		}else{
-			$this->form_validation->set_rules('PNS_ID','KODE','required|max_length[30]|unique[pegawai.PNS_ID' . $extra_unique_rule . ']');
+			$this->form_validation->set_rules('PNS_ID','KODE','required|max_length[36]|unique[pegawai.PNS_ID' . $extra_unique_rule . ']');
 		}
-        $this->form_validation->set_rules('PNS_ID','PNS ID','required|max_length[32]|unique[pegawai.PNS_ID' . $extra_unique_rule . ']');
+        $this->form_validation->set_rules('PNS_ID','PNS ID','required|max_length[36]|unique[pegawai.PNS_ID' . $extra_unique_rule . ']');
         $response = array(
             'success'=>false,
             'msg'=>'Unknown error'

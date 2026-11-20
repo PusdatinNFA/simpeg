@@ -26,12 +26,13 @@
     <fieldset>
        
             <input id='id' type='hidden' class="form-control" name='id' maxlength='32' value="<?php echo set_value('id', isset($detail_riwayat->id) ? trim($detail_riwayat->id) : ''); ?>" />
-            <input id='PNS_ID' type='hidden' class="form-control" name='PNS_ID' maxlength='32' value="<?php echo set_value('PNS_ID', isset($PNS_ID) ? trim($PNS_ID) : ''); ?>" />
+            <input id='PNS_ID' type='hidden' class="form-control" name='PNS_ID' maxlength='36' value="<?php echo set_value('PNS_ID', isset($PNS_ID) ? trim($PNS_ID) : ''); ?>" />
             <div class="row">   
                 <div class="control-group<?php echo form_error('n_gol_ruang') ? ' error' : ''; ?> col-sm-6">
                     <?php echo form_label("Golongan Ruang", 'Golongan Ruang', array('class' => 'control-label')); ?>
                     <div class='controls'>
                         <select name='n_golongan_id' class='form-control' id="n_golongan_id">
+                            <option value="">-- Pilih Golongan --</option>
                             <?php 
                                 foreach($list_golongan as $row){
                                     $selected = '';
@@ -190,7 +191,38 @@
                         <?php } ?>
                     </div>
                 </div>
+            </div>            
+            <!-- <div class="control-group col-sm-8">
+                <label for="inputNAMA" class="control-label">Berkas Pembatalan</label>
+                <div class='controls'>
+                    <div id="form_upload">
+                      <input id="file_dokumen_pembatalan" name="file_dokumen_pembatalan" class="file" type="file" data-show-upload="false" data-preview-file-type="pdf">
+                    </div>
+                    
+                </div>
+            </div> 
+            <div class="control-group col-sm-4">
+                <label for="inputNAMA" class="control-label"><br></label>
+                <div class='controls'>
+                    <div class=" btn-group">
+                    <?php if (!$read_only){ ?>
+                        <?php $kode_arsip = uniqid(); ?>
+                        <a href="#" kode='<?=$kode_arsip?>' class="btn btn-sm btn-success btn-daftar-arsip" data-toggle='tooltip' tooltip="Pilih dokumen" title="Pilih dokumen"><span class="fa fa-search"></span> pilih</a>
+                        <a href="#" id='view_<?=$kode_arsip?>' class="btn btn-sm btn-info show-modal hide" data-toggle='tooltip' tooltip="Lihat dokumen baru" title="Lihat dokumen baru"><span class="fa fa-file-o"></span> lihat</a>
+                    <?php } ?>
+                        <input type="text" name='id_arsip_pembatalan' id='<?=$kode_arsip?>' class="hide" value="<?= $detail_riwayat->id_arsip_pembatalan ?>">
+                        <?php if (isset($detail_riwayat->id_arsip_perbaikan)) { ?>
+                            <a href="<?php echo base_url(); ?>admin/arsip/arsip_digital/viewdoc2/<?php echo $detail_riwayat->id_arsip_pembatalan; ?>" data-toggle='tooltip' class="btn btn-sm btn-warning show-modal" tooltip="Lihat dokumen" title="Lihat dokumen"><span class="fa fa-file-o"></span> Lihat</a>
+                        <?php } ?>
+                    </div>
+                </div>
             </div>
+            <div class="control-group col-sm-12">
+                <label for="inputNAMA" class="control-label">Alasan Pembatalan</label>
+                <div class='controls'>
+                    <textarea name="alasan_pembatalan" class="form-control"><?=$detail_riwayat->alasan_pembatalan?></textarea>
+                </div>
+            </div> -->
             <input type="text" class="hide" name='mandiri' value="<?=$mandiri?$mandiri:''?>">
             <input type="text" class="hide" name='id_update_mandiri' value="<?=$id_update_mandiri?$id_update_mandiri:''?>">
         
@@ -200,13 +232,19 @@
                 <legend>Status KGB</legend>
                 <div class="callout callout-warning">
                     <h4>Perhatian</h4>
-                    <p>Checklist "Final" jika data yang dimasukan sudah final (akan tampil di profile pegawai). <br>
+                    <p>Pilih <b>Final</b> jika data yang dimasukan sudah final (akan tampil di profile pegawai). <br> Pilih <b>Dibatalkan</b> apabila ada pembatalan KGB. 
                     Jika melampirkan dokumen digital, maka statusnya otomatis final </p>
                 </div>
                 <div class="control-group col-sm-6">
-                    <label for="inputNAMA" class="control-label">Final?</label>
+                    <label for="inputNAMA" class="control-label">Status</label>
                     <div class='controls'>
-                        <input id='final' type='checkbox' name='final' value="1" <?php echo $detail_riwayat->final == "1" ? "checked" : ""; ?> />
+                        <!-- <input id='final' type='checkbox' name='final' value="1" <?php echo $detail_riwayat->final == "1" ? "checked" : ""; ?> /> -->
+                        <select name="final" class="form-control">
+                            <option value="1" <?=$detail_riwayat->final == 1 ? "selected" : ""?>>Final</option>
+                            <option value="2" <?=$detail_riwayat->final == 2 ? "selected" : ""?>>Final (Perubahan)</option>
+                            <option value="0" <?= empty($detail_riwayat->final) ? "selected" : ""?>>Draft</option>
+                            <option value="99" <?= $detail_riwayat->final == 99 ? "selected" : ""?>>Dibatalkan</option>
+                        </select>
                         <span class='help-inline'><?php echo form_error('final'); ?></span>
                     </div>
                 </div>

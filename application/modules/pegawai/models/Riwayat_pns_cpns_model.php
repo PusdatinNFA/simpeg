@@ -83,5 +83,23 @@ class Riwayat_pns_cpns_model extends BF_Model
 		$this->db->distinct();
 		return parent::count_all();
 	}
+	
+	public function getUnsyncBkn($id_table = null)
+	{
+		if ($id_table){
+			$this->db->where('id_tabel', $id_table);
+		}
+		$result = $this->db->from('hris.vw_unsync_pns')->get()->result();
+		return $result;
+	}
+	public function countUnsyncBkn($id_table = null)
+	{
+		if ($id_table){
+			$this->db->where('id_tabel', $id_table);
+		}
+		$this->db->select('id_tabel');
+		$result = $this->db->from('hris.vw_unsync_pns')->get()->num_rows();
+		return $result;
+	}
 	 
 }

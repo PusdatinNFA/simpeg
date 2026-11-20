@@ -42,7 +42,7 @@ class Riwayat_kgb_model extends BF_Model
 		array(
 			'field' => 'PNS_ID',
 			'label' => 'PNS ID',
-			'rules' => 'max_length[32]',
+			'rules' => 'max_length[36]',
 		),
 		array(
 			'field' => 'last_education_date',

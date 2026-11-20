@@ -29,8 +29,8 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
 			 <div class="control-group<?php echo form_error('PNS_ID') ? ' error' : ''; ?> col-sm-12">
                 <?php echo form_label('PNS ID', 'PNS_ID', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                    <input id='ID' type='hidden' class="form-control" name='ID' maxlength='32' value="<?php echo set_value('ID', isset($pegawai->ID) ? $pegawai->ID : ''); ?>" />
-                    <input id='PNS_ID' type='text' class="form-control" name='PNS_ID' maxlength='32' value="<?php echo set_value('PNS_ID', isset($pegawai->PNS_ID) ? $pegawai->PNS_ID : ''); ?>" />
+                    <input id='ID' type='hidden' class="form-control" name='ID' maxlength='36' value="<?php echo set_value('ID', isset($pegawai->ID) ? $pegawai->ID : ''); ?>" />
+                    <input id='PNS_ID' type='text' class="form-control" name='PNS_ID' maxlength='36' value="<?php echo set_value('PNS_ID', isset($pegawai->PNS_ID) ? $pegawai->PNS_ID : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('PNS_ID'); ?></span>
                 </div>
             </div>
@@ -59,7 +59,7 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
             <div class="control-group<?php echo form_error('NAMA') ? ' error' : ''; ?> col-sm-7">
                 <?php echo form_label(lang('pegawai_field_NAMA'), 'NAMA', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                    <input id='NAMA' type='text' class="form-control" name='NAMA' maxlength='50' value="<?php echo set_value('NAMA', isset($pegawai->NAMA) ? $pegawai->NAMA : ''); ?>" />
+                    <input id='NAMA' type='text' class="form-control" name='NAMA' maxlength='255' value="<?php echo set_value('NAMA', isset($pegawai->NAMA) ? $pegawai->NAMA : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('NAMA'); ?></span>
                 </div>
             </div>
@@ -136,21 +136,21 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
             <div class="control-group<?php echo form_error('NIK') ? ' error' : ''; ?> col-sm-6">
                 <?php echo form_label(lang('pegawai_field_NIK'), 'NIK', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                    <input id='NIK' type='text' class="form-control" name='NIK' maxlength='32' value="<?php echo set_value('NIK', isset($pegawai->NIK) ? $pegawai->NIK : ''); ?>" />
+                    <input id='NIK' type='text' class="form-control" name='NIK' maxlength='36' value="<?php echo set_value('NIK', isset($pegawai->NIK) ? $pegawai->NIK : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('NIK'); ?></span>
                 </div>
             </div>
             <div class="control-group<?php echo form_error('no_kk') ? ' error' : ''; ?> col-sm-6">
             <label for="inputNAMA" class="control-label">Nomor KK</label>
                 <div class='controls'>
-                    <input id='no_kk' type='text' class="form-control" name='no_kk' maxlength='32' value="<?php echo set_value('no_kk', isset($pegawai->no_kk) ? $pegawai->no_kk : ''); ?>" />
+                    <input id='no_kk' type='text' class="form-control" name='no_kk' maxlength='36' value="<?php echo set_value('no_kk', isset($pegawai->no_kk) ? $pegawai->no_kk : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('no_kk'); ?></span>
                 </div>
             </div>
             <div class="control-group<?php echo form_error('kode_pos') ? ' error' : ''; ?> col-sm-6">
             <label for="inputNAMA" class="control-label">Kode Pos (Sesuai KK)</label>
                 <div class='controls'>
-                    <input id='kode_pos' type='text' class="form-control" name='kode_pos' maxlength='32' value="<?php echo set_value('kode_pos', isset($pegawai->kode_pos) ? $pegawai->kode_pos : ''); ?>" />
+                    <input id='kode_pos' type='text' class="form-control" name='kode_pos' maxlength='36' value="<?php echo set_value('kode_pos', isset($pegawai->kode_pos) ? $pegawai->kode_pos : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('kode_pos'); ?></span>
                 </div>
             </div>
@@ -431,7 +431,7 @@ $id = isset($pegawai->ID) ? $pegawai->ID : '';
             <div class="control-group col-sm-12" id="form_no_induk_jf">
 				<?php echo form_label("Nomor Induk Jabatan Fungsional", 'no_induk_jf', array('class' => 'control-label')); ?>
                 <div class='controls'>
-                    <input id='no_induk_jf' type='text' class="form-control" name='no_induk_jf' maxlength='32' value="<?php echo set_value('no_induk_jf', isset($pegawai->no_induk_jf) ? $pegawai->no_induk_jf : ''); ?>" />
+                    <input id='no_induk_jf' type='text' class="form-control" name='no_induk_jf' maxlength='36' value="<?php echo set_value('no_induk_jf', isset($pegawai->no_induk_jf) ? $pegawai->no_induk_jf : ''); ?>" />
                     <span class='help-inline'><?php echo form_error('no_induk_jf'); ?></span>
                 </div>
 			</div> 

@@ -115,12 +115,13 @@ class reports extends Admin_Controller
 		$jks = $this->pegawai_model->grupbyjk($this->UNOR_ID);
 		$jsonjk = array();
 		$datajk = array();
+
 		if (isset($jks) && is_array($jks) && count($jks)) :
 			foreach ($jks as $record) :
-				if($record->JENIS_KELAMIN != "")
+				//if($record->JENIS_KELAMIN != "")
 					$datajk["Jenis_Kelamin"] = $record->JENIS_KELAMIN;
-				else
-					$datajk["Jenis_Kelamin"] = "Kosong";
+				//else
+				//	$datajk["Jenis_Kelamin"] = "Kosong";
 				$datajk["jumlah"] = $record->jumlah;
 				$jsonjk[] 	= $datajk;
 			endforeach;

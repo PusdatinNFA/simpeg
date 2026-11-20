@@ -54,7 +54,7 @@
                             <?php echo $row->tmtJabatan ? "<br><b>TMT : </b>".$row->tmtJabatan : ""; ?>
                             <br><b>Selesai : </b><?php echo isset($tmt_selesai_jabatan[$no]) ? $tmt_selesai_jabatan[$no] : null;?>
                           </td>
-                          <td><?php echo $row->tmtPelantikan; ?></td>
+                          <td><?php echo !empty($row->tmtPelantikan) ? $row->tmtPelantikan : "-"; ?></td>
                         </tr>
                         <?php  
                         $no++;

@@ -134,14 +134,17 @@ endif;
                     <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/profilen/<?php echo $pegawai->ref; ?>" class="btn btn-danger btn-block"><i class="fa fa-user"></i> Kembali Ke Profile </a>
                 <?php
                 } ?>
+                <?php if ($this->auth->has_permission('DataUtama.Kepegawaian.UploadBkn')) : ?>
+                <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/perbandingan/<?php echo $pegawai->ref; ?>" class="show-modal btn btn-info btn-perbandingan btn-block" tooltip="Perbandingan Data BKN dan Simpeg"><i class="fa fa-eye"></i> Bandingkan Data </a>    
+                <?php endif; ?>
                 <?php if ($this->auth->has_permission('Pegawai.Downloaddrhsingkat.View')) : ?>
-                  <a href="<?php echo base_url();?>data_nominatif/slks/cetakdrh/<?php echo $pegawai->PNS_ID; ?>" class="btn btn-info btn-block" target="_BLANK"><i class="fa fa-download"></i> Download DRH Singkat</a>
+                  <a href="<?php echo base_url();?>data_nominatif/slks/cetakdrh/<?php echo $pegawai->PNS_ID; ?>" class="btn btn-default btn-block" target="_BLANK"><i class="fa fa-download"></i> Download DRH Singkat</a>
                 <?php endif; ?>
                 <?php if ($this->auth->has_permission('Pegawai.Downloaddrh.View')) : ?>
                 <a href="<?php echo base_url();?>admin/kepegawaian/pegawai/download_drh/<?php echo $pegawai->PNS_ID; ?>" class="btn btn-success btn-block" target="_BLANK"><i class="fa fa-download"></i> Download DRH Lengkap</a>
                 <?php endif; ?>
                 <?php if ($this->auth->has_permission('Pegawai.SinkronBkn.View')){ ?>
-                <button tooltip="Singkron data Pribadi" class="btn btn-success btn-block generatedatabkn" kode="<?=$pegawai->NIP_BARU?>"><i class="fa fa-gear"></i> Sinkron data Pribadi</button>
+                <button tooltip="Singkron data Pribadi" class="btn btn-warning btn-block generatedatabkn" kode="<?=$pegawai->NIP_BARU?>"><i class="fa fa-gear"></i> Sinkron data Pribadi</button>
                 <?php } ?>
                 <br>
                 <?php if ($this->auth->has_permission('Pegawai.Pindahprofile.View')) : ?>

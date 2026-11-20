@@ -60,6 +60,8 @@ class Vw_kpo_model extends BF_Model
 		if(empty($this->selects))
 		{
 			$this->select("distinct on(vw_kpo.pegawai_nip) vw_kpo.pegawai_nip,
+				tmt_cpns,
+				tmt_pns,
 				vw_kpo.id,
 				vw_kpo.ref,
 				dt_kp_yad,
@@ -68,13 +70,20 @@ class Vw_kpo_model extends BF_Model
 				unitkerja.\"ABBREVIATION\",
 				pegawai.\"NAMA\" AS nama_pegawai,
 				vw_kpo.golongan_id,
+				golongan_maksimal,
 				vw_kpo.masa_kerja_thn as o_masa_kerja_thn,
 				vw_kpo.masa_kerja_bln as o_masa_kerja_bln,
 				((vw_kpo.masa_kerja_thn*12)+vw_kpo.masa_kerja_bln) as o_jml_masa_kerja_bln,
 				vw_kpo.tmt_sk,
 				'$tanggal' tgl_estimasi,
+				nama_kawasan,
+				jenis_jabatan,
+				nama_jabatan,
+				tmt_jabatan,
+				pengelola_sdm_kawasan_id,
 				(select count(*) as total from rwt_hukdis where  trim(\"ID_JENIS_HUKUMAN\") = '7' and trim(\"PNS_NIP\") = trim(pegawai.\"NIP_BARU\")
-				) as riwayat_hukdis
+				) as riwayat_hukdis,
+				vw_kpo.next_gol_id,vw_kpo.next_gol_nama,vw_kpo.next_gol_pangkat, pegawai.PNS_ID
 				");
 		}
 		$this->db->join("pegawai", "pegawai.NIP_BARU = vw_kpo.pegawai_nip", "INNER");
@@ -82,6 +91,7 @@ class Vw_kpo_model extends BF_Model
 		$this->db->where_not_in("pegawai.KEDUDUKAN_HUKUM_ID",STATUS_NON_ACTIVE);
 		$this->db->where("vw_kpo.dt_kp_yad <= '".$tanggal."'");
 		$this->db->where("pegawai.\"JENIS_JABATAN_ID\" <> '2'"); //  bukan sebagai JF
+		$this->db->where("vw_kpo.golongan_id != '45'");
 		$this->db->order_by('vw_kpo.pegawai_nip');
 		$this->db->order_by('vw_kpo.tmt_sk',"desc");
 		return parent::find_all();
@@ -97,15 +107,20 @@ class Vw_kpo_model extends BF_Model
 		$this->db->where_not_in("pegawai.KEDUDUKAN_HUKUM_ID",STATUS_NON_ACTIVE);
 		$this->db->where("vw_kpo.dt_kp_yad <= '".$tanggal."'");
 		$this->db->where("pegawai.\"JENIS_JABATAN_ID\" <> '2'");
+		$this->db->where("vw_kpo.golongan_id != '45'");
 		return parent::find_all();
 	}
 	public function getEstimasiKpoJft($tanggal){
 		if(empty($this->selects))
 		{
 			$this->select("distinct on(vw_kpo.pegawai_nip) vw_kpo.pegawai_nip,
+				tmt_cpns,
+				tmt_pns,
 				vw_kpo.id,
 				vw_kpo.ref,
-				dt_kp_yad,
+				case when dt_kp_yad_jf > vw_rwt_ak.tgl_sk then dt_kp_yad_jf 
+					else(date_trunc('month', vw_rwt_ak.tgl_sk) + interval '1 month')::date end 
+				as dt_kp_yad,
 				tingkat_pendidikan,
 				pegawai.ref as ref_pegawai,
 				unitkerja.\"ABBREVIATION\",
@@ -116,15 +131,28 @@ class Vw_kpo_model extends BF_Model
 				((vw_kpo.masa_kerja_thn*12)+vw_kpo.masa_kerja_bln) as o_jml_masa_kerja_bln,
 				vw_kpo.tmt_sk,
 				'$tanggal' tgl_estimasi,
+				nama_kawasan,
+				jenis_jabatan,
+				nama_jabatan,
+				tmt_jabatan,
+				ak_akhir_total,
+				pengelola_sdm_kawasan_id,
 				(select count(*) as total from rwt_hukdis where  trim(\"ID_JENIS_HUKUMAN\") = '7' and trim(\"PNS_NIP\") = trim(pegawai.\"NIP_BARU\")
-				) as riwayat_hukdis
+				) as riwayat_hukdis,
+				vw_kpo.next_gol_id,vw_kpo.next_gol_nama,vw_kpo.next_gol_pangkat, pegawai.PNS_ID
 				");
 		}
 		$this->db->join("pegawai", "pegawai.NIP_BARU = vw_kpo.pegawai_nip", "INNER");
 		$this->db->join("unitkerja", "unitkerja.ID = pegawai.UNOR_ID", "LEFT");
+		$this->db->join("vw_rwt_ak", "vw_rwt_ak.pegawai_nip = pegawai.NIP_BARU", "LEFT");
 		$this->db->where_not_in("pegawai.KEDUDUKAN_HUKUM_ID",STATUS_NON_ACTIVE);
-		$this->db->where("vw_kpo.dt_kp_yad <= '".$tanggal."'");
+		$this->db->where("vw_kpo.dt_kp_yad_jf <= '".$tanggal."'");
+		// tako ubah syarat kp JF TGL SK AK <= TMT terakhir + 2 tahun
+		// $this->db->where("vw_rwt_ak.tgl_sk <= vw_kpo.dt_kp_yad_jf");
+		$this->db->where("vw_rwt_ak.tgl_sk <= '".$tanggal."'");
+		$this->db->where("vw_rwt_ak.tgl_sk >= vw_kpo.tmt_sk");
 		$this->db->where("pegawai.\"JENIS_JABATAN_ID\" = '2'"); //  bukan sebagai JF
+		$this->db->where("vw_kpo.golongan_id != '45'");
 		$this->db->order_by('vw_kpo.pegawai_nip');
 		$this->db->order_by('vw_kpo.tmt_sk',"desc");
 		return parent::find_all();
@@ -137,9 +165,15 @@ class Vw_kpo_model extends BF_Model
 		$this->db->join("pegawai", "pegawai.NIP_BARU = vw_kpo.pegawai_nip", "LEFT");
 		$this->db->join("unitkerja", "unitkerja.ID = pegawai.UNOR_ID", "LEFT");
 		$this->db->join("rwt_kgb r", "r.ref = vw_kpo.ref and '".$tanggal."' = r.tmt_sk", "LEFT");
+		$this->db->join("vw_rwt_ak", "vw_rwt_ak.pegawai_nip = pegawai.NIP_BARU", "LEFT");
 		$this->db->where_not_in("pegawai.KEDUDUKAN_HUKUM_ID",STATUS_NON_ACTIVE);
-		$this->db->where("vw_kpo.dt_kp_yad <= '".$tanggal."'");
-		$this->db->where("pegawai.\"JENIS_JABATAN_ID\" = '2'");
+		$this->db->where("vw_kpo.dt_kp_yad_jf <= '".$tanggal."'");
+		// tako ubah syarat kp JF TGL SK AK <= TMT terakhir + 2 tahun
+		// $this->db->where("vw_rwt_ak.tgl_sk <= vw_kpo.dt_kp_yad_jf");
+		$this->db->where("vw_rwt_ak.tgl_sk <= '".$tanggal."'");
+		$this->db->where("vw_rwt_ak.tgl_sk >= vw_kpo.tmt_sk");
+		$this->db->where("pegawai.\"JENIS_JABATAN_ID\" = '2'"); //  bukan sebagai JF
+		$this->db->where("vw_kpo.golongan_id != '45'");
 		return parent::find_all();
 	}
 	public function getEstimasiKgbDetail($tanggal){

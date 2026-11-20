@@ -42,7 +42,7 @@ class Riwayat_penghargaan_model extends BF_Model
 		array(
 			'field' => 'PNS_ID',
 			'label' => 'PNS ID',
-			'rules' => 'max_length[32]|required',
+			'rules' => 'max_length[36]|required',
 		),
 		array(
 			'field' => 'ID_JENIS_PENGHARGAAN',
@@ -81,12 +81,30 @@ class Riwayat_penghargaan_model extends BF_Model
 	{
 
 		if (empty($this->selects)) {
-			$this->select($this->table_name . '.*,jp.NAMA as jenis_penghargaan_text');
+			$this->select($this->table_name . '.*, p.PNS_ID, p.NAMA, p.ref, jp.NAMA as jenis_penghargaan_text, unit.NAMA_UNOR_FULL, coalesce(pengelola_sdm_kawasan_id,1) kawasan_sdm');
 		}
 		if ($PNS_ID != "") {
 			$this->db->where('PNS_ID', $PNS_ID);
 		}
+		$this->db->join('pegawai as p', 'p.NIP_BARU = rwt_penghargaan.PNS_NIP', 'inner');
 		$this->db->join('jenis_penghargaan as jp', 'jp.ID = rwt_penghargaan.ID_JENIS_PENGHARGAAN', 'left');
+		$this->db->join("hris.vw_unit_list as unit", "p.UNOR_ID=unit.KODE_INTERNAL", 'left');
+		$this->db->order_by("SK_TANGGAL","ASC");
+		return parent::find_all();
+	}
+	public function find_detil($PNS_ID = "")
+	{
+
+		if (empty($this->selects)) {
+			$this->select('p.PNS_ID,PNS_NIP,p.NAMA, ID_JENIS_PENGHARGAAN,jp.NAMA JENIS_PENGHARGAAN, SK_NOMOR,
+            rwt_penghargaan.SK_TANGGAL, TAHUN, INSTITUSI,KETERANGAN, NAMA_UNOR_FULL, pengelola_sdm_kawasan_id KAWASAN_SDM');
+		}
+		if ($PNS_ID != "") {
+			$this->db->where('PNS_ID', $PNS_ID);
+		}
+		$this->db->join('pegawai as p', 'p.NIP_BARU = rwt_penghargaan.PNS_NIP', 'inner');
+		$this->db->join('jenis_penghargaan as jp', 'jp.ID = rwt_penghargaan.ID_JENIS_PENGHARGAAN', 'left');
+		$this->db->join("hris.vw_unit_list as unit", "p.UNOR_ID=unit.KODE_INTERNAL", 'left');
 		$this->db->order_by("SK_TANGGAL","ASC");
 		return parent::find_all();
 	}
@@ -95,13 +113,16 @@ class Riwayat_penghargaan_model extends BF_Model
 	{
 
 		if (empty($this->selects)) {
-			$this->select($this->table_name . '.*,jp.NAMA as jenis_penghargaan_text');
+			$this->select($this->table_name . '.*,p.PNS_ID, jp.NAMA as jenis_penghargaan_text');
 		}
 		if ($PNS_ID != "") {
 			$this->db->where('PNS_ID', $PNS_ID);
 		}
+		$this->db->join('pegawai as p', 'p.NIP_BARU = rwt_penghargaan.PNS_NIP', 'left');
+		$this->db->join("hris.vw_unit_list as unit", "p.UNOR_ID=unit.KODE_INTERNAL", 'left');
 		return parent::count_all();
 	}
+
 	public function getUnsyncBkn($id_table = null)
 	{
 		if ($id_table){
@@ -119,4 +140,5 @@ class Riwayat_penghargaan_model extends BF_Model
 		$result = $this->db->from('hris.vw_penghargaan')->get()->num_rows();
 		return $result;
 	}
+	
 }
